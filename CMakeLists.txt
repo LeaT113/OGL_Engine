@@ -3,7 +3,7 @@ project(OGL_Engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} src/Application.cpp)
+add_executable(${PROJECT_NAME} src/Application.cpp src/Time.hpp src/Time.cpp)
 
 
     # Libraries
