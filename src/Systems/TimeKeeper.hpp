@@ -1,14 +1,14 @@
-#ifndef OGL_ENGINE_TIME_HPP
-#define OGL_ENGINE_TIME_HPP
+#ifndef OGL_ENGINE_TIMEKEEPER_HPP
+#define OGL_ENGINE_TIMEKEEPER_HPP
 #include <chrono>
 
-class Time
+class TimeKeeper
 {
 public:
-	[[nodiscard]] double TimeSinceStartup() const;
-	[[nodiscard]] double DeltaTime() const;
+	double TimeSinceStartup() const;
+	double DeltaTime() const;
 
-	Time();
+	TimeKeeper();
 
 	void Update();
 
@@ -23,4 +23,4 @@ private:
 };
 
 
-#endif //OGL_ENGINE_TIME_HPP
+#endif //OGL_ENGINE_TIMEKEEPER_HPP

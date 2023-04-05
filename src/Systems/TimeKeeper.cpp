@@ -1,21 +1,21 @@
-#include "Time.hpp"
+#include "TimeKeeper.hpp"
 
-Time::Time(): _startupTime(std::chrono::steady_clock::now())
+TimeKeeper::TimeKeeper(): _startupTime(std::chrono::steady_clock::now())
 {
 	Update();
 }
 
-double Time::TimeSinceStartup() const
+double TimeKeeper::TimeSinceStartup() const
 {
 	return _timeSinceStartup;
 }
 
-double Time::DeltaTime() const
+double TimeKeeper::DeltaTime() const
 {
 	return _deltaTime;
 }
 
-void Time::Update()
+void TimeKeeper::Update()
 {
 	TimePoint currentTime = std::chrono::steady_clock::now();
 
