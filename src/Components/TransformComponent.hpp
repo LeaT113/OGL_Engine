@@ -19,10 +19,21 @@ public:
 	const glm::vec3 &Scale() const;
 	glm::vec3 &Scale();
 
+	/// Rotation of <i>angle</i> degrees around <i>axis</i> around the local origin
+	/// \param angle How many degrees to rotate
+	/// \param axis Vector around which to rotate
+	void AngleAxis(float angle, const glm::vec3& axis);
+
+	/// Rotation of <i>angle</i> degrees around <i>axis</i> around <i>point</i>
+	/// \param angle How many degrees to rotate
+	/// \param axis Vector around which to rotate
+	/// \param point Rotation origin
+	void AngleAxisPoint(float angle, const glm::vec3& axis, const glm::vec3& point);
+
 private:
-	glm::vec3 _position{};
-	glm::quat _rotation{};
-	glm::vec3 _scale{};
+	glm::vec3 _position;
+	glm::quat _rotation;
+	glm::vec3 _scale;
 
 	bool _changed = true;
 };
