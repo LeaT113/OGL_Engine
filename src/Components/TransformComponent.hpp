@@ -19,6 +19,10 @@ public:
 	const glm::vec3 &Scale() const;
 	glm::vec3 &Scale();
 
+	const glm::mat4 &ModelToWorld();
+
+	void NotifyParentChanged();
+
 	/// Rotation of <i>angle</i> degrees around <i>axis</i> around the local origin
 	/// \param angle How many degrees to rotate
 	/// \param axis Vector around which to rotate
@@ -34,6 +38,7 @@ private:
 	glm::vec3 _position;
 	glm::quat _rotation;
 	glm::vec3 _scale;
+	glm::mat4 _modelToWorld;
 
 	bool _changed = true;
 };

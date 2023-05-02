@@ -1,5 +1,7 @@
 #include "TransformComponent.hpp"
 #include <functional>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 
 TransformComponent::TransformComponent(): _position(0), _rotation(), _scale(1)
@@ -38,6 +40,23 @@ glm::vec3 &TransformComponent::Scale()
 	return _scale;
 }
 
+const glm::mat4 &TransformComponent::ModelToWorld()
+{
+	if(_changed)
+	{
+		_modelToWorld = glm::translate(_position) * glm::toMat4(_rotation) * glm::scale(_scale);
+		_changed = false;
+	}
+
+	return _modelToWorld;
+}
+
+void TransformComponent::NotifyParentChanged()
+{
+	_changed = true;
+}
+
+
 void TransformComponent::AngleAxis(float angle, const glm::vec3 &axis)
 {
 	_rotation = glm::angleAxis(glm::radians(angle),  glm::normalize(axis)) * _rotation;
@@ -49,3 +68,4 @@ void TransformComponent::AngleAxisPoint(float angle, const glm::vec3 &axis, cons
 	_rotation = rot * _rotation;
 	_position = rot * _position;
 }
+
