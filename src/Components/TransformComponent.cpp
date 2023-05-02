@@ -4,8 +4,10 @@
 #include <glm/gtx/quaternion.hpp>
 
 
-TransformComponent::TransformComponent(): _position(0), _rotation(), _scale(1)
-{}
+TransformComponent::TransformComponent(const Entity* owner): _position(0), _rotation(), _scale(1)
+{
+	_owner = owner;
+}
 
 const glm::vec3 &TransformComponent::Position() const
 {

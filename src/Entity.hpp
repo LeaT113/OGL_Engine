@@ -39,7 +39,7 @@ private:
 template<typename T, typename... Args>
 bool Entity::AddComponent(Args &&... args)
 {
-	auto [it, isNew] = _components.try_emplace(&typeid(T), std::make_unique<T>(std::forward<Args>(args)...));
+	auto [it, isNew] = _components.try_emplace(&typeid(T), std::make_unique<T>(this, std::forward<Args>(args)...));
 
 	return isNew;
 }

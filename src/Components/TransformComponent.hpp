@@ -8,7 +8,7 @@
 class TransformComponent : public Component
 {
 public:
-	TransformComponent();
+	explicit TransformComponent(const Entity* owner);
 
 	const glm::vec3 &Position() const;
 	glm::vec3 &Position();

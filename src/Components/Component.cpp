@@ -5,6 +5,7 @@
 #include "Component.hpp"
 
 
-Component::Component() = default;
+Component::Component(): _owner(nullptr)
+{}
 
 Component::~Component() = default;
