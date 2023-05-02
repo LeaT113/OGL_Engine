@@ -3,7 +3,10 @@ project(OGL_Engine)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} src/Application.cpp src/Time.hpp src/Time.cpp)
+add_executable(${PROJECT_NAME} src/Application.cpp
+        src/Entity.hpp src/Entity.cpp
+        src/Components/Component.hpp src/Components/Component.cpp src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
+        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Input.hpp src/Input.cpp)
 
 
     # Libraries
