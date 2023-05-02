@@ -1,6 +1,7 @@
 {
   "name" : "opengl-engine",
   "version" : "0.0.1",
+  "builtin-baseline": "203383666e2422ed31e1faebe6efa6e306bd126d",
   "dependencies" : [ {
     "name" : "assimp",
     "version>=" : "5.2.5",
