@@ -16,7 +16,7 @@ const glm::vec3 &TransformComponent::Position() const
 
 glm::vec3 &TransformComponent::Position()
 {
-	_changed = true;
+	NotifyChanged();
 	return _position;
 }
 
@@ -27,7 +27,7 @@ const glm::quat &TransformComponent::Rotation() const
 
 glm::quat &TransformComponent::Rotation()
 {
-	_changed = true;
+	NotifyChanged();
 	return _rotation;
 }
 
@@ -38,26 +38,39 @@ const glm::vec3 &TransformComponent::Scale() const
 
 glm::vec3 &TransformComponent::Scale()
 {
-	_changed = true;
+	NotifyChanged();
 	return _scale;
 }
 
 const glm::mat4 &TransformComponent::ModelToWorld()
 {
-	if(_changed)
+	bool valid = _validMatrixBits & 1;
+	if(!valid)
 	{
 		_modelToWorld = glm::translate(_position) * glm::toMat4(_rotation) * glm::scale(_scale);
-		_changed = false;
+		_validMatrixBits |= 1;
 	}
 
 	return _modelToWorld;
 }
 
-void TransformComponent::NotifyParentChanged()
+const glm::mat4 &TransformComponent::WorldToModel()
 {
-	_changed = true;
+	bool valid = _validMatrixBits & 2;
+	if(!valid)
+	{
+		_worldToModel = glm::inverse(ModelToWorld());
+		_validMatrixBits |= 2;
+	}
+
+	return _modelToWorld;
 }
 
+
+void TransformComponent::NotifyChanged()
+{
+	_validMatrixBits = 0;
+}
 
 void TransformComponent::AngleAxis(float angle, const glm::vec3 &axis)
 {
@@ -69,5 +82,20 @@ void TransformComponent::AngleAxisPoint(float angle, const glm::vec3 &axis, cons
 	auto rot = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
 	_rotation = rot * _rotation;
 	_position = rot * _position;
+}
+
+glm::vec3 TransformComponent::Up()
+{
+	return ModelToWorld() * glm::vec4(0, 1, 0, 0);
+}
+
+glm::vec3 TransformComponent::Forward()
+{
+	return ModelToWorld() * glm::vec4(0, 0, -1, 0);
+}
+
+glm::vec3 TransformComponent::Right()
+{
+	return ModelToWorld() * glm::vec4(1, 0, 0, 0);
 }
 
