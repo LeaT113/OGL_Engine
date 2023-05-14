@@ -16,10 +16,10 @@ public:
 
 	// Components
 	template <typename T, typename... Args>
-	bool AddComponent(Args&&... args);
+	Entity& AddComponent(Args&&... args);
 
 	template <typename T>
-	T* GetComponent();
+	T* GetComponent() const;
 
 
 	// Shortcuts
@@ -37,15 +37,18 @@ private:
 
 
 template<typename T, typename... Args>
-bool Entity::AddComponent(Args &&... args)
+Entity& Entity::AddComponent(Args &&... args)
 {
 	auto [it, isNew] = _components.try_emplace(&typeid(T), std::make_unique<T>(this, std::forward<Args>(args)...));
 
-	return isNew;
+	return *this;
 }
 
+/// Get component of type
+/// \tparam T Type of component, must inherit from Component
+/// \return Pointer to component or nullptr if Entity has no component of this type
 template<typename T>
-T* Entity::GetComponent()
+T* Entity::GetComponent() const
 {
 	auto it = _components.find(&typeid(T));
 	if(it == _components.end())
