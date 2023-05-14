@@ -63,7 +63,7 @@ const glm::mat4 &TransformComponent::WorldToModel()
 		_validMatrixBits |= 2;
 	}
 
-	return _modelToWorld;
+	return _worldToModel;
 }
 
 
