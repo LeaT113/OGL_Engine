@@ -7,7 +7,7 @@
 #include "Systems/TimeKeeper.hpp"
 #include "Entity/Entity.hpp"
 #include "Components/CameraComponent.hpp"
-#include <glm/gtx/string_cast.hpp>
+#include "Systems/MeshDatabase.hpp"
 
 
 std::unique_ptr<InputSystem> inputSystem;
@@ -16,18 +16,9 @@ std::unique_ptr<TimeKeeper> timeKeeper;
 
 int main()
 {
-
-	Entity entity;
-	entity
-			.AddComponent<TransformComponent>()
-			.AddComponent<CameraComponent>(ProjectionType::Perspective, 90.0f);
-	auto transform = entity.GetComponent<TransformComponent>();
-	transform->Position() += glm::vec3(1, -2, 3);
-	std::cout << transform->Position().x << ", " << transform->Position().y << ", " << transform->Position().z
-			  << std::endl;
-	auto camera = entity.GetComponent<CameraComponent>();
-	std::cout << glm::to_string(camera->View()) << std::endl;
-
+	Entity camera;
+	camera.AddComponent<TransformComponent>()
+	        .AddComponent<CameraComponent>(ProjectionType::Perspective, 90.0f);
 
 	GLFWwindow *window;
 
@@ -54,14 +45,15 @@ int main()
 
 	// Initialize systems
 	timeKeeper = std::make_unique<TimeKeeper>();
+
 	inputSystem = std::make_unique<InputSystem>();
-
-
-	// Handle input
 	glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
 		inputSystem->OnKeyChanged(key, action);
 	});
 
+	// Test model loading
+	MeshDatabase::LoadMesh("Suzzane.obj");
+	std::cout << MeshDatabase::GetMesh("Suzzane.obj") << std::endl;
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))

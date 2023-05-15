@@ -3,7 +3,7 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <vector>
-#include <GL/glew.h>
+
 
 bool MeshDatabase::AddMesh(const std::string &name, uint32_t vertexCount, const float *vertices, const float *normals,
 						   uint32_t triangleCount, const unsigned int *indices)
@@ -52,7 +52,8 @@ bool MeshDatabase::LoadMesh(const std::string &fileName)
 	// Indices
 	uint32_t triangleCount = mesh->mNumFaces;
 	std::vector<unsigned int> indices(triangleCount * 3);
-	for (size_t i = 0; i < triangleCount; i++) {
+	for (size_t i = 0; i < triangleCount; i++)
+	{
 		indices[i + 0] = mesh->mFaces[i].mIndices[0];
 		indices[i + 1] = mesh->mFaces[i].mIndices[1];
 		indices[i + 2] = mesh->mFaces[i].mIndices[2];
