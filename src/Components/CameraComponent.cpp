@@ -1,5 +1,5 @@
 #include "CameraComponent.hpp"
-#include "../Entity.hpp"
+#include "../Entity/Entity.hpp"
 
 CameraComponent::CameraComponent(const Entity *owner, ProjectionType projectionType, float horizontalFov)
 		: _projectionType(projectionType), _horizontalFov(horizontalFov), _projectionValid(false)

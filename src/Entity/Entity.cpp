@@ -1,5 +1,5 @@
 #include "Entity.hpp"
-#include "Components/TransformComponent.hpp"
+#include "../Components/TransformComponent.hpp"
 
 
 size_t Entity::_sIndexCounter;

@@ -1,10 +1,10 @@
 #include <iostream>
-#include "Input.hpp"
+#include "InputSystem.hpp"
 
 
-Input::Input() = default;
+InputSystem::InputSystem() = default;
 
-void Input::OnKeyChanged(int key, int action)
+void InputSystem::OnKeyChanged(int key, int action)
 {
 	if(key < 0 || key > GLFW_KEY_LAST)
 		return;

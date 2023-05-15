@@ -3,12 +3,14 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <iomanip>
-#include "Input.hpp"
+#include "Systems/InputSystem.hpp"
 #include "Systems/TimeKeeper.hpp"
-#include "Entity.hpp"
+#include "Entity/Entity.hpp"
+#include "Components/CameraComponent.hpp"
+#include <glm/gtx/string_cast.hpp>
 
 
-std::unique_ptr<Input> inputSystem;
+std::unique_ptr<InputSystem> inputSystem;
 std::unique_ptr<TimeKeeper> timeKeeper;
 
 
@@ -16,13 +18,18 @@ int main()
 {
 
 	Entity entity;
-	entity.AddComponent<TransformComponent>();
+	entity
+			.AddComponent<TransformComponent>()
+			.AddComponent<CameraComponent>(ProjectionType::Perspective, 90.0f);
 	auto transform = entity.GetComponent<TransformComponent>();
-	transform->Position() += glm::vec3(1, 2, 3);
-	std::cout << transform->Position().x << ", " << transform->Position().y << ", " << transform->Position().z << std::endl;
+	transform->Position() += glm::vec3(1, -2, 3);
+	std::cout << transform->Position().x << ", " << transform->Position().y << ", " << transform->Position().z
+			  << std::endl;
+	auto camera = entity.GetComponent<CameraComponent>();
+	std::cout << glm::to_string(camera->View()) << std::endl;
 
 
-	GLFWwindow* window;
+	GLFWwindow *window;
 
 	/* Initialize the library */
 	if (!glfwInit())
@@ -40,18 +47,18 @@ int main()
 	glfwMakeContextCurrent(window);
 
 	// Initialize GLEW
-	if(glewInit() != GLEW_OK)
+	if (glewInit() != GLEW_OK)
 		std::cout << "GLEW failed to initialize" << std::endl;
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 
 	// Initialize systems
 	timeKeeper = std::make_unique<TimeKeeper>();
-	inputSystem = std::make_unique<Input>();
+	inputSystem = std::make_unique<InputSystem>();
 
 
 	// Handle input
-	glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods){
+	glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
 		inputSystem->OnKeyChanged(key, action);
 	});
 
@@ -61,7 +68,7 @@ int main()
 	{
 		// Update state
 		timeKeeper->Update();
-		std::cout << std::setprecision(1) << std::fixed << timeKeeper->TimeSinceStartup() << "s | " << timeKeeper->DeltaTime() * 1000 << "ms | " << 1 / timeKeeper->DeltaTime() << "FPS" << std::endl;
+		//std::cout << std::setprecision(1) << std::fixed << timeKeeper->TimeSinceStartup() << "s | " << timeKeeper->DeltaTime() * 1000 << "ms | " << 1 / timeKeeper->DeltaTime() << "FPS" << std::endl;
 
 
 		// Render

@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
-#include "../Singleton.hpp"
+#include "../Common/Singleton.hpp"
 #include "../Data/MeshData.hpp"
 
 class MeshDatabase : public Singleton<MeshDatabase>

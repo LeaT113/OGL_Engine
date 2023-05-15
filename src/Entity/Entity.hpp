@@ -2,8 +2,8 @@
 #define OGL_ENGINE_ENTITY_HPP
 #include <memory>
 #include <map>
-#include "Components/Component.hpp"
-#include "Components/TransformComponent.hpp"
+#include "../Components/Component.hpp"
+#include "../Components/TransformComponent.hpp"
 
 
 class Entity

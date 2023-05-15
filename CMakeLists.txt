@@ -4,14 +4,16 @@ project(OGL_Engine)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(${PROJECT_NAME} src/Application.cpp
-        src/Entity.hpp src/Entity.cpp
+        src/Common/Singleton.hpp
 
         src/Components/Component.hpp src/Components/Component.cpp src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
         src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
 
-        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Input.hpp src/Input.cpp src/Systems/MeshDatabase.hpp src/Systems/MeshDatabase.cpp
+        src/Data/MeshData.hpp src/Data/MeshData.cpp
 
-        src/Data/MeshData.hpp src/Data/MeshData.cpp)
+        src/Entity/Entity.hpp src/Entity/Entity.cpp
+
+        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Systems/InputSystem.hpp src/Systems/InputSystem.cpp src/Systems/MeshDatabase.hpp src/Systems/MeshDatabase.cpp)
 
 # Libraries
 find_package(OpenGL REQUIRED)
