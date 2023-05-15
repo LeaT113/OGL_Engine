@@ -5,12 +5,15 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(${PROJECT_NAME} src/Application.cpp
         src/Entity.hpp src/Entity.cpp
+
         src/Components/Component.hpp src/Components/Component.cpp src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
-        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Input.hpp src/Input.cpp)
+        src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
 
+        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Input.hpp src/Input.cpp src/Systems/MeshDatabase.hpp src/Systems/MeshDatabase.cpp
 
-    # Libraries
-# OpenGL libraries
+        src/Data/MeshData.hpp src/Data/MeshData.cpp)
+
+# Libraries
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::GL)
 
@@ -25,3 +28,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
 find_package(assimp CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE assimp::assimp)
+
+# Resources
+set(source_dir "${CMAKE_SOURCE_DIR}/res")
+set(destination_dir "${CMAKE_BINARY_DIR}")
+
+file(COPY ${source_dir} DESTINATION ${destination_dir})
