@@ -7,7 +7,7 @@
 #include "Systems/TimeKeeper.hpp"
 #include "Entity/Entity.hpp"
 #include "Components/CameraComponent.hpp"
-#include "Systems/MeshDatabase.hpp"
+#include "Systems/ResourceDatabase.hpp"
 
 
 std::unique_ptr<InputSystem> inputSystem;
@@ -52,8 +52,9 @@ int main()
 	});
 
 	// Test model loading
-	MeshDatabase::LoadMesh("Suzzane.obj");
-	std::cout << MeshDatabase::GetMesh("Suzzane.obj") << std::endl;
+	ResourceDatabase::LoadMesh("Suzzane.obj");
+	std::cout << ResourceDatabase::GetMesh("Suzzane.obj") << std::endl;
+	ResourceDatabase::LoadShader("PhongShader.glsl");
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
