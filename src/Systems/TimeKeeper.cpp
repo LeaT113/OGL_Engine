@@ -1,3 +1,5 @@
+#include <iostream>
+#include <iomanip>
 #include "TimeKeeper.hpp"
 
 TimeKeeper::TimeKeeper(): _startupTime(std::chrono::steady_clock::now())
@@ -24,6 +26,13 @@ void TimeKeeper::Update()
 	_deltaTime = std::chrono::duration<double>(currentTime - _lastUpdateTime).count();
 
 	_lastUpdateTime = currentTime;
+
+	std::cout << std::setprecision(1) << std::fixed << TimeSinceStartup() << "s | " << DeltaTime() * 1000 << "ms | " << 1 / DeltaTime() << "FPS" << std::endl;
+}
+
+void TimeKeeper::EnableLogging(bool enable)
+{
+	_logging = enable;
 }
 
 

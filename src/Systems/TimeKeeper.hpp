@@ -8,6 +8,8 @@ public:
 	double TimeSinceStartup() const;
 	double DeltaTime() const;
 
+	void EnableLogging(bool enable);
+
 	TimeKeeper();
 
 	void Update();
@@ -20,6 +22,7 @@ private:
 	TimePoint _lastUpdateTime;
 	double _timeSinceStartup = 0;
 	double _deltaTime = 0;
+	bool _logging = false;
 };
 
 

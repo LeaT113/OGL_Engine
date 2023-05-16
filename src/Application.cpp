@@ -61,8 +61,6 @@ int main()
 	{
 		// Update state
 		timeKeeper->Update();
-		//std::cout << std::setprecision(1) << std::fixed << timeKeeper->TimeSinceStartup() << "s | " << timeKeeper->DeltaTime() * 1000 << "ms | " << 1 / timeKeeper->DeltaTime() << "FPS" << std::endl;
-
 
 		// Render
 		glClear(GL_COLOR_BUFFER_BIT);
