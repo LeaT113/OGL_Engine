@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <set>
 
 
 const std::string ResourceDatabase::ModelsPath = "res/Models/";
@@ -103,6 +104,7 @@ bool ResourceDatabase::LoadShader(const std::string &fileName)
 	std::ifstream stream(ShadersPath + fileName);
 
 	std::stringstream includes;
+	std::set<std::pair<std::string, std::string>> uniforms;
 	std::stringstream vertexShader;
 	std::stringstream fragmentShader;
 
@@ -143,8 +145,15 @@ bool ResourceDatabase::LoadShader(const std::string &fileName)
 			continue;
 		}
 
-		// Append lines
-		switch (mode)
+		// Code line
+		auto findUniform = line.find("uniform ");
+		if(findUniform != std::string::npos) // Uniform collection
+		{
+			auto contents = line.substr(findUniform+8, line.length()-findUniform-9);
+			auto findSplit = line.find(' ', 8);
+			uniforms.emplace( line.substr(findSplit+1, line.length()-findSplit-2), line.substr(findUniform+8, findSplit-8)); // name and datatype
+		}
+		switch (mode) // Append
 		{
 			case 1:
 				vertexShader << line << '\n';
