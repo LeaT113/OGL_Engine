@@ -20,7 +20,7 @@ public:
 	static const MeshData *GetMesh(const std::string &name);
 
 
-	static bool AddShader(const std::string &name, const std::string &vertexShader, const std::string &fragmentShader);
+	static bool AddShader(const std::string &name, const std::set<std::string> &uniforms, const std::string &vertexShader, const std::string &fragmentShader);
 
 	static bool LoadShader(const std::string &fileName);
 

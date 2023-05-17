@@ -85,26 +85,26 @@ const MeshData *ResourceDatabase::GetMesh(const std::string &name)
 
 
 bool
-ResourceDatabase::AddShader(const std::string &name, const std::string &vertexShader, const std::string &fragmentShader)
+ResourceDatabase::AddShader(const std::string &name, const std::set<std::string> &uniforms, const std::string &vertexShader, const std::string &fragmentShader)
 {
 	auto existing = GetShader(name);
 	if (existing != nullptr)
 		throw std::runtime_error("ResourceDatabase shader with name '" + name + "' already exists");
 
 	Instance()._shaders.emplace(name,
-								std::make_unique<ShaderData>(vertexShader, fragmentShader));
+								std::make_unique<ShaderData>(uniforms, vertexShader, fragmentShader));
 
 	return true;
 }
 
 bool ResourceDatabase::LoadShader(const std::string &fileName)
 {
-	static const std::string version = "#version 440 core";
+	static const std::string version = "#version 450 core";
 
 	std::ifstream stream(ShadersPath + fileName);
 
 	std::stringstream includes;
-	std::set<std::pair<std::string, std::string>> uniforms;
+	std::set<std::string> uniforms;
 	std::stringstream vertexShader;
 	std::stringstream fragmentShader;
 
@@ -149,9 +149,8 @@ bool ResourceDatabase::LoadShader(const std::string &fileName)
 		auto findUniform = line.find("uniform ");
 		if(findUniform != std::string::npos) // Uniform collection
 		{
-			auto contents = line.substr(findUniform+8, line.length()-findUniform-9);
-			auto findSplit = line.find(' ', 8);
-			uniforms.emplace( line.substr(findSplit+1, line.length()-findSplit-2), line.substr(findUniform+8, findSplit-8)); // name and datatype
+			// TODO Do in ShaderData
+			uniforms.emplace(line.substr(findUniform+8, line.length()-findUniform-9));
 		}
 		switch (mode) // Append
 		{
@@ -168,7 +167,7 @@ bool ResourceDatabase::LoadShader(const std::string &fileName)
 		}
 	}
 
-	AddShader(fileName, vertexShader.str(), fragmentShader.str());
+	AddShader(fileName, uniforms, vertexShader.str(), fragmentShader.str());
 
 	return true;
 }
