@@ -27,7 +27,8 @@ void TimeKeeper::Update()
 
 	_lastUpdateTime = currentTime;
 
-	std::cout << std::setprecision(1) << std::fixed << TimeSinceStartup() << "s | " << DeltaTime() * 1000 << "ms | " << 1 / DeltaTime() << "FPS" << std::endl;
+	if(_logging)
+		std::cout << std::setprecision(1) << std::fixed << TimeSinceStartup() << "s | " << DeltaTime() * 1000 << "ms | " << 1 / DeltaTime() << "FPS" << std::endl;
 }
 
 void TimeKeeper::EnableLogging(bool enable)
