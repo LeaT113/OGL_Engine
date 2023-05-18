@@ -2,7 +2,7 @@
 #include "MaterialData.hpp"
 
 
-MaterialData::MaterialData(ShaderData &shader)
+MaterialData::MaterialData(const ShaderData &shader)
 {
 	for (const auto &uniform : shader.Uniforms())
 	{

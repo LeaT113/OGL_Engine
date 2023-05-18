@@ -8,7 +8,8 @@
 
 class MaterialData
 {
-	explicit MaterialData(ShaderData &shader);
+public:
+	explicit MaterialData(const ShaderData &shader);
 
 	float &FloatProperty(const std::string &name);
 
