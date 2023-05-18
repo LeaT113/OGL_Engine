@@ -131,3 +131,8 @@ ShaderData::UniformType ShaderData::UniformTypeFromGlsl(const std::string &typeN
 
 	return it->second;
 }
+
+const std::unordered_map<std::string, std::pair<ShaderData::UniformType, GLint>> &ShaderData::Uniforms() const
+{
+	return _uniforms;
+}

@@ -12,6 +12,15 @@
 class ShaderData
 {
 public:
+	enum class UniformType
+	{
+		Invalid = 0,
+		Float = 1,
+		Vec3 = 2,
+		Vec4 = 3,
+		Mat4 = 4
+	};
+
 	ShaderData(const std::set<std::string> &uniforms, const std::string &vertexShader, const std::string &fragmentShader);
 
 	~ShaderData();
@@ -26,16 +35,10 @@ public:
 
 	void SetMat4(const std::string &name, glm::mat4 value);
 
+	const std::unordered_map<std::string, std::pair<ShaderData::UniformType, GLint>> &Uniforms() const;
+
 private:
 	// TODO Track bound shader as static member
-	enum UniformType
-	{
-		Invalid = 0,
-		Float = 1,
-		Vec3 = 2,
-		Vec4 = 3,
-		Mat4 = 4
-	};
 	std::unordered_map<std::string, std::pair<UniformType, GLint>> _uniforms;
 	GLuint _shaderProgram;
 
