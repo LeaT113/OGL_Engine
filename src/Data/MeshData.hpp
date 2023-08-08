@@ -6,10 +6,14 @@
 class MeshData
 {
 public:
-	MeshData(uint32_t vertexCount, const float *vertices, const float *normals,
-			 uint32_t triangleCount, const unsigned int *indices);
+	MeshData(uint32_t vertexCount, const float *positions, const float *normals,
+             uint32_t triangleCount, const unsigned int *indices);
 
 	~MeshData();
+
+	void Bind() const;
+
+	void Draw() const;
 
 private:
 	static constexpr GLuint PositionLocation = 0;

@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(${PROJECT_NAME}
         src/Application.cpp
 
-        src/Common/Singleton.hpp
+        src/Common/Singleton.hpp src/Common/HybridSingleton.hpp
 
-        src/Components/Component.hpp src/Components/Component.cpp src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
-        src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp src/Components/RendererComponent.hpp
-        src/Components/RendererComponent.cpp
+        src/Components/Component.hpp src/Components/Component.cpp src/Components/TransformComponent.hpp
+        src/Components/TransformComponent.cpp src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
+        src/Components/RendererComponent.hpp src/Components/RendererComponent.cpp
 
         src/Data/MeshData.hpp src/Data/MeshData.cpp src/Data/MaterialData.hpp src/Data/MaterialData.cpp
         src/Data/ShaderData.hpp src/Data/ShaderData.cpp
@@ -18,7 +18,8 @@ add_executable(${PROJECT_NAME}
         src/Entity/Entity.hpp src/Entity/Entity.cpp
 
         src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Systems/InputSystem.hpp src/Systems/InputSystem.cpp
-        src/Systems/ResourceDatabase.hpp src/Systems/ResourceDatabase.cpp)
+        src/Systems/ResourceDatabase.hpp src/Systems/ResourceDatabase.cpp src/Systems/RenderSystem.hpp
+        src/Systems/RenderSystem.cpp)
 
 # Libraries
 find_package(OpenGL REQUIRED)

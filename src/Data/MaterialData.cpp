@@ -2,7 +2,7 @@
 #include "MaterialData.hpp"
 
 
-MaterialData::MaterialData(const ShaderData &shader)
+MaterialData::MaterialData(const ShaderData &shader): _shader(shader)
 {
 	for (const auto &uniform : shader.Uniforms())
 	{
@@ -30,6 +30,23 @@ MaterialData::MaterialData(const ShaderData &shader)
 	}
 }
 
+
+void MaterialData::Bind()
+{
+	_shader.Bind();
+
+	for(const auto &f : _propertiesFloat)
+		_shader.SetFloat(f.first, f.second);
+
+	for(const auto &vec3 : _propertiesVec3)
+		_shader.SetVec3(vec3.first, vec3.second);
+
+	for(const auto &vec4 : _propertiesVec4)
+		_shader.SetVec4(vec4.first, vec4.second);
+
+	for(const auto &mat4 : _propertiesMat4)
+		_shader.SetMat4(mat4.first, mat4.second);
+}
 
 float &MaterialData::FloatProperty(const std::string &name)
 {

@@ -11,6 +11,8 @@ class MaterialData
 public:
 	explicit MaterialData(const ShaderData &shader);
 
+	void Bind();
+
 	float &FloatProperty(const std::string &name);
 
 	glm::vec3 &Vec3Property(const std::string &name);
@@ -20,6 +22,7 @@ public:
 	glm::mat4 &Mat4Property(const std::string &name);
 
 private:
+	ShaderData _shader;
 	std::map<std::string, float> _propertiesFloat;
 	std::map<std::string, glm::vec3> _propertiesVec3;
 	std::map<std::string, glm::vec4> _propertiesVec4;
