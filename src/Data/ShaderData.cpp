@@ -25,7 +25,7 @@ ShaderData::ShaderData(const std::set<std::string> &uniforms, const std::string 
 	{
 		auto findSplit = uniform.find(' ');
 
-		auto type = UniformTypeFromGlsl(uniform.substr(0, uniform.length() - findSplit - 1));
+		auto type = UniformTypeFromGlsl(uniform.substr(0, findSplit));
 		auto name = uniform.substr(findSplit + 1, uniform.length() - findSplit - 1);
 		auto location = glGetUniformLocation(_shaderProgram, name.c_str());
 
