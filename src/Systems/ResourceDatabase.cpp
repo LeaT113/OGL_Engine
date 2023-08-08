@@ -14,15 +14,15 @@ const std::string ResourceDatabase::ShadersPath = "res/Shaders/";
 
 
 bool
-ResourceDatabase::AddMesh(const std::string &name, uint32_t vertexCount, const float *vertices, const float *normals,
-						  uint32_t triangleCount, const unsigned int *indices)
+ResourceDatabase::AddMesh(const std::string &name, uint32_t vertexCount, const float *positions, const float *normals,
+                          uint32_t triangleCount, const unsigned int *indices)
 {
 	auto existing = GetMesh(name);
 	if (existing != nullptr)
 		throw std::runtime_error("ResourceDatabase mesh with name '" + name + "' already exists");
 
 	Instance()._meshes.emplace(name,
-							   std::make_unique<MeshData>(vertexCount, vertices, normals, triangleCount, indices));
+							   std::make_unique<MeshData>(vertexCount, positions, normals, triangleCount, indices));
 
 	return true;
 }
@@ -63,9 +63,9 @@ bool ResourceDatabase::LoadMesh(const std::string &fileName)
 	std::vector<unsigned int> indices(triangleCount * 3);
 	for (size_t i = 0; i < triangleCount; i++)
 	{
-		indices[i + 0] = mesh->mFaces[i].mIndices[0];
-		indices[i + 1] = mesh->mFaces[i].mIndices[1];
-		indices[i + 2] = mesh->mFaces[i].mIndices[2];
+		indices[i*3 + 0] = mesh->mFaces[i].mIndices[0];
+		indices[i*3 + 1] = mesh->mFaces[i].mIndices[1];
+		indices[i*3 + 2] = mesh->mFaces[i].mIndices[2];
 	}
 
 	AddMesh(fileName, vertexCount, vertices, normals, triangleCount, indices.data());

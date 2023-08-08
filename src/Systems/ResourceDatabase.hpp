@@ -12,8 +12,8 @@
 class ResourceDatabase : public Singleton<ResourceDatabase>
 {
 public:
-	static bool AddMesh(const std::string &name, uint32_t vertexCount, const float *vertices, const float *normals,
-						uint32_t triangleCount, const unsigned int *indices);
+	static bool AddMesh(const std::string &name, uint32_t vertexCount, const float *positions, const float *normals,
+                        uint32_t triangleCount, const unsigned int *indices);
 
 	static bool LoadMesh(const std::string &fileName);
 
