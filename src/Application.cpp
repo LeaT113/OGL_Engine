@@ -48,6 +48,9 @@ int main()
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
         inputSystem->OnMouseMoved(xpos, ypos);
     });
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+       inputSystem->OnMouseButtonChanged(button, action);
+    });
 
 
     // Set up rendering
@@ -70,73 +73,41 @@ int main()
     auto shader = ResourceDatabase::GetShader("PhongShader.glsl");
     MaterialData material(*shader);
 
-    const float positions[] = {
-            -0.5, 0, 0.5,
-            0.5, 0, 0.5,
-            0.5, 0, -0.5,
-            -0.5, 0, -0.5
-    };
-    const float normals[] = {
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0
-    };
-    const unsigned int indices[] = {
-            0, 1, 2,
-            2, 3, 0
-    };
-    ResourceDatabase::AddMesh("Ground", 4, positions, normals, 2, indices);
-    Entity ground;
-    ground
+
+    ResourceDatabase::LoadMesh("Plane.obj");
+    Entity plane;
+    plane
         .AddComponent<TransformComponent>()
-        .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Ground"), material);
-    ground.Transform()->Scale() = glm::vec3(5, 5, 5);
-    ground.Transform()->Position() = glm::vec3(0, 0, 0);
-
-
-
-    const float cubePositions[] = {
-            0.500000, 0.500000, -0.500000,
-            0.500000, -0.500000, -0.500000,
-            0.500000, 0.500000, 0.500000,
-            0.500000, -0.500000, 0.500000,
-            -0.500000, 0.500000, -0.500000,
-            -0.500000, -0.500000, -0.500000,
-            -0.500000, 0.500000, 0.500000,
-            -0.500000, -0.500000, 0.500000,
-    };
-    const unsigned int cubeIndices[] = {
-            4, 2, 0,
-            2, 7, 3,
-            6, 5, 7,
-            1, 7, 5,
-            0, 3, 1,
-            4, 1, 5,
-            4, 6, 2,
-            2, 6, 7,
-            6, 4, 5,
-            1, 3, 7,
-            0, 2, 3,
-            4, 0, 1,
-    };
+        .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Plane.obj"), material);
+    plane.Transform()->Scale() = glm::vec3(15, 15, 15);
+    plane.Transform()->Position() = glm::vec3(0, 0, 0);
 
     ResourceDatabase::LoadMesh("Suzanne.obj");
     Entity suzanne;
     suzanne
             .AddComponent<TransformComponent>()
             .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Suzanne.obj"), material);
-    suzanne.Transform()->Position() = glm::vec3(0, 0.8, 0);
+    suzanne.Transform()->Position() = glm::vec3(1, 0.6, -1);
     suzanne.Transform()->Scale() = glm::vec3(0.4, 0.4, 0.4);
 
-    camera.Transform()->Position() = glm::vec3(0, 0.8, 1);
-    //camera.Transform()->AngleAxis(-20, camera.Transform()->Right());
+    ResourceDatabase::LoadMesh("Cube.obj");
+    Entity cube;
+    cube
+            .AddComponent<TransformComponent>()
+            .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Cube.obj"), material);
+    cube.Transform()->Position() = glm::vec3(-0.8, 0.5, -1.3);
+
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
 		// Update state
 		timeKeeper->Update();
+
+        if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE))
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Camera movement
         float rotationX, rotationY;
@@ -159,8 +130,6 @@ int main()
 
 		// Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //camera.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup()*0.5f) * 0.2, 0, 0);
 
         suzanne.Transform()->AngleAxis(timeKeeper->DeltaTime() * 50, glm::vec3(0, 1, 0));
 
