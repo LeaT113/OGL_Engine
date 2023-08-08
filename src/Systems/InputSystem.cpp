@@ -11,7 +11,7 @@ void InputSystem::OnKeyChanged(int key, int action)
 	if(!(action == GLFW_PRESS || action == GLFW_RELEASE))
 		return;
 
-	keyState[key] = action == GLFW_PRESS;
+    _keyState[key] = action == GLFW_PRESS;
 }
 
 bool InputSystem::IsKeyPressed(int key) const
@@ -19,28 +19,55 @@ bool InputSystem::IsKeyPressed(int key) const
     if(!IsKeyValid(key))
         return false;
 
-    return keyState[key];
+    return _keyState[key];
 }
 
-inline bool InputSystem::IsKeyValid(int key) const
+
+void InputSystem::OnMouseButtonChanged(int button, int action)
 {
-    return key > 0 && key <= GLFW_KEY_LAST;
+    if(!IsMouseButtonValid(button))
+        return;
+
+    if(!(action == GLFW_PRESS || action == GLFW_RELEASE))
+        return;
+
+    _mouseButtonState[button] = action == GLFW_PRESS;
 }
+
+bool InputSystem::IsMouseButtonPressed(int button) const
+{
+    if(!IsMouseButtonValid(button))
+        return false;
+
+    return _mouseButtonState[button];
+}
+
 
 void InputSystem::OnMouseMoved(double xPos, double yPos)
 {
-    mouseCurrentX = xPos;
-    mouseCurrentY = yPos;
+    _mouseCurrentX = xPos;
+    _mouseCurrentY = yPos;
 }
 
 void InputSystem::RestartRelativeMouse()
 {
-    mouseStartX = mouseCurrentX;
-    mouseStartY = mouseCurrentY;
+    _mouseStartX = _mouseCurrentX;
+    _mouseStartY = _mouseCurrentY;
 }
 
 void InputSystem::GetRelativeMouse(float &movementX, float &movementY) const
 {
-    movementX = mouseCurrentX - mouseStartX;
-    movementY = mouseCurrentY - mouseStartY;
+    movementX = _mouseCurrentX - _mouseStartX;
+    movementY = _mouseCurrentY - _mouseStartY;
+}
+
+
+inline bool InputSystem::IsKeyValid(int key) const
+{
+    return key >= 0 && key <= GLFW_KEY_LAST;
+}
+
+bool InputSystem::IsMouseButtonValid(int button) const
+{
+    return button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST;
 }

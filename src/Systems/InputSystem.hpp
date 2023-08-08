@@ -11,16 +11,21 @@ public:
 	void OnKeyChanged(int key, int action);
     bool IsKeyPressed(int key) const;
 
+    void OnMouseButtonChanged(int button, int action);
+    bool IsMouseButtonPressed(int button) const;
+
     void OnMouseMoved(double xPos, double yPos);
     void RestartRelativeMouse();
     void GetRelativeMouse(float& movementX, float& movementY) const;
 
 private:
-	bool keyState[GLFW_KEY_LAST+1];
-    double mouseStartX, mouseStartY;
-    double mouseCurrentX, mouseCurrentY;
+	bool _keyState[GLFW_KEY_LAST + 1];
+    bool _mouseButtonState[GLFW_MOUSE_BUTTON_LAST + 1];
+    double _mouseStartX, _mouseStartY;
+    double _mouseCurrentX, _mouseCurrentY;
 
     inline bool IsKeyValid(int key) const;
+    inline bool IsMouseButtonValid(int button) const;
 };
 
 
