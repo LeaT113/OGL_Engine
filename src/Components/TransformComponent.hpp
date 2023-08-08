@@ -3,6 +3,8 @@
 #include "Component.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <iostream>
+
 
 class TransformComponent : public Component
 {
@@ -38,6 +40,8 @@ public:
 	void AngleAxisPoint(float angle, const glm::vec3& axis, const glm::vec3& point);
 
 	void NotifyChanged();
+
+    friend std::ostream& operator<<(std::ostream& os, const TransformComponent& transform);
 
 private:
 	glm::vec3 _position;
