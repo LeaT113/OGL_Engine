@@ -26,3 +26,21 @@ inline bool InputSystem::IsKeyValid(int key) const
 {
     return key > 0 && key <= GLFW_KEY_LAST;
 }
+
+void InputSystem::OnMouseMoved(double xPos, double yPos)
+{
+    mouseCurrentX = xPos;
+    mouseCurrentY = yPos;
+}
+
+void InputSystem::RestartRelativeMouse()
+{
+    mouseStartX = mouseCurrentX;
+    mouseStartY = mouseCurrentY;
+}
+
+void InputSystem::GetRelativeMouse(float &movementX, float &movementY) const
+{
+    movementX = mouseCurrentX - mouseStartX;
+    movementY = mouseCurrentY - mouseStartY;
+}
