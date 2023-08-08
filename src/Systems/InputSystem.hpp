@@ -10,8 +10,12 @@ public:
 
 	void OnKeyChanged(int key, int action);
 
+    bool IsKeyPressed(int key) const;
+
 private:
 	bool keyState[GLFW_KEY_LAST+1];
+
+    inline bool IsKeyValid(int key) const;
 };
 
 
