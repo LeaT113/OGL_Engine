@@ -6,20 +6,41 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(${PROJECT_NAME}
         src/Application.cpp
 
-        src/Common/Singleton.hpp src/Common/HybridSingleton.hpp
+        # Common
+        src/Common/HybridSingleton.hpp
+        src/Common/Singleton.hpp
 
-        src/Components/Component.hpp src/Components/Component.cpp src/Components/TransformComponent.hpp
-        src/Components/TransformComponent.cpp src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
+        # Components
+        src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
+        src/Components/Component.hpp src/Components/Component.cpp
         src/Components/RendererComponent.hpp src/Components/RendererComponent.cpp
+        src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
 
-        src/Data/MeshData.hpp src/Data/MeshData.cpp src/Data/MaterialData.hpp src/Data/MaterialData.cpp
+        # Data
+        src/Data/MaterialData.hpp src/Data/MaterialData.cpp
+        src/Data/MeshData.hpp src/Data/MeshData.cpp
         src/Data/ShaderData.hpp src/Data/ShaderData.cpp
 
+        # Entity
         src/Entity/Entity.hpp src/Entity/Entity.cpp
 
-        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp src/Systems/InputSystem.hpp src/Systems/InputSystem.cpp
-        src/Systems/ResourceDatabase.hpp src/Systems/ResourceDatabase.cpp src/Systems/RenderSystem.hpp
-        src/Systems/RenderSystem.cpp)
+        # Systems
+        src/Systems/InputSystem.hpp src/Systems/InputSystem.cpp
+        src/Systems/RenderSystem.hpp src/Systems/RenderSystem.cpp
+        src/Systems/ResourceDatabase.hpp src/Systems/ResourceDatabase.cpp
+        src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp
+
+        # OGL
+        src/OGL/Graphics.hpp src/OGL/Graphics.cpp
+        src/OGL/IBindable.hpp
+        src/OGL/IndexBuffer.hpp src/OGL/IndexBuffer.cpp
+        src/OGL/VertexArray.hpp src/OGL/VertexArray.cpp
+        src/OGL/VertexBuffer.hpp src/OGL/VertexBuffer.cpp
+
+        # Resources
+        src/Resources/Mesh.hpp src/Resources/Mesh.cpp
+        src/Resources/Shader.hpp src/Resources/Shader.cpp
+)
 
 # Libraries
 find_package(OpenGL REQUIRED)
