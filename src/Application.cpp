@@ -8,6 +8,7 @@
 #include "Components/CameraComponent.hpp"
 #include "Systems/ResourceDatabase.hpp"
 #include "Systems/RenderSystem.hpp"
+#include "Resources/ModelLoader.hpp"
 
 
 std::unique_ptr<TimeKeeper> timeKeeper = std::make_unique<TimeKeeper>();
@@ -52,6 +53,17 @@ int main()
        inputSystem->OnMouseButtonChanged(button, action);
     });
 
+    // Debugging
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+    const GLchar *message,const void *userParam)
+       {
+            for (;length > 0; length--)
+                std::cout << *(message++);
+
+            std::cout << std::endl;
+       }, nullptr);
+
 
     // Set up rendering
     glCullFace(GL_BACK);
@@ -74,28 +86,38 @@ int main()
     MaterialData material(*shader);
 
 
-    ResourceDatabase::LoadMesh("Plane.obj");
+    ModelLoader ml;
+
+    ml.LoadModel("Plane.obj");
     Entity plane;
     plane
         .AddComponent<TransformComponent>()
-        .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Plane.obj"), material);
+        .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), material);
     plane.Transform()->Scale() = glm::vec3(15, 15, 15);
     plane.Transform()->Position() = glm::vec3(0, 0, 0);
 
-    ResourceDatabase::LoadMesh("Suzanne.obj");
+    ml.LoadModel("Suzanne.obj");
     Entity suzanne;
     suzanne
             .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Suzanne.obj"), material);
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Suzanne.obj"), material);
     suzanne.Transform()->Position() = glm::vec3(1, 0.6, -1);
     suzanne.Transform()->Scale() = glm::vec3(0.4, 0.4, 0.4);
 
-    ResourceDatabase::LoadMesh("Cube.obj");
+    ml.LoadModel("Cube.obj");
     Entity cube;
     cube
             .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(*ResourceDatabase::GetMesh("Cube.obj"), material);
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.obj"), material);
     cube.Transform()->Position() = glm::vec3(-0.8, 0.5, -1.3);
+
+    ml.LoadModel("MaterialTest.obj");
+    Entity materialTest;
+    materialTest
+            .AddComponent<TransformComponent>()
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("MaterialTest.obj"), material);
+    materialTest.Transform()->Position() = glm::vec3(-1, 0.4, 1.3);
+    materialTest.Transform()->Scale() = glm::vec3(0.4);
 
 
 	// Game loop

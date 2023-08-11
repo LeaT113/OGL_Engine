@@ -1,9 +1,10 @@
 #include "RendererComponent.hpp"
 #include "../Entity/Entity.hpp"
 #include "../Systems/RenderSystem.hpp"
+#include "../OGL/Graphics.hpp"
 
 
-RendererComponent::RendererComponent(const Entity *owner, const MeshData &mesh, MaterialData &material) : _mesh(mesh),
+RendererComponent::RendererComponent(const Entity *owner, const Mesh* mesh, MaterialData &material) : _mesh(mesh),
 																									_material(material)
 {
 	_owner = owner;
@@ -17,7 +18,7 @@ void RendererComponent::Render(CameraComponent& camera)
     _material.Mat4Property("uMVP") = camera.Projection() * camera.View() * _transform->ModelToWorld();
     _material.Mat4Property("uModelToWorld") = _transform->ModelToWorld();
 
-	_mesh.Bind();
+    Graphics::Bind(_mesh->GetVertexArray());
 	_material.Bind();
-	_mesh.Draw();
+	Graphics::RenderMesh(*_mesh, 0, _transform->ModelToWorld(), _material);
 }

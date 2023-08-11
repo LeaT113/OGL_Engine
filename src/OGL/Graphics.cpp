@@ -26,7 +26,9 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, glm::mat4
     // communicate vertex data layout
     // set uniforms from material
     // pass transformation matrices and other universal uniforms not stored in material
-    // call draw
+    // set pipeline settings like depth write, blending
 
-    Graphics::Bind(VertexBuffer::None);
+    // Call draw
+    auto submesh = mesh.GetSubmesh(submeshIndex);
+    glDrawElements(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset);
 }

@@ -28,7 +28,7 @@ GLuint VertexArray::GetBindID() const
 }
 
 
-void VertexArray::AddVertexBuffer(const VertexBuffer &buffer, const std::vector<Shader::Attribute> &attributeLayout)
+void VertexArray::AddVertexBuffer(const VertexBuffer &buffer, const std::vector<VertexAttribute> &attributeLayout)
 {
     if(_vertexBufferCount > 0)
         throw std::runtime_error("VertexArray currently only supports one VertexBuffer");
@@ -41,14 +41,14 @@ void VertexArray::AddVertexBuffer(const VertexBuffer &buffer, const std::vector<
     if(_layout == Layout::Interleaved)
     {
         for(auto attribute : attributeLayout)
-            stride += Shader::GetAttributeInfo(attribute).byteSize;
+            stride += GetVertexAttributeInfo(attribute).byteSize;
     }
 
     size_t offset = 0;
 
     for (auto attribute : attributeLayout)
     {
-        auto attributeInfo = Shader::GetAttributeInfo(attribute);
+        auto attributeInfo = GetVertexAttributeInfo(attribute);
 
         glVertexAttribPointer((GLuint) attribute, attributeInfo.size, attributeInfo.type, attributeInfo.normalized, stride, (void *) offset);
         glEnableVertexAttribArray((GLuint) attribute);
@@ -70,5 +70,9 @@ void VertexArray::SetIndexBuffer(const IndexBuffer &buffer)
     Graphics::Bind(VertexArray::None);
 
     _indexBufferPresent = true;
+}
+
+size_t VertexArray::GetVertexCount() const {
+    return _vertexCount;
 }
 

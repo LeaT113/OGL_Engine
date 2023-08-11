@@ -6,9 +6,10 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(${PROJECT_NAME}
         src/Application.cpp
 
-        # Common
-        src/Common/HybridSingleton.hpp
-        src/Common/Singleton.hpp
+        # Core
+        src/Core/Handle.hpp
+        src/Core/HybridSingleton.hpp
+        src/Core/Singleton.hpp
 
         # Components
         src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
@@ -18,7 +19,6 @@ add_executable(${PROJECT_NAME}
 
         # Data
         src/Data/MaterialData.hpp src/Data/MaterialData.cpp
-        src/Data/MeshData.hpp src/Data/MeshData.cpp
         src/Data/ShaderData.hpp src/Data/ShaderData.cpp
 
         # Entity
@@ -35,10 +35,12 @@ add_executable(${PROJECT_NAME}
         src/OGL/IBindable.hpp
         src/OGL/IndexBuffer.hpp src/OGL/IndexBuffer.cpp
         src/OGL/VertexArray.hpp src/OGL/VertexArray.cpp
+        src/OGL/VertexAttributes.hpp src/OGL/VertexAttributes.cpp
         src/OGL/VertexBuffer.hpp src/OGL/VertexBuffer.cpp
 
         # Resources
         src/Resources/Mesh.hpp src/Resources/Mesh.cpp
+        src/Resources/ModelLoader.hpp src/Resources/ModelLoader.cpp
         src/Resources/Shader.hpp src/Resources/Shader.cpp
 )
 

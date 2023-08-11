@@ -5,7 +5,7 @@
 #include "IBindable.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
-#include "../Resources/Shader.hpp"
+#include "VertexAttributes.hpp"
 
 
 class VertexArray : public IBindable
@@ -22,8 +22,10 @@ public:
 
     GLuint GetBindID() const override;
 
-    void AddVertexBuffer(const VertexBuffer &buffer, const std::vector<Shader::Attribute> &attributeLayout);
+    void AddVertexBuffer(const VertexBuffer &buffer, const std::vector<VertexAttribute> &attributeLayout);
     void SetIndexBuffer(const IndexBuffer &buffer);
+
+    size_t GetVertexCount() const;
 
     const static VertexArray None;
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include "../Components/CameraComponent.hpp"
 #include "../Components/RendererComponent.hpp"
-#include "../Common/HybridSingleton.hpp"
+#include "../Core/HybridSingleton.hpp"
 
 
 class RenderSystem : public HybridSingleton<RenderSystem>
