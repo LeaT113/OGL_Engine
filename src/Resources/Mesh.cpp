@@ -1,9 +1,12 @@
 #include "Mesh.hpp"
 
 
-Mesh::Mesh(Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray) : _vertexBuffer(vertexBuffer.Release()),
-                                                                                                                  _indexBuffer(indexBuffer.Release()),
-                                                                                                                  _vertexArray(vertexArray.Release())
+Mesh::Mesh(Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray) : _vertexBuffer(
+        vertexBuffer.Pass()),
+                                                                                                                  _indexBuffer(
+                                                                                                                          indexBuffer.Pass()),
+                                                                                                                  _vertexArray(
+                                                                                                                          vertexArray.Pass())
 {
 
 }

@@ -18,7 +18,7 @@ bool ResourceDatabase::AddMesh(const std::string &name, Handle<Mesh> mesh)
     if (existing != nullptr)
         throw std::runtime_error("ResourceDatabase mesh with name '" + name + "' already exists");
 
-    Instance()._meshLibrary.emplace(name, mesh.Release());
+    Instance()._meshLibrary.emplace(name, mesh.Pass());
 
     return true;
 }

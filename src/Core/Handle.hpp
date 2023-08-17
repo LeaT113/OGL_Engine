@@ -26,15 +26,24 @@ public:
         return *this;
     }
 
+    // Creation
     template<typename... Args>
     static Handle Make(Args&&... args)
     {
         return Handle(std::make_unique<T>(std::forward<Args>(args)...));
     }
+    static Handle Empty()
+    {
+        return Handle(nullptr);
+    }
 
-    Handle Release()
+    Handle Pass()
     {
         return Handle(std::move(_ptr));
+    }
+    T Release()
+    {
+        return std::move(*_ptr);
     }
 
     T* Access() const

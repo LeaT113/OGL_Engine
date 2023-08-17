@@ -87,9 +87,9 @@ Entity *ModelLoader::LoadModel(const std::string& path)
 
     // Mesh
     // TODO Give mesh to ResourceDatabase with name
-    auto m = Handle<Mesh>::Make(vertexBuffer.Release(), indexBuffer.Release(), vertexArray.Release());
+    auto m = Handle<Mesh>::Make(vertexBuffer.Pass(), indexBuffer.Pass(), vertexArray.Pass());
     m->AddSubmesh({0, static_cast<int>(triangleCount*3)});
-    ResourceDatabase::AddMesh(path, m.Release());
+    ResourceDatabase::AddMesh(path, m.Pass());
 
     return nullptr;
 }
