@@ -42,6 +42,7 @@ add_executable(${PROJECT_NAME}
         src/Resources/Mesh.hpp src/Resources/Mesh.cpp
         src/Resources/ModelLoader.hpp src/Resources/ModelLoader.cpp
         src/Resources/Shader.hpp src/Resources/Shader.cpp
+        src/Resources/ShaderLoader.hpp src/Resources/ShaderLoader.cpp
 )
 
 # Libraries
