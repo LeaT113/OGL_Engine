@@ -41,32 +41,32 @@ int Shader::GetUniformLocation(const std::string &name) const
     return it->second;
 }
 
-void Shader::SetFloat(int location, float value) const
+void Shader::SetFloat(int location, float value)
 {
     glUniform1f(location, value);
 }
 
-void Shader::SetVec2(int location, glm::vec2 value) const
+void Shader::SetVec2(int location, glm::vec2 value)
 {
     glUniform2fv(location, 1, glm::value_ptr(value));
 }
 
-void Shader::SetVec3(int location, glm::vec3 value) const
+void Shader::SetVec3(int location, glm::vec3 value)
 {
     glUniform3fv(location, 1, glm::value_ptr(value));
 }
 
-void Shader::SetVec4(int location, glm::vec4 value) const
+void Shader::SetVec4(int location, glm::vec4 value)
 {
     glUniform4fv(location, 1, glm::value_ptr(value));
 }
 
-void Shader::SetMat3(int location, glm::mat3 value) const
+void Shader::SetMat3(int location, glm::mat3 value)
 {
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::SetMat4(int location, glm::mat4 value) const
+void Shader::SetMat4(int location, glm::mat4 value)
 {
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }

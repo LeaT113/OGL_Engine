@@ -22,12 +22,12 @@ public:
     // Uniforms
     int GetUniformLocation(const std::string &name) const;
 
-    void SetFloat(int location, float value) const;
-    void SetVec2(int location, glm::vec2 value) const;
-    void SetVec3(int location, glm::vec3 value) const;
-    void SetVec4(int location, glm::vec4 value) const;
-    void SetMat3(int location, glm::mat3 value) const;
-    void SetMat4(int location, glm::mat4 value) const;
+    static void SetFloat(int location, float value);
+    static void SetVec2(int location, glm::vec2 value);
+    static void SetVec3(int location, glm::vec3 value);
+    static void SetVec4(int location, glm::vec4 value);
+    static void SetMat3(int location, glm::mat3 value);
+    static void SetMat4(int location, glm::mat4 value);
 
 private:
     unsigned int _shader;
