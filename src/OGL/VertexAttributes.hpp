@@ -23,6 +23,7 @@ struct VertexAttributeInfo
     unsigned int type;
     unsigned int normalized;
     int byteSize;
+    std::string name;
 };
 
 const VertexAttributeInfo &GetVertexAttributeInfo(VertexAttribute attribute);
