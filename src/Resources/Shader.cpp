@@ -123,7 +123,7 @@ std::type_index Shader::TypeOpenglToCpp(unsigned int type)
     }
 }
 
-void Shader::SetTransformations(glm::mat4 modelToWorld, CameraComponent &camera) const
+void Shader::SetTransformations(const glm::mat4 &modelToWorld, const CameraComponent &camera) const
 {
     SetMat4(GetUniformLocation("ObjectToWorldMatrix"), modelToWorld);
     SetMat4(GetUniformLocation("WorldToObjectMatrix"), glm::inverse(modelToWorld));

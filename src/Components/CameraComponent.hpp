@@ -21,8 +21,8 @@ public:
 	void SetWindowDimensions(int width, int height);
 
 	// Matrices
-	const glm::mat4 &View();
-	const glm::mat4 &Projection();
+	const glm::mat4 &View() const;
+	const glm::mat4 &Projection() const;
 
 private:
 	static constexpr float NearClippingPlane = 0.1f;
@@ -34,8 +34,8 @@ private:
 	float _horizontalFov;
 	int _width, _height;
 
-	glm::mat4 _projectionMatrix;
-	bool _projectionValid;
+	mutable glm::mat4 _projectionMatrix;
+	mutable bool _projectionValid;
 
 	TransformComponent* _transform;
 };

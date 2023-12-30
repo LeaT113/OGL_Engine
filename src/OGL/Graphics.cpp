@@ -23,8 +23,8 @@ void Graphics::Bind(const Shader &shader)
 }
 
 
-void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, glm::mat4 modelToWorld,
-                          const Material &material, CameraComponent &camera)
+void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld,
+                          const Material &material, const CameraComponent &camera)
 {
     Graphics::Bind(mesh.GetVertexArray());
 

@@ -21,12 +21,12 @@ void CameraComponent::SetWindowDimensions(int width, int height)
 	_projectionValid = false;
 }
 
-const glm::mat4 &CameraComponent::View()
+const glm::mat4 &CameraComponent::View() const
 {
 	return _transform->WorldToModel();
 }
 
-const glm::mat4 &CameraComponent::Projection()
+const glm::mat4 &CameraComponent::Projection() const
 {
 	if(!_projectionValid)
 	{

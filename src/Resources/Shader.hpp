@@ -33,7 +33,7 @@ public:
     static void SetMat3(int location, glm::mat3 value);
     static void SetMat4(int location, glm::mat4 value);
 
-    void SetTransformations(glm::mat4 modelToWorld, CameraComponent &camera) const;
+    void SetTransformations(const glm::mat4 &modelToWorld, const CameraComponent &camera) const;
 
 private:
     unsigned int _shader;

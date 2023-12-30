@@ -14,7 +14,7 @@ class RendererComponent : public Component
 public:
     RendererComponent(const Entity *owner, const Mesh* mesh, Material &material);
 
-	void Render(CameraComponent& camera);
+	void Render(const CameraComponent &camera) const;
 
 private:
     const Mesh* _mesh;

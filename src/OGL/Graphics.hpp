@@ -21,7 +21,7 @@ public:
     // static void Bind(const Texture& texture, unsigned int slot);
 
     // Render
-    static void RenderMesh(const Mesh &mesh, unsigned int submeshIndex, glm::mat4 modelToWorld, const Material &material, CameraComponent &camera);
+    static void RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld, const Material &material, const CameraComponent &camera);
 
     //static void DrawMesh(const MeshData* mesh, );
     //static void DrawMeshInstanced;

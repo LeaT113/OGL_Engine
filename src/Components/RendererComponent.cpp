@@ -13,10 +13,7 @@ RendererComponent::RendererComponent(const Entity *owner, const Mesh* mesh, Mate
 	RenderSystem::RegisterRenderer(this);
 }
 
-void RendererComponent::Render(CameraComponent& camera)
+void RendererComponent::Render(const CameraComponent &camera) const
 {
-    //_material.Mat4Property("uMVP") = camera.Projection() * camera.View() * _transform->ModelToWorld();
-    //_material.Mat4Property("uModelToWorld") = _transform->ModelToWorld();
-
 	Graphics::RenderMesh(*_mesh, 0, _transform->ModelToWorld(), _material, camera);
 }
