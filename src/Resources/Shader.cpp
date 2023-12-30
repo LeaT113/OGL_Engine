@@ -8,6 +8,7 @@
 
 Shader::Shader(unsigned int id, std::string name): _shader(id), _name(std::move(name))
 {
+    // TODO Move to shader loader
     GLint uniformCount = 0;
     glGetProgramiv(_shader, GL_ACTIVE_UNIFORMS, &uniformCount);
     if(uniformCount == 0)

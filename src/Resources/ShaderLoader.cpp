@@ -58,8 +58,9 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     // Bind vertex attrib locations
     for(int i = 0; i < VertexAttribute::COUNT; i++)
     {
-        std::string name = "a" + GetVertexAttributeInfo((VertexAttribute)i).name;
-        glBindAttribLocation(program, (VertexAttribute)i, name.c_str());
+        auto att = static_cast<VertexAttribute>(i);
+        std::string name = "a" + GetVertexAttributeInfo(att).name;
+        glBindAttribLocation(program, att, name.c_str());
     }
 
     // Link
