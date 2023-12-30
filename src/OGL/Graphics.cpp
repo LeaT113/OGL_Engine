@@ -18,20 +18,28 @@ void Graphics::Bind(const VertexArray &vertexArray)
 
 void Graphics::Bind(const Shader &shader)
 {
+    // TODO Only do if not already bound?
     glUseProgram(shader.GetBindID());
 }
 
 
 void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, glm::mat4 modelToWorld,
-                          const MaterialData &material)
+                          const Material &material, CameraComponent &camera)
 {
     Graphics::Bind(mesh.GetVertexArray());
 
     // Bind shader
-    // Graphics::Bind(material.GetShader());
+    const Shader &shader = material.GetShader();
+    Graphics::Bind(shader);
 
-    // set uniforms from material
-    // pass transformation matrices and other universal uniforms not stored in material
+    // Set material values
+    material.ApplyValues();
+
+    // Set transformation matrices
+    shader.SetTransformations(modelToWorld, camera);
+
+    // Set universal uniforms
+
     // set pipeline settings like depth write, blending
 
     // Call draw
