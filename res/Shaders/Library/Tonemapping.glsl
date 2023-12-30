@@ -1,4 +1,3 @@
-
 // From https://www.shadertoy.com/view/3ldXDf
 
 vec3 SimpleReinhardToneMapping(vec3 color)

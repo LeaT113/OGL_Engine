@@ -17,7 +17,3 @@ float Point_DistanceAttenuationSphere(float distance, float radius)
     // From http://www.cemyuksel.com/research/pointlightattenuation/
     return 2 / (distance*distance + radius*radius + distance*sqrt(distance*distance + radius*radius));
 }
-
-
-
-
