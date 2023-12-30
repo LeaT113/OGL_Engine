@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
         src/OGL/VertexArray.hpp src/OGL/VertexArray.cpp
         src/OGL/VertexAttributes.hpp src/OGL/VertexAttributes.cpp
         src/OGL/VertexBuffer.hpp src/OGL/VertexBuffer.cpp
+        src/OGL/UniformBuffer.hpp src/OGL/UniformBuffer.cpp
 
         # Resources
         src/Resources/Mesh.hpp src/Resources/Mesh.cpp
@@ -44,6 +45,7 @@ add_executable(${PROJECT_NAME}
         src/Resources/Shader.hpp src/Resources/Shader.cpp
         src/Resources/ShaderLoader.hpp src/Resources/ShaderLoader.cpp
         src/Resources/Material.hpp src/Resources/Material.cpp
+        src/Resources/ShaderStructs.hpp src/Resources/ShaderStructs.cpp
 )
 
 # Libraries

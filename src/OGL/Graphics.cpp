@@ -22,6 +22,11 @@ void Graphics::Bind(const Shader &shader)
     glUseProgram(shader.GetBindID());
 }
 
+void Graphics::Bind(const UniformBuffer& uniformBuffer, unsigned int slot)
+{
+    glBindBufferBase(GL_UNIFORM_BUFFER, slot, uniformBuffer.GetBindID());
+}
+
 
 void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld,
                           const Material &material, const CameraComponent &camera)

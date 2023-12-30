@@ -6,11 +6,14 @@
 #include "Systems/TimeKeeper.hpp"
 #include "Entity/Entity.hpp"
 #include "Components/CameraComponent.hpp"
+#include "OGL/Graphics.hpp"
+#include "OGL/UniformBuffer.hpp"
 #include "Systems/ResourceDatabase.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "Resources/ModelLoader.hpp"
 #include "Resources/ShaderLoader.hpp"
 #include "Resources/Material.hpp"
+#include "Resources/ShaderStructs.hpp"
 
 
 std::unique_ptr<TimeKeeper> timeKeeper = std::make_unique<TimeKeeper>();
@@ -116,6 +119,17 @@ int main()
     materialTest.Transform()->Position() = glm::vec3(-1, 0.4, 1.3);
     materialTest.Transform()->Scale() = glm::vec3(0.4);
 
+	// Lights
+	PointLight lights[] =
+	{
+		{glm::vec3(-1.5, 0.3, 0),  0, glm::vec3(0.5, 0, 0), 0.1f},
+		{glm::vec3(0, 0.3, 0),  0, glm::vec3(0, 0.5, 0),  0.1f},
+		{glm::vec3(1.5, 0.3, 0),  0, glm::vec3(0, 0, 0.5),  0.1f},
+		{},
+	};
+	Handle<UniformBuffer> lightBuffer = Handle<UniformBuffer>::Make(sizeof(lights));
+	Graphics::Bind(*lightBuffer, 1);
+	lightBuffer->SetData(0, sizeof(lights), lights);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))

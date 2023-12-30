@@ -27,7 +27,7 @@ void frag()
     vec3 normalWS = normalize(v2f.normal);
     vec3 cameraPos = ViewToWorldPos((0).xxx);
 
-    vec3 lighting = PointLight(v2f.position, normalWS, cameraPos, vec3(0, 0.3, 0), 0.1, vec3(0.9, .23, .05) * 0.2) + vec3(0.01, 0.013, 0.02);
+    vec3 lighting = ApplyLights(v2f.position, normalWS, cameraPos);
 
     vec3 col = vec3(1,1,1) * lighting;
     col = FilmicToneMapping(col);
