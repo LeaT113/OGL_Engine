@@ -9,6 +9,8 @@
 #include "Systems/ResourceDatabase.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "Resources/ModelLoader.hpp"
+#include "Resources/ShaderLoader.hpp"
+#include "Resources/Material.hpp"
 
 
 std::unique_ptr<TimeKeeper> timeKeeper = std::make_unique<TimeKeeper>();
@@ -79,20 +81,15 @@ int main()
         .AddComponent<CameraComponent>(ProjectionType::Perspective, 75.0f);
     rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 
-
-	// Geometry
-    ResourceDatabase::LoadShader("PhongShader.glsl");
-    auto shader = ResourceDatabase::GetShader("PhongShader.glsl");
-    MaterialData material(*shader);
-
-
+    auto s = ShaderLoader::LoadShader("PhongShader1.glsl");
+    auto material = Handle<Material>::Make(*s.Access());
     ModelLoader ml;
 
     ml.LoadModel("Plane.obj");
     Entity plane;
     plane
         .AddComponent<TransformComponent>()
-        .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), material);
+        .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), *material.Access());
     plane.Transform()->Scale() = glm::vec3(15, 15, 15);
     plane.Transform()->Position() = glm::vec3(0, 0, 0);
 
@@ -100,7 +97,7 @@ int main()
     Entity suzanne;
     suzanne
             .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Suzanne.obj"), material);
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Suzanne.obj"), *material.Access());
     suzanne.Transform()->Position() = glm::vec3(1, 0.6, -1);
     suzanne.Transform()->Scale() = glm::vec3(0.4, 0.4, 0.4);
 
@@ -108,14 +105,14 @@ int main()
     Entity cube;
     cube
             .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.obj"), material);
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.obj"), *material.Access());
     cube.Transform()->Position() = glm::vec3(-0.8, 0.5, -1.3);
 
     ml.LoadModel("MaterialTest.obj");
     Entity materialTest;
     materialTest
             .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("MaterialTest.obj"), material);
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("MaterialTest.obj"), *material.Access());
     materialTest.Transform()->Position() = glm::vec3(-1, 0.4, 1.3);
     materialTest.Transform()->Scale() = glm::vec3(0.4);
 
@@ -153,7 +150,7 @@ int main()
 		// Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        suzanne.Transform()->AngleAxis(timeKeeper->DeltaTime() * 50, glm::vec3(0, 1, 0));
+        //suzanne.Transform()->AngleAxis(timeKeeper->DeltaTime() * 50, glm::vec3(0, 1, 0));
 
         rendererSystem->Render();
 

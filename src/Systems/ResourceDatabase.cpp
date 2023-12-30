@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include <set>
+#include "../Resources/ShaderLoader.hpp"
 
 
 const std::string ResourceDatabase::ShadersPath = "res/Shaders/";
@@ -122,12 +123,32 @@ bool ResourceDatabase::LoadShader(const std::string &fileName)
 	return true;
 }
 
-const ShaderData *ResourceDatabase::GetShader(const std::string &name)
+bool ResourceDatabase::AddShader(const std::string &name, Handle<Shader> shader)
+{
+	auto existing = GetShader(name);
+	if (existing != nullptr)
+		throw std::runtime_error("ResourceDatabase shader with name '" + name + "' already exists");
+
+	Instance()._shaderLibrary.emplace(name, shader.Pass());
+
+	return true;
+}
+
+const Shader *ResourceDatabase::GetShader(const std::string &name)
 {
 	auto &instance = Instance();
-	auto it = instance._shaders.find(name);
-	if (it == instance._shaders.end())
+	auto it = instance._shaderLibrary.find(name);
+	if (it == instance._shaderLibrary.end())
 		return nullptr;
 
-	return it->second.get();
+	return it->second.Access();
+}
+
+void ResourceDatabase::ReloadShaders()
+{
+    for(const auto& [name, shader] : Instance()._shaderLibrary)
+    {
+        auto newShader = ShaderLoader::LoadShader("");
+        shader->Replace(newShader.Release());
+    }
 }

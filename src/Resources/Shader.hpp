@@ -6,7 +6,10 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/fwd.hpp>
+#include <typeindex>
+#include <vector>
 #include "../OGL/IBindable.hpp"
+#include "../Components/CameraComponent.hpp"
 
 
 class Shader : public IBindable
@@ -19,8 +22,9 @@ public:
 
     unsigned int GetBindID() const override;
 
-    // Uniforms
     int GetUniformLocation(const std::string &name) const;
+
+    std::unordered_map<std::string, std::pair<int, std::type_index>> GetUniforms() const;
 
     static void SetFloat(int location, float value);
     static void SetVec2(int location, glm::vec2 value);
@@ -29,10 +33,14 @@ public:
     static void SetMat3(int location, glm::mat3 value);
     static void SetMat4(int location, glm::mat4 value);
 
+    void SetTransformations(glm::mat4 modelToWorld, CameraComponent &camera) const;
+
 private:
     unsigned int _shader;
     std::string _name;
-    std::unordered_map<std::string, int> _uniformLocations;
+    std::unordered_map<std::string, std::pair<int, std::type_index>> _uniformsNameLocationType;
+
+    static std::type_index TypeOpenglToCpp(unsigned int type);
 };
 
 

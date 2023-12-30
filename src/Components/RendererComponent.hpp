@@ -3,23 +3,23 @@
 
 #include <memory>
 #include "Component.hpp"
-#include "../Data/MaterialData.hpp"
 #include "TransformComponent.hpp"
 #include "CameraComponent.hpp"
 #include "../Resources/Mesh.hpp"
+#include "../Resources/Material.hpp"
 
 
 class RendererComponent : public Component
 {
 public:
-    RendererComponent(const Entity *owner, const Mesh* mesh, MaterialData &material);
+    RendererComponent(const Entity *owner, const Mesh* mesh, Material &material);
 
 	void Render(CameraComponent& camera);
 
 private:
     const Mesh* _mesh;
 
-	MaterialData &_material;
+	Material &_material;
 
     TransformComponent* _transform;
 };

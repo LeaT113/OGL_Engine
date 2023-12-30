@@ -43,6 +43,7 @@ add_executable(${PROJECT_NAME}
         src/Resources/ModelLoader.hpp src/Resources/ModelLoader.cpp
         src/Resources/Shader.hpp src/Resources/Shader.cpp
         src/Resources/ShaderLoader.hpp src/Resources/ShaderLoader.cpp
+        src/Resources/Material.hpp src/Resources/Material.cpp
 )
 
 # Libraries
