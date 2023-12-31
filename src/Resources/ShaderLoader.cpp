@@ -3,6 +3,7 @@
 #include "ShaderLoader.hpp"
 #include "GL/glew.h"
 #include "../OGL/VertexAttributes.hpp"
+#include "../Systems/ResourceDatabase.hpp"
 
 
 const std::string ShaderLoader::ShadersPath = "res/Shaders/";
@@ -27,7 +28,6 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
                 << parsedShader.shared.rdbuf();
 
     // Assemble and compile
-    // TODO UBO structs
     std::stringstream vertexSource;
     vertexSource << sharedSource.rdbuf()
                        << parsedShader.vertexFunction.rdbuf();
@@ -40,20 +40,12 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
                             << parsedShader.fragmentFunction.rdbuf();
     GLuint fragmentShader = CompileShader(fragmentSource.str(), GL_FRAGMENT_SHADER);
 
-    /*
-    sharedSource.seekg(0);
-    parsedShader.vertexFunction.seekg(0);
-    parsedShader.fragmentFunction.seekg(0);
-    {
-        std::ofstream outFile("shader_debug_output.glsl");
-        outFile << sharedSource.rdbuf() << parsedShader.vertexFunction.rdbuf() << parsedShader.fragmentFunction.rdbuf();
-    }
-    */
-
     // Create and attach program
     GLuint program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
     // Bind vertex attrib locations
     for(int i = 0; i < VertexAttribute::COUNT; i++)
@@ -66,15 +58,37 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     // Link
     glLinkProgram(program);
     glValidateProgram(program);
-    // TODO Check validation results
+    GLint glValidationStatus = 0;
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &glValidationStatus);
+    if (glValidationStatus == GL_FALSE)
+        return Handle<Shader>::Empty();
 
-    // Cleanup
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    // Uniforms
+    std::unordered_map<std::string, Shader::Uniform> uniforms;
+    GLint uniformCount = 0;
+    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
+    if(uniformCount > 0)
+    {
+        GLint nameMaxLength = 0;
+        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &nameMaxLength);
+        auto uniformName = std::make_unique<char[]>(nameMaxLength);
 
-    // TODO Get uniforms
+        GLsizei length, count = 0;
+        GLenum type = GL_NONE;
 
-    return Handle<Shader>::Make(program, path);
+        for (GLint i = 0; i < uniformCount; ++i)
+        {
+            glGetActiveUniform(program, i, nameMaxLength, &length, &count, &type, uniformName.get());
+
+            std::string nameString (uniformName.get(), length);
+            int location = glGetUniformLocation(program, uniformName.get());
+            std::type_index dataType = TypeOpenglToCpp(type);
+
+            uniforms.emplace(std::move(nameString), Shader::Uniform{location, dataType});
+        }
+    }
+
+    return Handle<Shader>::Make(program, path, uniforms);
 }
 
 ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
@@ -166,7 +180,7 @@ ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
 
             result.vertexFunction << line << '\n';
         }
-        else if(state == ParseState::FragmentFunction)
+        else // state == ParseState::FragmentFunction
         {
             result.fragmentFunction << line << '\n';
         }
@@ -237,7 +251,7 @@ unsigned int ShaderLoader::CompileShader(const std::string &source, unsigned int
     {
         int length;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        char *message = (char *) alloca(length * sizeof(char));
+        char *message = static_cast<char *>(alloca(length * sizeof(char)));
         glGetShaderInfoLog(shader, length, &length, message);
         std::string mes = "Shader failed to compile: ";
         mes += message;
@@ -250,4 +264,26 @@ unsigned int ShaderLoader::CompileShader(const std::string &source, unsigned int
     return shader;
 }
 
+std::type_index ShaderLoader::TypeOpenglToCpp(unsigned int type)
+{
+    switch(type)
+    {
+        case GL_FLOAT:
+            return typeid(float);
 
+        case GL_FLOAT_VEC2:
+            return typeid(glm::vec2);
+        case GL_FLOAT_VEC3:
+            return typeid(glm::vec3);
+        case GL_FLOAT_VEC4:
+            return typeid(glm::vec4);
+
+        case GL_FLOAT_MAT3:
+            return typeid(glm::mat3);
+        case GL_FLOAT_MAT4:
+            return typeid(glm::mat4);
+
+        default:
+            throw std::runtime_error("ShaderLoader::TypeOpenglToCpp unsupported type");
+    }
+}

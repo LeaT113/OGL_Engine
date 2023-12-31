@@ -6,32 +6,9 @@
 #include "../OGL/Graphics.hpp"
 
 
-Shader::Shader(unsigned int id, std::string name): _shader(id), _name(std::move(name))
-{
-    // TODO Move to shader loader
-    GLint uniformCount = 0;
-    glGetProgramiv(_shader, GL_ACTIVE_UNIFORMS, &uniformCount);
-    if(uniformCount == 0)
-        return;
-
-    GLint 	nameMaxLength = 0;
-    GLsizei length = 0;
-    GLsizei count = 0;
-    GLenum 	type = GL_NONE;
-    glGetProgramiv(_shader, GL_ACTIVE_UNIFORM_MAX_LENGTH, &nameMaxLength);
-
-    auto uniformName = std::make_unique<char[]>(nameMaxLength);
-    for (GLint i = 0; i < uniformCount; ++i)
-    {
-        glGetActiveUniform(_shader, i, nameMaxLength, &length, &count, &type, uniformName.get());
-
-        std::string nameString (uniformName.get(), length);
-        int location = glGetUniformLocation(_shader, uniformName.get());
-        std::type_index dataType = TypeOpenglToCpp(type);
-
-        _uniformsNameLocationType.emplace(std::move(nameString), std::make_pair(location, dataType));
-    }
-}
+Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms)
+    : _shader(id), _name(std::move(name)), _uniforms(std::move(uniforms))
+{}
 
 Shader::~Shader()
 {
@@ -46,7 +23,7 @@ void Shader::Replace(Shader &&other) noexcept
     glDeleteProgram(_shader);
 
     _shader = other._shader;
-    _uniformsNameLocationType = std::move(other._uniformsNameLocationType);
+    _uniforms = std::move(other._uniforms);
 
     other._shader = -1;
 }
@@ -58,16 +35,16 @@ unsigned int Shader::GetBindID() const
 
 int Shader::GetUniformLocation(const std::string &name) const
 {
-    auto it = _uniformsNameLocationType.find(name);
-    if(it == _uniformsNameLocationType.end())
+    auto it = _uniforms.find(name);
+    if(it == _uniforms.end())
         return -1;
 
-    return it->second.first;
+    return it->second.location;
 }
 
-std::unordered_map<std::string, std::pair<int, std::type_index>> Shader::GetUniforms() const
+std::unordered_map<std::string, Shader::Uniform> Shader::GetUniforms() const
 {
-    return _uniformsNameLocationType;
+    return _uniforms;
 }
 
 void Shader::SetFloat(int location, float value)
@@ -98,30 +75,6 @@ void Shader::SetMat3(int location, glm::mat3 value)
 void Shader::SetMat4(int location, glm::mat4 value)
 {
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
-}
-
-std::type_index Shader::TypeOpenglToCpp(unsigned int type)
-{
-    switch(type)
-    {
-        case GL_FLOAT:
-            return typeid(float);
-
-        case GL_FLOAT_VEC2:
-            return typeid(glm::vec2);
-        case GL_FLOAT_VEC3:
-            return typeid(glm::vec3);
-        case GL_FLOAT_VEC4:
-            return typeid(glm::vec4);
-
-        case GL_FLOAT_MAT3:
-            return typeid(glm::mat3);
-        case GL_FLOAT_MAT4:
-            return typeid(glm::mat4);
-
-        default:
-            throw std::runtime_error("Shader::TypeOpenglToCpp unsupported type");
-    }
 }
 
 void Shader::SetTransformations(const glm::mat4 &modelToWorld, const CameraComponent &camera) const

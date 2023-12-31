@@ -15,7 +15,7 @@ Material::Material(const Shader &shader): _shader(shader)
             };
 
     for(const auto &u : _shader.GetUniforms())
-        _uniformLocationValue.emplace(u.second.first, uniformTypeToInstance.at(u.second.second)());
+        _uniformLocationValue.emplace(u.second.location, uniformTypeToInstance.at(u.second.type)());
 }
 
 const Shader &Material::GetShader() const

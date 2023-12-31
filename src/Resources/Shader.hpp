@@ -15,7 +15,12 @@
 class Shader : public IBindable
 {
 public:
-    explicit Shader(unsigned int id, std::string name);
+    struct Uniform {
+        int location;
+        std::type_index type;
+    };
+
+    Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms);
     ~Shader();
 
     void Replace(Shader&& other) noexcept;
@@ -24,7 +29,7 @@ public:
 
     int GetUniformLocation(const std::string &name) const;
 
-    std::unordered_map<std::string, std::pair<int, std::type_index>> GetUniforms() const;
+    std::unordered_map<std::string, Uniform> GetUniforms() const;
 
     static void SetFloat(int location, float value);
     static void SetVec2(int location, glm::vec2 value);
@@ -38,9 +43,7 @@ public:
 private:
     unsigned int _shader;
     std::string _name;
-    std::unordered_map<std::string, std::pair<int, std::type_index>> _uniformsNameLocationType;
-
-    static std::type_index TypeOpenglToCpp(unsigned int type);
+    std::unordered_map<std::string, Uniform> _uniforms;
 };
 
 

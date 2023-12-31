@@ -32,6 +32,8 @@ private:
     static std::stringstream GenerateIncludeString(const std::vector<std::string> &includes);
 
     static unsigned int CompileShader(const std::string &source, unsigned int type);
+
+    static std::type_index TypeOpenglToCpp(unsigned int type);
 };
 
 
