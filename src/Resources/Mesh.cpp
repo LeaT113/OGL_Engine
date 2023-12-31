@@ -1,15 +1,9 @@
 #include "Mesh.hpp"
 
 
-Mesh::Mesh(Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray) : _vertexBuffer(
-        vertexBuffer.Pass()),
-                                                                                                                  _indexBuffer(
-                                                                                                                          indexBuffer.Pass()),
-                                                                                                                  _vertexArray(
-                                                                                                                          vertexArray.Pass())
-{
-
-}
+Mesh::Mesh(Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray)
+    : _vertexBuffer(vertexBuffer.Pass()), _indexBuffer(indexBuffer.Pass()), _vertexArray(vertexArray.Pass())
+{}
 
 
 const VertexArray &Mesh::GetVertexArray() const
