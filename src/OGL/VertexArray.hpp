@@ -18,7 +18,7 @@ public:
     };
 
     explicit VertexArray(Layout layout, size_t vertexCount);
-    ~VertexArray();
+    ~VertexArray() override;
 
     GLuint GetBindID() const override;
 

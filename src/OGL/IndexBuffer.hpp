@@ -9,7 +9,7 @@ class IndexBuffer : public IBindable
 {
 public:
     IndexBuffer(const unsigned int* data, unsigned int count);
-    ~IndexBuffer();
+    ~IndexBuffer() override;
 
     GLuint GetBindID() const override;
 
