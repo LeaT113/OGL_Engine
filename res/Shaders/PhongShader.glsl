@@ -1,36 +1,33 @@
-#include "Library/Lighting.glsl"
+#include "Library/Core.glsl"
 #include "Library/Lights.glsl"
 #include "Library/Tonemapping.glsl"
 
-//#shader vertex
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec3 aNormal;
-uniform mat4 uMVP;
-uniform mat4 uModelToWorld;
-out vec3 position;
-out vec3 normal;
+in vec3 aPosition;
+in vec3 aNormal;
 
-void main()
+uniform vec4 Color;
+
+struct v2f
 {
-    vec4 positionWS = uModelToWorld * vec4(aPosition, 1.0);
-    vec4 normalWS = normalize(uModelToWorld * vec4(aNormal, 0.0));
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+};
 
-    position = positionWS.xyz;
-    normal = normalWS.xyz;
+void vert()
+{
+    v2f.position = ObjectToWorldPos(aPosition);
+    v2f.normal = ObjectToWorldNormal(aNormal);
 
-    gl_Position = uMVP * vec4(aPosition, 1);
+    gl_Position = ObjectToClipPos(aPosition);
 }
 
-//#shader fragment
-in vec3 position;
-in vec3 normal;
-layout (location = 0) out vec4 color;
-
-void main()
+void frag()
 {
-    vec3 normalWS = normalize(normal);
+    vec3 normalWS = normalize(v2f.normal);
+    vec3 cameraPos = ViewToWorldPos((0).xxx);
 
-    vec3 lighting = PointLight(position, normalWS, vec3(0, 0.3, 0), 0.1, vec3(0.9, .23, .05) * 0.2) + vec3(0.01, 0.013, 0.02);
+    vec3 lighting = ApplyLights(v2f.position, normalWS, cameraPos);
 
     vec3 col = vec3(1,1,1) * lighting;
     col = FilmicToneMapping(col);

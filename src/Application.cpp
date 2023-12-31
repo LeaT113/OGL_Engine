@@ -6,19 +6,19 @@
 #include "Systems/TimeKeeper.hpp"
 #include "Entity/Entity.hpp"
 #include "Components/CameraComponent.hpp"
-#include "OGL/Graphics.hpp"
-#include "OGL/UniformBuffer.hpp"
+#include "Components/LightComponent.hpp"
 #include "Systems/ResourceDatabase.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "Resources/ModelLoader.hpp"
 #include "Resources/ShaderLoader.hpp"
 #include "Resources/Material.hpp"
-#include "Resources/ShaderStructs.hpp"
+#include "Systems/LightingSystem.hpp"
 
 
 std::unique_ptr<TimeKeeper> timeKeeper = std::make_unique<TimeKeeper>();
 std::unique_ptr<InputSystem> inputSystem = std::make_unique<InputSystem>();
 std::unique_ptr<RenderSystem> rendererSystem = std::make_unique<RenderSystem>();
+std::unique_ptr<LightingSystem> lightingSystem = std::make_unique<LightingSystem>();
 
 int main()
 {
@@ -84,7 +84,7 @@ int main()
         .AddComponent<CameraComponent>(ProjectionType::Perspective, 75.0f);
     rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 
-    auto s = ShaderLoader::LoadShader("PhongShader1.glsl");
+    auto s = ShaderLoader::LoadShader("PhongShader.glsl");
     auto material = Handle<Material>::Make(*s.Access());
     ModelLoader ml;
 
@@ -119,17 +119,32 @@ int main()
     materialTest.Transform()->Position() = glm::vec3(-1, 0.4, 1.3);
     materialTest.Transform()->Scale() = glm::vec3(0.4);
 
-	// Lights
-	PointLight lights[] =
-	{
-		{glm::vec3(-1.5, 0.3, 0),  0, glm::vec3(0.5, 0, 0), 0.1f},
-		{glm::vec3(0, 0.3, 0),  0, glm::vec3(0, 0.5, 0),  0.1f},
-		{glm::vec3(1.5, 0.3, 0),  0, glm::vec3(0, 0, 0.5),  0.1f},
-		{},
-	};
-	Handle<UniformBuffer> lightBuffer = Handle<UniformBuffer>::Make(sizeof(lights));
-	Graphics::Bind(*lightBuffer, 1);
-	lightBuffer->SetData(0, sizeof(lights), lights);
+	auto emissionShader = ShaderLoader::LoadShader("EmissionShader.glsl");
+	auto emissionMaterial0 = Handle<Material>::Make(*emissionShader);
+	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f);
+	ml.LoadModel("Icosphere.obj");
+	Entity pointLight0;
+	pointLight0
+		.AddComponent<TransformComponent>()
+		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Icosphere.obj"), *emissionMaterial0)
+		.AddComponent<LightComponent>(LightComponent::LightType::Point);
+	pointLight0.Transform()->Position() = glm::vec3(-1.5, 0.3, 0);
+	pointLight0.Transform()->Scale() = glm::vec3(0.1);
+	emissionMaterial0->Set("Color", glm::vec4(col0, 0));
+	auto pl0 = pointLight0.GetComponent<LightComponent>();
+	pl0->SetColor(col0);
+
+	auto emissionMaterial1 = Handle<Material>::Make(*emissionShader);
+	auto col1 = glm::vec3(96.0f/255.0f, 137.0f/255, 214.0f/255);
+	Entity pointLight1;
+	pointLight1
+		.AddComponent<TransformComponent>()
+		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Icosphere.obj"), *emissionMaterial1)
+		.AddComponent<LightComponent>(LightComponent::LightType::Point);
+	pointLight1.Transform()->Scale() = glm::vec3(0.1);
+	emissionMaterial1->Set("Color", glm::vec4(col1, 0));
+	auto pl1 = pointLight1.GetComponent<LightComponent>();
+	pl1->SetColor(col1);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -164,8 +179,10 @@ int main()
 		// Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //suzanne.Transform()->AngleAxis(timeKeeper->DeltaTime() * 50, glm::vec3(0, 1, 0));
+		pointLight0.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
+		pointLight1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
 
+		lightingSystem->UpdateLights();
         rendererSystem->Render();
 
 		glfwSwapBuffers(window);

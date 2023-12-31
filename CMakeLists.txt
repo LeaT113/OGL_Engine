@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
         src/Components/Component.hpp src/Components/Component.cpp
         src/Components/RendererComponent.hpp src/Components/RendererComponent.cpp
         src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
+        src/Components/LightComponent.hpp src/Components/LightComponent.cpp
 
         # Data
         src/Data/MaterialData.hpp src/Data/MaterialData.cpp
@@ -29,6 +30,7 @@ add_executable(${PROJECT_NAME}
         src/Systems/RenderSystem.hpp src/Systems/RenderSystem.cpp
         src/Systems/ResourceDatabase.hpp src/Systems/ResourceDatabase.cpp
         src/Systems/TimeKeeper.hpp src/Systems/TimeKeeper.cpp
+        src/Systems/LightingSystem.hpp src/Systems/LightingSystem.cpp
 
         # OGL
         src/OGL/Graphics.hpp src/OGL/Graphics.cpp
@@ -46,6 +48,7 @@ add_executable(${PROJECT_NAME}
         src/Resources/ShaderLoader.hpp src/Resources/ShaderLoader.cpp
         src/Resources/Material.hpp src/Resources/Material.cpp
         src/Resources/ShaderStructs.hpp src/Resources/ShaderStructs.cpp
+
 )
 
 # Libraries

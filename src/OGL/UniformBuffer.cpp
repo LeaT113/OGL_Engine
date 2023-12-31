@@ -12,7 +12,7 @@ UniformBuffer::UniformBuffer(unsigned int size) : _ubo(0), _size(size)
 {
     glGenBuffers(1, &_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
-    glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STREAM_DRAW);
 }
 
 UniformBuffer::~UniformBuffer()
