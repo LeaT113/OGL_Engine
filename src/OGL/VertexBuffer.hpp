@@ -10,7 +10,7 @@ class VertexBuffer : public IBindable
 {
 public:
     VertexBuffer(const void* data, unsigned int size);
-    ~VertexBuffer();
+    ~VertexBuffer() override;
 
     void InsertData(unsigned int offset, const void* data, unsigned int size);
 

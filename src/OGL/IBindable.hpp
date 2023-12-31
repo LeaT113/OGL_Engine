@@ -5,6 +5,8 @@
 class IBindable
 {
 public:
+    virtual ~IBindable();
+
     virtual unsigned int GetBindID() const = 0;
 };
 

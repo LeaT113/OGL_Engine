@@ -9,7 +9,7 @@ class UniformBuffer : public IBindable
 {
 public:
     explicit UniformBuffer(unsigned int size);
-    ~UniformBuffer();
+    ~UniformBuffer() override;
 
     void SetData(unsigned int offset, unsigned int size, const void *data);
 
