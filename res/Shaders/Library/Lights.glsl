@@ -72,7 +72,8 @@ vec3 ApplySpotLight(vec3 position, vec3 normal, vec3 cameraPos, SpotLight spotLi
     float distanceAttenuation = Point_DistanceAttenuationSphere(dist, 0.1f);
 
     float spotDot = dot(-lightDir, spotLight.direction);
-    float spotAttenuation = clamp(spotLight.spotA * spotDot + spotLight.spotB, 0, 1);
+    float spotAttenuation = clamp(spotDot * spotLight.spotA + spotLight.spotB, 0, 1);
+    spotAttenuation = spotAttenuation * spotAttenuation;
 
     return spotLight.color * angleAttenuation * distanceAttenuation * spotAttenuation;
 }
@@ -84,7 +85,7 @@ vec3 ApplyLights(vec3 position, vec3 normal, vec3 cameraPos)
     l += ApplyAmbientLight(position, normal, cameraPos, Lights.ambientLight);
     l += ApplyDirectLight(position, normal, cameraPos, Lights.directLight);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         l += ApplyPointLight(position, normal, cameraPos, Lights.pointLights[i]);
         l += ApplySpotLight(position, normal, cameraPos, Lights.spotLights[i]);

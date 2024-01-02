@@ -5,7 +5,7 @@
 
 
 LightComponent::LightComponent(const Entity* owner, LightType type)
-    : _lightType(type), _color(1), _direction(0, -1, 0)
+    : _lightType(type), _color(1), _direction(0, -1, 0), _spotInnerAngle(20), _spotOuterAngle(30)
 {
     _owner = owner;
     _transform = owner->GetComponent<TransformComponent>();
@@ -28,8 +28,6 @@ void LightComponent::SetSpotAngles(float innerAngle, float outerAngle)
 {
     _spotInnerAngle = innerAngle;
     _spotOuterAngle = outerAngle;
-
-
 }
 
 LightComponent::LightType LightComponent::GetType() const
@@ -54,8 +52,16 @@ PointLight LightComponent::GetPointLight() const
 
 SpotLight LightComponent::GetSpotLight() const
 {
-    float spotA = 1 / (glm::cos(glm::radians(_spotInnerAngle/2)) - glm::cos(glm::radians(_spotOuterAngle/2)));
-    float spotB = - glm::cos(glm::radians(_spotInnerAngle/2));
+    float innerCos = glm::cos(glm::radians(_spotInnerAngle * 0.5f));
+    float outerCos = glm::cos(glm::radians(_spotOuterAngle * 0.5f));
 
-    return SpotLight(_color, spotA, _transform->Position(), spotB, _direction);
+    float a = 1 / glm::max(innerCos - outerCos, 0.001f);
+    float b = -outerCos * a;
+
+    //float spotA = 1 / (glm::cos(glm::radians(_spotInnerAngle/2)) - glm::cos(glm::radians(_spotOuterAngle/2)));
+    //float spotB = - glm::cos(glm::radians(_spotInnerAngle/2));
+
+    glm::vec3 dirWS = glm::normalize(_transform->ModelToWorld() * glm::vec4(_direction, 0));
+
+    return SpotLight(_color, a, _transform->Position(), b, dirWS);
 }
