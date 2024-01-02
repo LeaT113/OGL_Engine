@@ -1,6 +1,7 @@
 #include <fstream>
 #include <set>
 #include "ShaderLoader.hpp"
+#include "Texture.hpp"
 #include "GL/glew.h"
 #include "../OGL/VertexAttributes.hpp"
 #include "../Systems/ResourceDatabase.hpp"
@@ -63,16 +64,19 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     if (glValidationStatus == GL_FALSE)
         return Handle<Shader>::Empty();
 
-    // Uniforms
+    // Uniforms and textures
     std::unordered_map<std::string, Shader::Uniform> uniforms;
+    std::unordered_map<std::string, Shader::TextureSlot> textures;
+    glUseProgram(program);
     GLint uniformCount = 0;
     glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
     if(uniformCount > 0)
     {
+        int textureSlotIndex = 0;
+
         GLint nameMaxLength = 0;
         glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &nameMaxLength);
         auto uniformName = std::make_unique<char[]>(nameMaxLength);
-
         GLsizei length, count = 0;
         GLenum type = GL_NONE;
 
@@ -82,13 +86,25 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
 
             std::string nameString (uniformName.get(), length);
             int location = glGetUniformLocation(program, uniformName.get());
-            std::type_index dataType = TypeOpenglToCpp(type);
 
-            uniforms.emplace(std::move(nameString), Shader::Uniform{location, dataType});
+            // Texture slot
+            if(type >= GL_SAMPLER_1D && type <= GL_SAMPLER_CUBE)
+            {
+                // TODO get specific texture type
+                glUniform1i(location, textureSlotIndex);
+                textures.emplace(std::move(nameString), Shader::TextureSlot{textureSlotIndex, Texture::Type::Tex2D});
+                textureSlotIndex++;
+            }
+            else // Uniform
+            {
+                std::type_index dataType = TypeOpenglToCpp(type);
+                uniforms.emplace(std::move(nameString), Shader::Uniform{location, dataType});
+            }
         }
     }
 
-    return Handle<Shader>::Make(program, path, uniforms);
+
+    return Handle<Shader>::Make(program, path, uniforms, textures);
 }
 
 ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
@@ -282,6 +298,10 @@ std::type_index ShaderLoader::TypeOpenglToCpp(unsigned int type)
             return typeid(glm::mat3);
         case GL_FLOAT_MAT4:
             return typeid(glm::mat4);
+
+        case GL_SAMPLER_2D:
+            return typeid(Texture*);
+
 
         default:
             throw std::runtime_error("ShaderLoader::TypeOpenglToCpp unsupported type");

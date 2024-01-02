@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 #include "Shader.hpp"
 
+class Texture;
+
 
 class Material
 {
@@ -32,6 +34,7 @@ public:
         Set(_shader.GetUniformLocation(name), value);
     }
 
+    // TODO Specialize get for textures
     template<typename T>
     T Get(const std::string& name) const
     {
@@ -54,12 +57,15 @@ public:
 
     void ApplyValues() const;
 
+    void BindTextures() const;
+
     const Shader &GetShader() const;
 
 private:
     const Shader &_shader;
-    using MaterialValue = std::variant<float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
+    using MaterialValue = std::variant<float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4, Texture*>;
     std::unordered_map<int, MaterialValue> _uniformLocationValue;
+    std::vector<Texture*> _textures;
 };
 
 

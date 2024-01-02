@@ -3,11 +3,10 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "Shader.hpp"
-#include "../OGL/Graphics.hpp"
 
 
-Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms)
-    : _shader(id), _name(std::move(name)), _uniforms(std::move(uniforms))
+Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms, std::unordered_map<std::string, TextureSlot> textures)
+    : _shader(id), _name(std::move(name)), _uniforms(std::move(uniforms)), _textures(std::move(textures))
 {}
 
 Shader::~Shader()
@@ -33,18 +32,30 @@ unsigned int Shader::GetBindID() const
     return _shader;
 }
 
+/// \brief Get the location of a simple uniform or the binding slot of a sampler for the currently bound shader
+/// \param name Name of uniform in shader
+/// \return Location or slot of uniform
 int Shader::GetUniformLocation(const std::string &name) const
 {
     auto it = _uniforms.find(name);
-    if(it == _uniforms.end())
-        return -1;
+    if(it != _uniforms.end())
+        return it->second.location;
 
-    return it->second.location;
+    auto it2 = _textures.find(name);
+    if(it2 != _textures.end())
+        return it2->second.binding;
+
+    return -1;
 }
 
 std::unordered_map<std::string, Shader::Uniform> Shader::GetUniforms() const
 {
     return _uniforms;
+}
+
+std::unordered_map<std::string, Shader::TextureSlot> Shader::GetTextureSlots() const
+{
+    return _textures;
 }
 
 void Shader::SetFloat(int location, float value)
@@ -77,12 +88,12 @@ void Shader::SetMat4(int location, glm::mat4 value)
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void Shader::SetTransformations(const glm::mat4 &modelToWorld, const CameraComponent &camera) const
+void Shader::SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const
 {
     SetMat4(GetUniformLocation("ObjectToWorldMatrix"), modelToWorld);
     SetMat4(GetUniformLocation("WorldToObjectMatrix"), glm::inverse(modelToWorld));
-    SetMat4(GetUniformLocation("WorldToViewMatrix"), camera.View());
-    SetMat4(GetUniformLocation("ViewToWorldMatrix"), glm::inverse(camera.View()));
+    SetMat4(GetUniformLocation("WorldToViewMatrix"), view);
+    SetMat4(GetUniformLocation("ViewToWorldMatrix"), glm::inverse(view));
 
-    SetMat4(GetUniformLocation("ObjectToClipMatrix"), camera.Projection() * camera.View() * modelToWorld);
+    SetMat4(GetUniformLocation("ObjectToClipMatrix"), projection * view * modelToWorld);
 }

@@ -1,14 +1,17 @@
 #ifndef OGL_ENGINE_GRAPHICS_HPP
 #define OGL_ENGINE_GRAPHICS_HPP
+#include <glm/fwd.hpp>
 
-#include <glm/glm.hpp>
-#include "../Resources/Mesh.hpp"
-#include "../Resources/Shader.hpp"
-#include "../Resources/Material.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
-#include "UniformBuffer.hpp"
-#include "VertexArray.hpp"
+class VertexBuffer;
+class IndexBuffer;
+class VertexArray;
+class Shader;
+class UniformBuffer;
+class Texture;
+class Mesh;
+class Material;
+class CameraComponent;
+class RendererComponent;
 
 
 class Graphics
@@ -20,7 +23,7 @@ public:
     static void Bind(const VertexArray &vertexArray);
     static void Bind(const Shader &shader);
     static void Bind(const UniformBuffer &uniformBuffer, unsigned int slot);
-    // static void Bind(const Texture& texture, unsigned int slot);
+    static void Bind(const Texture &texture, unsigned int slot);
 
     // Render
     static void RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld, const Material &material, const CameraComponent &camera);

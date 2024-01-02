@@ -7,11 +7,13 @@
 #include "Entity/Entity.hpp"
 #include "Components/CameraComponent.hpp"
 #include "Components/LightComponent.hpp"
+#include "OGL/Graphics.hpp"
 #include "Systems/ResourceDatabase.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "Resources/ModelLoader.hpp"
 #include "Resources/ShaderLoader.hpp"
 #include "Resources/Material.hpp"
+#include "Resources/TextureLoader.hpp"
 #include "Systems/LightingSystem.hpp"
 
 
@@ -81,12 +83,22 @@ int main()
     Entity camera;
     camera
         .AddComponent<TransformComponent>()
-        .AddComponent<CameraComponent>(ProjectionType::Perspective, 75.0f);
+        .AddComponent<CameraComponent>(ProjectionType::Perspective, 75.0f)
+		.AddComponent<LightComponent>(LightComponent::LightType::Spot);
     rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
+	auto flashLight = camera.GetComponent<LightComponent>();
+	flashLight->SetColor(glm::vec3(255, 243, 207) * 1.0f/100.0f);
+	flashLight->SetDirection(glm::vec3(0, 0, -1));
+	flashLight->SetSpotAngles(10, 90);
 
     auto s = ShaderLoader::LoadShader("PhongShader.glsl");
     auto material = Handle<Material>::Make(*s.Access());
     ModelLoader ml;
+
+	auto groundTexture = TextureLoader::LoadTexture("ground_tex.jpg");
+	auto waterFoamTexture = TextureLoader::LoadTexture("WaterFoam.png");
+	material->Set("Albedo", groundTexture.Access());
+	material->Set("Other", waterFoamTexture.Access());
 
     ml.LoadModel("Plane.obj");
     Entity plane;
@@ -121,8 +133,9 @@ int main()
 
 	auto emissionShader = ShaderLoader::LoadShader("EmissionShader.glsl");
 	auto emissionMaterial0 = Handle<Material>::Make(*emissionShader);
-	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f);
 	ml.LoadModel("Icosphere.obj");
+
+	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f);
 	Entity pointLight0;
 	pointLight0
 		.AddComponent<TransformComponent>()
@@ -146,16 +159,45 @@ int main()
 	auto pl1 = pointLight1.GetComponent<LightComponent>();
 	pl1->SetColor(col1);
 
+	auto emissionMaterial2 = Handle<Material>::Make(*emissionShader);
+	auto col2 = glm::vec3(0.8, 0.15, 0.2) * 3.0f;
+	Entity spotLight0;
+	spotLight0
+		.AddComponent<TransformComponent>()
+		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Icosphere.obj"), *emissionMaterial2)
+		.AddComponent<LightComponent>(LightComponent::LightType::Spot);
+	spotLight0.Transform()->Scale() = glm::vec3(0.1);
+	spotLight0.Transform()->Position() = glm::vec3(0, 1.5, 0);
+	emissionMaterial2->Set("Color", glm::vec4(col2, 0));
+	auto pl2 = spotLight0.GetComponent<LightComponent>();
+	pl2->SetColor(col2);
+	pl2->SetSpotAngles(20, 80);
+	pl2->SetDirection(glm::vec3(0.7, -0.3, 0));
+
+
+
 	// Game loop
+	bool mouse = true;
 	while (!glfwWindowShouldClose(window))
 	{
 		// Update state
 		timeKeeper->Update();
 
-        if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE))
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE)) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			mouse = false;
+
+        }
+
+		if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1)) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			inputSystem->RestartRelativeMouse();
+			mouse = true;
+		}
+
+		if(!mouse)
+			inputSystem->RestartRelativeMouse();
+
 
         // Camera movement
         float rotationX, rotationY;
@@ -181,6 +223,7 @@ int main()
 
 		pointLight0.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
 		pointLight1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
+		spotLight0.Transform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
 
 		lightingSystem->UpdateLights();
         rendererSystem->Render();

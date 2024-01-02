@@ -48,7 +48,8 @@ add_executable(${PROJECT_NAME}
         src/Resources/ShaderLoader.hpp src/Resources/ShaderLoader.cpp
         src/Resources/Material.hpp src/Resources/Material.cpp
         src/Resources/ShaderStructs.hpp src/Resources/ShaderStructs.cpp
-
+        src/Resources/Texture.hpp src/Resources/Texture.cpp
+        src/Resources/TextureLoader.hpp src/Resources/TextureLoader.cpp
 )
 
 # Libraries

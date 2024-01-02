@@ -1,5 +1,6 @@
 #include <functional>
 #include "Material.hpp"
+#include "../OGL/Graphics.hpp"
 
 
 Material::Material(const Shader &shader): _shader(shader)
@@ -14,8 +15,21 @@ Material::Material(const Shader &shader): _shader(shader)
                 {typeid(glm::mat4), []() -> MaterialValue { return glm::mat4(); }},
             };
 
+    // TODO Exclude non-properties
     for(const auto &u : _shader.GetUniforms())
         _uniformLocationValue.emplace(u.second.location, uniformTypeToInstance.at(u.second.type)());
+
+    for(const auto &t : _shader.GetTextureSlots())
+        _textures.push_back(nullptr);
+}
+
+template<>
+void Material::Set<Texture*>(int location, Texture* const & value)
+{
+    if (location < 0 || location >= _textures.size())
+        throw std::runtime_error("Material::Set invalid texture slot");
+
+    _textures[location] = value;
 }
 
 const Shader &Material::GetShader() const
@@ -43,4 +57,10 @@ void Material::ApplyValues() const
                 Shader::SetMat4(location, v);
         }, value);
     }
+}
+
+void Material::BindTextures() const
+{
+    for (int i = 0; i < _textures.size(); i++)
+        Graphics::Bind(*_textures[i], i);
 }

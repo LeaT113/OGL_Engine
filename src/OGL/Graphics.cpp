@@ -1,5 +1,15 @@
 #include "Graphics.hpp"
 
+#include "VertexBuffer.hpp"
+#include "VertexArray.hpp"
+#include "IndexBuffer.hpp"
+#include "../Resources/Shader.hpp"
+#include "UniformBuffer.hpp"
+#include "../Resources/Mesh.hpp"
+#include "../Resources/Material.hpp"
+#include "../Resources/Texture.hpp"
+#include "../Components/CameraComponent.hpp"
+
 
 void Graphics::Bind(const VertexBuffer &vertexBuffer)
 {
@@ -27,6 +37,12 @@ void Graphics::Bind(const UniformBuffer& uniformBuffer, unsigned int slot)
     glBindBufferBase(GL_UNIFORM_BUFFER, slot, uniformBuffer.GetBindID());
 }
 
+void Graphics::Bind(const Texture& texture, unsigned slot)
+{
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texture.GetBindID());
+}
+
 
 void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld,
                           const Material &material, const CameraComponent &camera)
@@ -37,11 +53,12 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm
     const Shader &shader = material.GetShader();
     Graphics::Bind(shader);
 
-    // Set material values
+    // Apply material
     material.ApplyValues();
+    material.BindTextures();
 
     // Set transformation matrices
-    shader.SetTransformations(modelToWorld, camera);
+    shader.SetTransformations(modelToWorld, camera.View(), camera.Projection());
 
     // Set universal uniforms
 

@@ -2,14 +2,10 @@
 #define OGL_ENGINE_SHADER_HPP
 
 #include <unordered_map>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/fwd.hpp>
 #include <typeindex>
-#include <vector>
+#include <glm/glm.hpp>
+#include "Texture.hpp"
 #include "../OGL/IBindable.hpp"
-#include "../Components/CameraComponent.hpp"
 
 
 class Shader : public IBindable
@@ -20,8 +16,13 @@ public:
         std::type_index type;
     };
 
-    Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms);
-    ~Shader();
+    struct TextureSlot {
+        int binding;
+        Texture::Type type;
+    };
+
+    Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms, std::unordered_map<std::string, TextureSlot> textures);
+    ~Shader() override;
 
     void Replace(Shader&& other) noexcept;
 
@@ -30,6 +31,7 @@ public:
     int GetUniformLocation(const std::string &name) const;
 
     std::unordered_map<std::string, Uniform> GetUniforms() const;
+    std::unordered_map<std::string, TextureSlot> GetTextureSlots() const;
 
     static void SetFloat(int location, float value);
     static void SetVec2(int location, glm::vec2 value);
@@ -38,12 +40,13 @@ public:
     static void SetMat3(int location, glm::mat3 value);
     static void SetMat4(int location, glm::mat4 value);
 
-    void SetTransformations(const glm::mat4 &modelToWorld, const CameraComponent &camera) const;
+    void SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const;
 
 private:
     unsigned int _shader;
     std::string _name;
     std::unordered_map<std::string, Uniform> _uniforms;
+    std::unordered_map<std::string, TextureSlot> _textures;
 };
 
 
