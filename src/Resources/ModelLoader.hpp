@@ -15,7 +15,7 @@ public:
     /// Load and construct
     /// \param path Relative path inside Models folder
     /// \return Render-able entity
-    Entity* LoadModel(const std::string& path);
+    static Entity* LoadModel(const std::string& path);
 
 private:
     static const std::string ModelsPath;

@@ -93,14 +93,13 @@ int main()
 
     auto s = ShaderLoader::LoadShader("PhongShader.glsl");
     auto material = Handle<Material>::Make(*s.Access());
-    ModelLoader ml;
-
 	auto groundTexture = TextureLoader::LoadTexture("ground_tex.jpg");
 	auto waterFoamTexture = TextureLoader::LoadTexture("WaterFoam.png");
 	material->Set("Albedo", groundTexture.Access());
 	material->Set("Other", waterFoamTexture.Access());
 
-    ml.LoadModel("Plane.obj");
+
+	ModelLoader::LoadModel("Plane.obj");
     Entity plane;
     plane
         .AddComponent<TransformComponent>()
@@ -108,7 +107,7 @@ int main()
     plane.Transform()->Scale() = glm::vec3(15, 15, 15);
     plane.Transform()->Position() = glm::vec3(0, 0, 0);
 
-    ml.LoadModel("Suzanne.obj");
+    ModelLoader::LoadModel("Suzanne.obj");
     Entity suzanne;
     suzanne
             .AddComponent<TransformComponent>()
@@ -116,14 +115,14 @@ int main()
     suzanne.Transform()->Position() = glm::vec3(1, 0.6, -1);
     suzanne.Transform()->Scale() = glm::vec3(0.4, 0.4, 0.4);
 
-    ml.LoadModel("Cube.obj");
+    ModelLoader::LoadModel("Cube.obj");
     Entity cube;
     cube
             .AddComponent<TransformComponent>()
             .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.obj"), *material.Access());
     cube.Transform()->Position() = glm::vec3(-0.8, 0.5, -1.3);
 
-    ml.LoadModel("MaterialTest.obj");
+    ModelLoader::LoadModel("MaterialTest.obj");
     Entity materialTest;
     materialTest
             .AddComponent<TransformComponent>()
@@ -133,7 +132,7 @@ int main()
 
 	auto emissionShader = ShaderLoader::LoadShader("EmissionShader.glsl");
 	auto emissionMaterial0 = Handle<Material>::Make(*emissionShader);
-	ml.LoadModel("Icosphere.obj");
+	ModelLoader::LoadModel("Icosphere.obj");
 
 	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f);
 	Entity pointLight0;
