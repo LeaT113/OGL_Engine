@@ -52,9 +52,20 @@ Entity *ModelLoader::LoadModel(const std::string& path)
         attributes.push_back(VertexAttribute::Tangent);
     }
 
+    std::vector<std::vector<float>> UVs;
     for(int i = 0; i < mesh->GetNumUVChannels(); i++)
     {
-        // TODO
+        UVs.emplace_back();
+        UVs[i].reserve((size_t)vertexCount * 2);
+
+        for (size_t j = 0; j < vertexCount; j++)
+        {
+            aiVector3D vector = (mesh->mTextureCoords[i])[j];
+            UVs[i].push_back(vector.x);
+            UVs[i].push_back(vector.y);
+        }
+
+        attributes.push_back((VertexAttribute)(TexCoord0 + i));
     }
 
     // Indices
@@ -78,6 +89,10 @@ Entity *ModelLoader::LoadModel(const std::string& path)
         vertexBuffer->InsertAttribute(VertexAttribute::Normal, offset, normals, vertexCount);
     if(tangents)
         vertexBuffer->InsertAttribute(VertexAttribute::Tangent, offset, tangents, vertexCount);
+    for (int i = 0; i < UVs.size(); i++)
+    {
+        vertexBuffer->InsertAttribute((VertexAttribute)(TexCoord0 + i), offset, UVs[i].data(), vertexCount);
+    }
 
     auto indexBuffer = Handle<IndexBuffer>::Make(indices.data(), indices.size() * sizeof(unsigned int));
 
