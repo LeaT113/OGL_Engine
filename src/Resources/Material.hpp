@@ -4,7 +4,6 @@
 #include <string>
 #include <variant>
 #include <stdexcept>
-#include <glm/glm.hpp>
 #include "Shader.hpp"
 
 class Texture;
@@ -18,14 +17,22 @@ public:
     template<typename T>
     void Set(int location, const T& value)
     {
-        auto it = _uniformLocationValue.find(location);
-        if (it == _uniformLocationValue.end())
-            throw std::runtime_error("Material::Set invalid property location");
+        auto it = _uniformValues.find(location);
+        if (it == _uniformValues.end())
+            return;// TODO throw std::runtime_error("Material::Set invalid property location");
 
         if (!std::holds_alternative<T>(it->second))
-            throw std::runtime_error("Material::Set type mismatch");
+            return;// TODO throw std::runtime_error("Material::Set type mismatch");
 
         it->second = value;
+    }
+
+    void Set(int location, Texture* value)
+    {
+        if (location < 0 || location >= _textureValues.size())
+            return;// TODO throw std::runtime_error("Material::Set invalid texture slot");
+
+        _textureValues[location] = value;
     }
 
     template<typename T>
@@ -44,11 +51,11 @@ public:
     template<typename T>
     T Get(int location) const
     {
-        auto it = _uniformLocationValue.find(location);
-        if (it == _uniformLocationValue.end())
+        auto it = _uniformValues.find(location);
+        if (it == _uniformValues.end())
             throw std::runtime_error("Material::Set invalid property location");
 
-        const MaterialValue &property = it->second;
+        const auto &property = it->second;
         if (!std::holds_alternative<T>(property))
             throw std::runtime_error("Material::Set type mismatch");
 
@@ -63,9 +70,9 @@ public:
 
 private:
     const Shader &_shader;
-    using MaterialValue = std::variant<float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4, Texture*>;
-    std::unordered_map<int, MaterialValue> _uniformLocationValue;
-    std::vector<Texture*> _textures;
+
+    std::unordered_map<int, Shader::UniformValue> _uniformValues;
+    std::unordered_map<int, Texture*> _textureValues;
 };
 
 

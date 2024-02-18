@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <typeindex>
+#include <variant>
 #include <glm/glm.hpp>
 #include "Texture.hpp"
 #include "../OGL/IBindable.hpp"
@@ -11,17 +12,22 @@
 class Shader : public IBindable
 {
 public:
-    struct Uniform {
+    using UniformValue = std::variant<bool, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
+
+    struct UniformSlot {
         int location;
         std::type_index type;
+        UniformValue defaultValue;
     };
 
     struct TextureSlot {
-        int binding;
+        int location;
+        int unit;
         Texture::Type type;
     };
 
-    Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms, std::unordered_map<std::string, TextureSlot> textures);
+
+    Shader(unsigned int id, std::string name, std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures);
     ~Shader() override;
 
     void Replace(Shader&& other) noexcept;
@@ -30,9 +36,10 @@ public:
 
     int GetUniformLocation(const std::string &name) const;
 
-    std::unordered_map<std::string, Uniform> GetUniforms() const;
+    std::unordered_map<std::string, UniformSlot> GetUniforms() const;
     std::unordered_map<std::string, TextureSlot> GetTextureSlots() const;
 
+    static void SetBool(int location, bool value);
     static void SetFloat(int location, float value);
     static void SetVec2(int location, glm::vec2 value);
     static void SetVec3(int location, glm::vec3 value);
@@ -42,10 +49,12 @@ public:
 
     void SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const;
 
+    void BindTextureUnits() const;
+
 private:
     unsigned int _shader;
     std::string _name;
-    std::unordered_map<std::string, Uniform> _uniforms;
+    std::unordered_map<std::string, UniformSlot> _uniforms;
     std::unordered_map<std::string, TextureSlot> _textures;
 };
 

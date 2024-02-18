@@ -52,6 +52,7 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm
     // Bind shader
     const Shader &shader = material.GetShader();
     Graphics::Bind(shader);
+    shader.BindTextureUnits();
 
     // Apply material
     material.ApplyValues();

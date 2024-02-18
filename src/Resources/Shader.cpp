@@ -5,7 +5,7 @@
 #include "Shader.hpp"
 
 
-Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, Uniform> uniforms, std::unordered_map<std::string, TextureSlot> textures)
+Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures)
     : _shader(id), _name(std::move(name)), _uniforms(std::move(uniforms)), _textures(std::move(textures))
 {}
 
@@ -43,12 +43,12 @@ int Shader::GetUniformLocation(const std::string &name) const
 
     auto it2 = _textures.find(name);
     if(it2 != _textures.end())
-        return it2->second.binding;
+        return it2->second.unit;
 
     return -1;
 }
 
-std::unordered_map<std::string, Shader::Uniform> Shader::GetUniforms() const
+std::unordered_map<std::string, Shader::UniformSlot> Shader::GetUniforms() const
 {
     return _uniforms;
 }
@@ -56,6 +56,11 @@ std::unordered_map<std::string, Shader::Uniform> Shader::GetUniforms() const
 std::unordered_map<std::string, Shader::TextureSlot> Shader::GetTextureSlots() const
 {
     return _textures;
+}
+
+void Shader::SetBool(int location, bool value)
+{
+    glUniform1i(location, value ? 1 : 0);
 }
 
 void Shader::SetFloat(int location, float value)
@@ -90,10 +95,19 @@ void Shader::SetMat4(int location, glm::mat4 value)
 
 void Shader::SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const
 {
-    SetMat4(GetUniformLocation("ObjectToWorldMatrix"), modelToWorld);
-    SetMat4(GetUniformLocation("WorldToObjectMatrix"), glm::inverse(modelToWorld));
-    SetMat4(GetUniformLocation("WorldToViewMatrix"), view);
-    SetMat4(GetUniformLocation("ViewToWorldMatrix"), glm::inverse(view));
+    SetMat4(GetUniformLocation("_ObjectToWorldMatrix"), modelToWorld);
+    SetMat4(GetUniformLocation("_WorldToObjectMatrix"), glm::inverse(modelToWorld));
+    SetMat3(GetUniformLocation("_ObjectToWorldNormalMatrix"), glm::transpose(glm::inverse(glm::mat3(modelToWorld))));
+    SetMat4(GetUniformLocation("_WorldToViewMatrix"), view);
+    SetMat4(GetUniformLocation("_ViewToWorldMatrix"), glm::inverse(view));
 
-    SetMat4(GetUniformLocation("ObjectToClipMatrix"), projection * view * modelToWorld);
+    SetMat4(GetUniformLocation("_ObjectToClipMatrix"), projection * view * modelToWorld);
+}
+
+void Shader::BindTextureUnits() const
+{
+    for (auto [name, slot] : _textures)
+    {
+        glUniform1i(slot.location, slot.unit);
+    }
 }

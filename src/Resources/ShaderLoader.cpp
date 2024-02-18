@@ -1,6 +1,7 @@
 #include <fstream>
 #include <set>
 #include "ShaderLoader.hpp"
+#include <iostream>
 #include "Texture.hpp"
 #include "GL/glew.h"
 #include "../OGL/VertexAttributes.hpp"
@@ -15,30 +16,36 @@ const std::string ShaderLoader::FragmentOutput = "out vec4 color;\n";
 Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
 {
     // Load and parse
-    std::ifstream shaderFile(ShadersPath + path);
-    if(!shaderFile)
-        return Handle<Shader>::Empty();
-    auto parsedShader = ParseShader(shaderFile);
-    shaderFile.close();
+    ShaderParseResult parsedShader;
+    {
+        std::ifstream shaderFile(ShadersPath + path);
+        if(!shaderFile)
+            return Handle<Shader>::Empty();
 
-    // Prepare code
-    auto includeSource = GenerateIncludeString(parsedShader.includes);
+        parsedShader = ParseShader(shaderFile);
+    }
+
+    // Process includes and uniforms
+    auto [includeSource, includeUniforms] = ProcessIncludes(parsedShader.includes);
+    parsedShader.uniforms.insert(parsedShader.uniforms.end(),  includeUniforms.begin(), includeUniforms.end());
+    auto [uniforms, textures] = ProcessUniforms(parsedShader.uniforms);
+
+    // Assemble
     std::stringstream sharedSource;
     sharedSource << GlslVersion
                  << includeSource.rdbuf()
                 << parsedShader.shared.rdbuf();
-
-    // Assemble and compile
     std::stringstream vertexSource;
     vertexSource << sharedSource.rdbuf()
                        << parsedShader.vertexFunction.rdbuf();
-    GLuint vertexShader = CompileShader(vertexSource.str(), GL_VERTEX_SHADER);
     sharedSource.seekg(0);
-
     std::stringstream fragmentSource;
     fragmentSource << sharedSource.rdbuf()
                             << FragmentOutput
                             << parsedShader.fragmentFunction.rdbuf();
+
+    // Compile
+    GLuint vertexShader = CompileShader(vertexSource.str(), GL_VERTEX_SHADER);
     GLuint fragmentShader = CompileShader(fragmentSource.str(), GL_FRAGMENT_SHADER);
 
     // Create and attach program
@@ -64,43 +71,16 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     if (glValidationStatus == GL_FALSE)
         return Handle<Shader>::Empty();
 
-    // Uniforms and textures
-    std::unordered_map<std::string, Shader::Uniform> uniforms;
-    std::unordered_map<std::string, Shader::TextureSlot> textures;
-    glUseProgram(program);
-    GLint uniformCount = 0;
-    glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
-    if(uniformCount > 0)
+    // Bind uniform and texture locations
+    for (auto & [name, slot] : uniforms)
     {
-        int textureSlotIndex = 0;
-
-        GLint nameMaxLength = 0;
-        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &nameMaxLength);
-        auto uniformName = std::make_unique<char[]>(nameMaxLength);
-        GLsizei length, count = 0;
-        GLenum type = GL_NONE;
-
-        for (GLint i = 0; i < uniformCount; ++i)
-        {
-            glGetActiveUniform(program, i, nameMaxLength, &length, &count, &type, uniformName.get());
-
-            std::string nameString (uniformName.get(), length);
-            int location = glGetUniformLocation(program, uniformName.get());
-
-            // Texture slot
-            if(type >= GL_SAMPLER_1D && type <= GL_SAMPLER_CUBE)
-            {
-                // TODO get specific texture type
-                glUniform1i(location, textureSlotIndex);
-                textures.emplace(std::move(nameString), Shader::TextureSlot{textureSlotIndex, Texture::Type::Tex2D});
-                textureSlotIndex++;
-            }
-            else // Uniform
-            {
-                std::type_index dataType = TypeOpenglToCpp(type);
-                uniforms.emplace(std::move(nameString), Shader::Uniform{location, dataType});
-            }
-        }
+        slot.location = glGetUniformLocation(program, name.c_str());
+    }
+    int textureUnit = 0;
+    for (auto & [name, slot] : textures)
+    {
+        slot.location = glGetUniformLocation(program, name.c_str());
+        slot.unit = textureUnit++;
     }
 
 
@@ -122,136 +102,85 @@ ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
         VertexFunction,
         FragmentFunction,
     };
-    ParseState state = ParseState::Shared;
+    ParseState state = Shared;
 
 
     for(std::string line; std::getline(stream, line); )
     {
-        // Skip empty lines
-        if(line.length() == 0)
+        // Skip empty lines and comments
+        if (line.empty() || line.starts_with("//"))
             continue;
 
-        // Skip comments
-        if(line.starts_with("//"))
-            continue;
-
-
-        if(state == ParseState::Shared)
+        switch (state)
         {
-            // Include
+        case Shared:
             if(line.starts_with("#include"))
             {
                 result.includes.emplace_back(line.substr(10, line.length() - 9 - 2));
-                continue;
             }
-
-            // Start V2F
-            if(line.starts_with("struct v2f"))
+            else if (line.starts_with("struct v2f"))
             {
                 result.vertexFunction << "out V2F" << line.substr(10) << '\n';
                 result.fragmentFunction << "in V2F" << line.substr(10) << '\n';
-                state = ParseState::V2F;
-                continue;
+                state = V2F;
             }
+            else if (line.starts_with("uniform"))
+            {
+                result.uniforms.emplace_back(line.substr(8, line.length() - 9));
+                result.shared << line << '\n';
+            }
+            else
+            {
+                result.shared << line << '\n';
+            }
+            break;
 
-            // Shared code
-            result.shared << line << '\n';
-        }
-        else if (state == ParseState::V2F)
-        {
+        case V2F:
             if(line.starts_with("};"))
             {
                 result.vertexFunction << "} v2f;" << '\n';
                 result.fragmentFunction << "} v2f;" << '\n';
-                state = ParseState::AfterV2F;
-                continue;
+                state = AfterV2F;
             }
+            else
+            {
+                result.vertexFunction << line << '\n';
+                result.fragmentFunction << line << '\n';
+            }
+            break;
 
-            result.vertexFunction << line << '\n';
-            result.fragmentFunction << line << '\n';
-
-        }
-        else if(state == ParseState::AfterV2F)
-        {
-            // Vert function
+        case AfterV2F:
             if(line.starts_with("void vert()"))
             {
                 result.vertexFunction << "void main()" << line.substr(11) << '\n';
-                state = ParseState::VertexFunction;
-                continue;
+                state = VertexFunction;
             }
+            else
+            {
+                result.shared << line << '\n';
+            }
+            break;
 
-            // Shared code
-            result.shared << line << '\n';
-        }
-        else if (state == ParseState::VertexFunction)
-        {
-            // Frag function
+        case VertexFunction:
             if(line.starts_with("void frag()"))
             {
                 result.fragmentFunction << "void main()" << line.substr(11) << '\n';
-                state = ParseState::FragmentFunction;
-                continue;
+                state = FragmentFunction;
             }
+            else
+            {
+                result.vertexFunction << line << '\n';
+            }
+            break;
 
-            result.vertexFunction << line << '\n';
-        }
-        else // state == ParseState::FragmentFunction
-        {
+        case FragmentFunction:
             result.fragmentFunction << line << '\n';
+            break;
         }
     }
 
 
     return result;
-}
-
-std::stringstream &ShaderLoader::ResolveInclude(std::stringstream &ss, const std::string &include, std::set<std::string> &alreadyIncluded)
-{
-    std::ifstream includeFile (ShadersPath + include);
-
-    std::streamoff prevPos = 0;
-    for(std::string line; std::getline(includeFile, line); prevPos = includeFile.tellg())
-    {
-        if(line.length() == 0)
-            continue;
-
-        if(line.starts_with("#include "))
-        {
-            std::string requiredInclude = line.substr(10, line.length() - 10 - 1);
-            if(!alreadyIncluded.contains(requiredInclude))
-            {
-                ResolveInclude(ss, requiredInclude, alreadyIncluded);
-                alreadyIncluded.emplace(requiredInclude);
-            }
-            continue;
-        }
-
-        includeFile.seekg(prevPos);
-        ss << "//      " << include << "\n" << includeFile.rdbuf() << "\n\n";
-        break;
-    }
-
-    return ss;
-}
-
-std::stringstream ShaderLoader::GenerateIncludeString(const std::vector<std::string> &includes)
-{
-    std::set<std::string> alreadyIncluded;
-
-    std::stringstream includeString;
-
-    includeString << "// ========== INCLUDES ==========\n";
-
-    for(const auto &incl : includes)
-    {
-        ResolveInclude(includeString, incl, alreadyIncluded);
-    }
-
-    includeString << "\n";
-    auto y = includeString.str();
-
-    return includeString;
 }
 
 unsigned int ShaderLoader::CompileShader(const std::string &source, unsigned int type)
@@ -280,30 +209,191 @@ unsigned int ShaderLoader::CompileShader(const std::string &source, unsigned int
     return shader;
 }
 
-std::type_index ShaderLoader::TypeOpenglToCpp(unsigned int type)
+std::pair<std::stringstream, std::vector<std::string>> ShaderLoader::ProcessIncludes(const std::vector<std::string>& includes)
 {
-    switch(type)
+    std::vector<std::string> uniforms;
+    std::stringstream includeString;
+    std::set<std::string> alreadyIncluded;
+
+    includeString << "// ========== INCLUDES ==========\n";
+    for(const auto &incl : includes)
     {
-        case GL_FLOAT:
-            return typeid(float);
-
-        case GL_FLOAT_VEC2:
-            return typeid(glm::vec2);
-        case GL_FLOAT_VEC3:
-            return typeid(glm::vec3);
-        case GL_FLOAT_VEC4:
-            return typeid(glm::vec4);
-
-        case GL_FLOAT_MAT3:
-            return typeid(glm::mat3);
-        case GL_FLOAT_MAT4:
-            return typeid(glm::mat4);
-
-        case GL_SAMPLER_2D:
-            return typeid(Texture*);
-
-
-        default:
-            throw std::runtime_error("ShaderLoader::TypeOpenglToCpp unsupported type");
+        GenerateIncludeStringFromFile(incl, includeString, alreadyIncluded, uniforms);
     }
+
+    includeString << "\n";
+
+    return std::make_pair<std::stringstream, std::vector<std::string>>(std::move(includeString), std::move(uniforms));
+}
+
+std::stringstream &ShaderLoader::GenerateIncludeStringFromFile(const std::string &includePath, std::stringstream &ss,
+                                                               std::set<std::string> &alreadyIncluded, std::vector<std::string>& uniforms)
+{
+    std::ifstream includeFile (ShadersPath + includePath);
+
+    std::streamoff includeFromPos = 0;
+    for(std::string line; std::getline(includeFile, line);)
+    {
+        if(line.empty())
+            continue;
+
+        if(line.starts_with("#include "))
+        {
+            std::string requiredInclude = line.substr(10, line.length() - 10 - 1);
+            if(!alreadyIncluded.contains(requiredInclude))
+            {
+                GenerateIncludeStringFromFile(requiredInclude, ss, alreadyIncluded, uniforms);
+                alreadyIncluded.emplace(requiredInclude);
+            }
+            includeFromPos = includeFile.tellg();
+        }
+        else if (line.starts_with("uniform"))
+        {
+            uniforms.push_back(line.substr(8, line.length() - 9));
+        }
+    }
+
+    includeFile.clear();
+    includeFile.seekg(includeFromPos);
+    ss << "//      " << includePath << "\n" << includeFile.rdbuf() << "\n\n";
+
+    return ss;
+}
+
+/// \brief Takes uniform strings and parses them into uniform and texture slots
+/// \param uniformStrings Vector of uniform strings in format [type name] or [type name = defaultValue]
+/// \return
+std::pair<std::unordered_map<std::string, Shader::UniformSlot>, std::unordered_map<std::string, Shader::TextureSlot>>
+ShaderLoader::ProcessUniforms(const std::vector<std::string>& uniformStrings)
+{
+    std::unordered_map<std::string, Shader::UniformSlot> uniforms;
+    std::unordered_map<std::string, Shader::TextureSlot> textures;
+
+    for (auto& line : uniformStrings)
+    {
+        std::istringstream iss(line);
+        std::string type, name, equals, defaultValue;
+
+        iss >> type >> name;
+        if (iss >> equals)
+        {
+            std::getline(iss, defaultValue);
+            defaultValue.erase(0, defaultValue.find_first_not_of(" ="));
+        }
+
+        if(!type.starts_with("sampler"))
+        {
+            // Uniform
+            auto typeId = ConvertShaderType(type);
+            uniforms.emplace(std::move(name), Shader::UniformSlot{-1, typeId, ConvertDefaultValue(typeId, defaultValue)});
+        }
+        else
+        {
+            // Texture
+            textures.emplace(std::move(name), Shader::TextureSlot{-1, ConvertTextureType(type)});
+        }
+    }
+
+    return std::make_pair(uniforms, textures);
+}
+
+std::type_index ShaderLoader::ConvertShaderType(const std::string& type)
+{
+    static const std::unordered_map<std::string, std::type_index> typeMap = {
+        {"bool", typeid(bool)},
+        {"float", typeid(float)},
+        {"vec2", typeid(glm::vec2)},
+        {"vec3", typeid(glm::vec3)},
+        {"vec4", typeid(glm::vec4)},
+        {"mat3", typeid(glm::mat3)},
+        {"mat4", typeid(glm::mat4)},
+        {"sampler2D", typeid(Texture*)},
+    };
+
+    auto it = typeMap.find(type);
+    if (it != typeMap.end())
+        return it->second;
+
+    throw std::runtime_error("ShaderLoader::ConvertShaderType Unsupported OpenGL type: " + type);
+}
+
+Texture::Type ShaderLoader::ConvertTextureType(const std::string& type)
+{
+    static const std::unordered_map<std::string, Texture::Type> textureTypeMap = {
+        {"sampler1D", Texture::Type::Tex1D},
+        {"sampler2D", Texture::Type::Tex2D},
+        {"sampler3D", Texture::Type::Tex3D},
+        {"samplerCube", Texture::Type::TexCubemap},
+        {"sampler1DArray", Texture::Type::Tex1DArray},
+        {"sampler2DArray", Texture::Type::Tex2DArray},
+    };
+
+    auto it = textureTypeMap.find(type);
+    if (it != textureTypeMap.end())
+        return it->second;
+
+    throw std::runtime_error("ShaderLoader::ConvertTextureType Unsupported texture type: " + type);
+}
+
+Shader::UniformValue ShaderLoader::ConvertDefaultValue(std::type_index type, const std::string& value)
+{
+    if (type == typeid(bool))
+    {
+        if (value.empty())
+            return false;
+        return value == "true";
+    }
+    if (type == typeid(float))
+    {
+        if (value.empty())
+            return 0.0f;
+        return std::stof(value);
+    }
+    if (type == typeid(glm::vec2) || type == typeid(glm::vec3) || type == typeid(glm::vec4))
+    {
+        std::istringstream iss(&value ? value : "");
+        char ignore;
+        if (type == typeid(glm::vec2))
+        {
+            glm::vec2 vec(0.0f);
+            if (!value.empty())
+                iss >> ignore >> vec.x >> ignore >> vec.y >> ignore;
+            return vec;
+        }
+        if (type == typeid(glm::vec3))
+        {
+            glm::vec3 vec(0.0f);
+            if (!value.empty())
+                iss >> ignore >> vec.x >> ignore >> vec.y >> ignore >> vec.z >> ignore;
+            return vec;
+        }
+        if(type == typeid(glm::vec4))
+        {
+            glm::vec4 vec(0.0f);
+            if (!value.empty())
+                iss >> ignore >> vec.x >> ignore >> vec.y >> ignore >> vec.z >> ignore >> vec.w >> ignore;
+            return vec;
+        }
+        return false; // Should not occur
+    }
+    if (type == typeid(glm::mat3))
+    {
+        if (value.empty())
+            return glm::mat3(0.0f);
+        if (value == "zero")
+            return glm::mat3(0.0f);
+        if (value == "identity")
+            return glm::mat3(1.0f);
+    }
+    if (type == typeid(glm::mat4))
+    {
+        if (value.empty())
+            return glm::mat4(0.0f);
+        if (value == "zero")
+            return glm::mat4(0.0f);
+        if (value == "identity")
+            return glm::mat4(1.0f);
+    }
+
+    throw std::runtime_error("ShaderLoader::ConvertDefaultValue Unsupported default value type");
 }

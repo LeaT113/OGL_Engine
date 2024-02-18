@@ -4,10 +4,10 @@
 
 in vec3 aPosition;
 in vec3 aNormal;
+in vec2 aTexCoord0;
 
 uniform vec4 Color;
-uniform sampler2D Albedo;
-uniform sampler2D Other;
+uniform sampler2D AlbedoTex;
 
 struct v2f
 {
@@ -20,6 +20,7 @@ void vert()
 {
     v2f.position = ObjectToWorldPos(aPosition);
     v2f.normal = ObjectToWorldNormal(aNormal);
+    v2f.uv = aTexCoord0;
 
     gl_Position = ObjectToClipPos(aPosition);
 }
@@ -31,10 +32,8 @@ void frag()
 
     vec3 lighting = ApplyLights(v2f.position, normalWS, cameraPos);
 
-    vec3 col = vec3(1,1,1) * lighting;
-    vec2 uv = v2f.position.xz + v2f.position.y;
-    vec4 tex = texture(Albedo, uv);
-    vec4 tex2 = texture(Other, uv * 0.5);
-    col = FilmicToneMapping(col * tex.xyz * (1 - tex2.xyz));
+    vec4 tex = texture(AlbedoTex, v2f.uv);
+    vec3 col = pow(tex.rgb, vec3(2.2)) * lighting;
+    col = FilmicToneMapping(col);
     color = vec4(col, 1);
 }

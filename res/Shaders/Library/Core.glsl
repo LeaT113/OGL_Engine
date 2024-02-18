@@ -1,40 +1,42 @@
-uniform mat4 ObjectToWorldMatrix;
-uniform mat4 WorldToObjectMatrix;
-uniform mat4 WorldToViewMatrix;
-uniform mat4 ViewToWorldMatrix;
-uniform mat4 ObjectToClipMatrix;
+uniform mat4 _ObjectToWorldMatrix;
+uniform mat4 _WorldToObjectMatrix;
+uniform mat3 _ObjectToWorldNormalMatrix;
+uniform mat4 _WorldToViewMatrix;
+uniform mat4 _ViewToWorldMatrix;
+uniform mat4 _ObjectToClipMatrix;
 
+uniform float _Time;
+uniform vec3 _WorldSpaceCameraPos;
+
+
+//          Transformations
 // Position
 vec3 ObjectToWorldPos(vec3 pos)
 {
-    return (ObjectToWorldMatrix * vec4(pos, 1.0)).xyz;
+    return (_ObjectToWorldMatrix * vec4(pos, 1.0)).xyz;
 }
 vec3 WorldToObjectPos(vec3 pos)
 {
-    return (WorldToObjectMatrix * vec4(pos, 1.0)).xyz;
+    return (_WorldToObjectMatrix * vec4(pos, 1.0)).xyz;
 }
 
 vec3 WorldToViewPos(vec3 pos)
 {
-    return (WorldToViewMatrix * vec4(pos, 1.0)).xyz;
+    return (_WorldToViewMatrix * vec4(pos, 1.0)).xyz;
 }
 vec3 ViewToWorldPos(vec3 pos)
 {
-    return (ViewToWorldMatrix * vec4(pos, 1.0)).xyz;
+    return (_ViewToWorldMatrix * vec4(pos, 1.0)).xyz;
 }
 
 vec4 ObjectToClipPos(vec3 pos)
 {
-    return ObjectToClipMatrix * vec4(pos, 1.0);
+    return _ObjectToClipMatrix * vec4(pos, 1.0);
 }
 
 // Normal
 vec3 ObjectToWorldNormal(vec3 normal)
 {
-    // TODO Check non-uniform scaling
-    return normalize(
-        WorldToObjectMatrix[0].xyz * normal.x +
-        WorldToObjectMatrix[1].xyz * normal.y +
-        WorldToObjectMatrix[2].xyz * normal.z
-    );
+    // https://zhangdoa.com/normal-and-normal-mapping
+    return normalize(_ObjectToWorldNormalMatrix * normal);
 }

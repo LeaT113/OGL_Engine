@@ -80,6 +80,7 @@ int main()
     glfwGetFramebufferSize(window, &width, &height);
     rendererSystem->SetRenderSize(width, height);
 
+	// Camera
     Entity camera;
     camera
         .AddComponent<TransformComponent>()
@@ -87,54 +88,75 @@ int main()
 		.AddComponent<LightComponent>(LightComponent::LightType::Spot);
     rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 	auto flashLight = camera.GetComponent<LightComponent>();
-	flashLight->SetColor(glm::vec3(255, 243, 207) * 1.0f/100.0f);
+	flashLight->SetColor(glm::vec3(255, 243, 207) * 0.5f/100.0f);
 	flashLight->SetDirection(glm::vec3(0, 0, -1));
 	flashLight->SetSpotAngles(10, 90);
 
-    auto s = ShaderLoader::LoadShader("PhongShader.glsl");
-    auto material = Handle<Material>::Make(*s.Access());
-	auto groundTexture = TextureLoader::LoadTexture("ground_tex.jpg");
-	auto waterFoamTexture = TextureLoader::LoadTexture("WaterFoam.png");
-	material->Set("Albedo", groundTexture.Access());
-	material->Set("Other", waterFoamTexture.Access());
+	// Materials
+	auto shaderPbr = ShaderLoader::LoadShader("PBRShader.glsl");
 
+	auto materialGround = Handle<Material>::Make(*shaderPbr);
+	auto groundAlbedo = TextureLoader::LoadTexture("ForestGround/ForestGround_Albedo.png");
+	auto groundDisplacement = TextureLoader::LoadTexture("ForestGround/ForestGround_Displacement.png");
+	auto groundNormal = TextureLoader::LoadTexture("ForestGround/ForestGround_Normal.png");
+	auto groundRoughness = TextureLoader::LoadTexture("ForestGround/ForestGround_Roughness.png");
+	auto groundOcclusion = TextureLoader::LoadTexture("ForestGround/ForestGround_Occlusion.png");
+	materialGround->Set("AlbedoTex", groundAlbedo.Access());
+	materialGround->Set("NormalTex", groundNormal.Access());
+	materialGround->Set("OcclusionTex", groundOcclusion.Access());
+	materialGround->Set("UseNormalmap", true);
+	materialGround->Set("HeightmapTex", groundDisplacement.Access());
+	materialGround->Set("UseHeightmap", true);
+	materialGround->Set("HeightmapDepth", 0.05f);
+	materialGround->Set("TextureScale", 3.0f);
+	materialGround->Set("NormalMapStrenght", 1.0f);
 
+	auto materialStoneBricks = Handle<Material>::Make(*shaderPbr);
+	auto stoneBricksAlbedo = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Albedo.png");
+	auto stoneBricksDisplacement = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Displacement.png");
+	auto stoneBricksNormal = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Normal.png");
+	auto stoneBricksRoughness = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Roughness.png");
+	auto stoneBricksOcclusion = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Occlusion.png");
+	materialStoneBricks->Set("AlbedoTex", stoneBricksAlbedo.Access());
+	materialStoneBricks->Set("NormalTex", stoneBricksNormal.Access());
+	materialStoneBricks->Set("OcclusionTex", stoneBricksOcclusion.Access());
+	materialStoneBricks->Set("UseNormalmap", true);
+	materialStoneBricks->Set("HeightmapTex", stoneBricksDisplacement.Access());
+	materialStoneBricks->Set("UseHeightmap", true);
+	materialStoneBricks->Set("HeightmapDepth", 0.1f);
+	materialStoneBricks->Set("TextureScale", 4.0f);
+	materialStoneBricks->Set("NormalMapStrenght", 2.0f);
+
+	// Models
 	ModelLoader::LoadModel("Plane.obj");
     Entity plane;
     plane
         .AddComponent<TransformComponent>()
-        .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), *material.Access());
+        .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), *materialGround);
     plane.Transform()->Scale() = glm::vec3(15, 15, 15);
     plane.Transform()->Position() = glm::vec3(0, 0, 0);
 
+
     ModelLoader::LoadModel("Suzanne.obj");
     Entity suzanne;
-    suzanne
-            .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Suzanne.obj"), *material.Access());
+    suzanne.AddComponent<TransformComponent>()
+            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Suzanne.obj"), *materialGround.Access());
     suzanne.Transform()->Position() = glm::vec3(1, 0.6, -1);
     suzanne.Transform()->Scale() = glm::vec3(0.4, 0.4, 0.4);
 
-    ModelLoader::LoadModel("Cube.obj");
+    ModelLoader::LoadModel("Cube.glb");
     Entity cube;
-    cube
-            .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.obj"), *material.Access());
+    cube.AddComponent<TransformComponent>()
+		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), *materialStoneBricks);
     cube.Transform()->Position() = glm::vec3(-0.8, 0.5, -1.3);
 
-    ModelLoader::LoadModel("MaterialTest.obj");
-    Entity materialTest;
-    materialTest
-            .AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("MaterialTest.obj"), *material.Access());
-    materialTest.Transform()->Position() = glm::vec3(-1, 0.4, 1.3);
-    materialTest.Transform()->Scale() = glm::vec3(0.4);
 
+	// Lights
 	auto emissionShader = ShaderLoader::LoadShader("EmissionShader.glsl");
-	auto emissionMaterial0 = Handle<Material>::Make(*emissionShader);
 	ModelLoader::LoadModel("Icosphere.obj");
 
-	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f);
+	auto emissionMaterial0 = Handle<Material>::Make(*emissionShader);
+	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f) * 1.0f;
 	Entity pointLight0;
 	pointLight0
 		.AddComponent<TransformComponent>()
@@ -147,7 +169,7 @@ int main()
 	pl0->SetColor(col0);
 
 	auto emissionMaterial1 = Handle<Material>::Make(*emissionShader);
-	auto col1 = glm::vec3(96.0f/255.0f, 137.0f/255, 214.0f/255);
+	auto col1 = glm::vec3(96.0f/255.0f, 137.0f/255, 214.0f/255) * 1.0f;
 	Entity pointLight1;
 	pointLight1
 		.AddComponent<TransformComponent>()
@@ -159,7 +181,7 @@ int main()
 	pl1->SetColor(col1);
 
 	auto emissionMaterial2 = Handle<Material>::Make(*emissionShader);
-	auto col2 = glm::vec3(0.8, 0.15, 0.2) * 3.0f;
+	auto col2 = glm::vec3(0.8, 0.15, 0.2) * 1.0f;
 	Entity spotLight0;
 	spotLight0
 		.AddComponent<TransformComponent>()
@@ -174,7 +196,6 @@ int main()
 	pl2->SetDirection(glm::vec3(0.7, -0.3, 0));
 
 
-
 	// Game loop
 	bool mouse = true;
 	while (!glfwWindowShouldClose(window))
@@ -182,13 +203,14 @@ int main()
 		// Update state
 		timeKeeper->Update();
 
-		if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE)) {
+		if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE))
+		{
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			mouse = false;
-
         }
 
-		if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1)) {
+		if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
+		{
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			inputSystem->RestartRelativeMouse();
 			mouse = true;
@@ -223,6 +245,9 @@ int main()
 		pointLight0.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
 		pointLight1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
 		spotLight0.Transform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
+
+		suzanne.Transform()->AngleAxis(30.0f * timeKeeper->DeltaTime(), glm::vec3(0, 1, 0));
+		suzanne.Transform()->Scale() = glm::vec3(glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()));
 
 		lightingSystem->UpdateLights();
         rendererSystem->Render();
