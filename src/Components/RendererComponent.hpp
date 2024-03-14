@@ -12,14 +12,16 @@
 class RendererComponent : public Component
 {
 public:
-    RendererComponent(const Entity *owner, const Mesh* mesh, Material &material);
+    RendererComponent(const Entity& owner, const Mesh* mesh, const Material* material);
+    explicit RendererComponent(const Entity& owner);
 
 	void Render(const CameraComponent &camera) const;
 
 private:
-    const Mesh* _mesh;
+    friend class Serializer;
 
-	Material &_material;
+    const Mesh* _mesh;
+    const Material* _material;
 
     TransformComponent* _transform;
 };

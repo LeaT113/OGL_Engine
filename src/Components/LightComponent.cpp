@@ -1,14 +1,21 @@
 #include "LightComponent.hpp"
 
-#include "../Entity/Entity.hpp"
+#include "../Scene/Entity.hpp"
 #include "../Systems/LightingSystem.hpp"
+#include "TransformComponent.hpp"
 
 
-LightComponent::LightComponent(const Entity* owner, LightType type)
-    : _lightType(type), _color(1), _direction(0, -1, 0), _spotInnerAngle(20), _spotOuterAngle(30)
+LightComponent::LightComponent(const Entity& owner, LightType type)
+    : Component(owner), _lightType(type), _color(1), _direction(0, -1, 0), _spotInnerAngle(20), _spotOuterAngle(30)
 {
-    _owner = owner;
-    _transform = owner->GetComponent<TransformComponent>();
+    _transform = _owner->GetComponent<TransformComponent>();
+
+    LightingSystem::RegisterLight(this);
+}
+
+LightComponent::LightComponent(const Entity& owner) : Component(owner)
+{
+    _transform = _owner->GetComponent<TransformComponent>();
 
     LightingSystem::RegisterLight(this);
 }

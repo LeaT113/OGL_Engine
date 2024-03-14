@@ -11,10 +11,6 @@ class Handle
 public:
     Handle() = delete;
 
-    /*
-    template<typename ...Args>
-    explicit Handle(Args&&... args) : _ptr(std::make_unique<T>(std::forward<Args>(args)...)) {}*/
-
     // Move constructor
     Handle(Handle&& other) noexcept : _ptr(std::move(other._ptr))
     { }
@@ -25,6 +21,11 @@ public:
         _ptr = std::move(other._ptr);
         return *this;
     }
+
+    // Polymorphic move constructor
+    template<typename U, typename = std::enable_if_t<std::is_base_of_v<T, U>>>
+    explicit Handle(Handle<U>&& other) noexcept : _ptr(other.release())
+    { }
 
     // Creation
     template<typename... Args>
@@ -55,16 +56,16 @@ public:
     T* operator->() const { return _ptr.get(); }
     T& operator*() const { return *_ptr; }
 
+    std::unique_ptr<T> release() noexcept {
+        return std::move(_ptr);
+    }
+
 private:
     std::unique_ptr<T> _ptr;
 
+    // Private constructor used by Make
     explicit Handle(std::unique_ptr<T> ptr) : _ptr(std::move(ptr))
     { }
-
-    static Handle Take(Handle other)
-    {
-        return Handle(std::move(other._ptr));
-    }
 };
 
 

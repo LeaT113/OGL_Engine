@@ -1,6 +1,6 @@
 #ifndef SHADERSTRUCTS_HPP
 #define SHADERSTRUCTS_HPP
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 
 struct AmbientLight
 {

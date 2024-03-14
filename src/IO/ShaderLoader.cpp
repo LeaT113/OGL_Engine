@@ -2,7 +2,7 @@
 #include <set>
 #include "ShaderLoader.hpp"
 #include <iostream>
-#include "Texture.hpp"
+#include "../Resources/Texture.hpp"
 #include "GL/glew.h"
 #include "../OGL/VertexAttributes.hpp"
 #include "../Systems/ResourceDatabase.hpp"

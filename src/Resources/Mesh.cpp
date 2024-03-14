@@ -1,9 +1,11 @@
 #include "Mesh.hpp"
 
 
-Mesh::Mesh(Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray)
+Mesh::Mesh(std::string name, Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray)
     : _vertexBuffer(vertexBuffer.Pass()), _indexBuffer(indexBuffer.Pass()), _vertexArray(vertexArray.Pass())
-{}
+{
+    _name = std::move(name);
+}
 
 
 const VertexArray &Mesh::GetVertexArray() const

@@ -3,13 +3,12 @@
 #include "Component.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <iostream>
 
 
 class TransformComponent : public Component
 {
 public:
-	explicit TransformComponent(const Entity* owner);
+	explicit TransformComponent(const Entity& owner);
 
 	// Accessors
 	const glm::vec3 &Position() const;
@@ -41,9 +40,9 @@ public:
 
 	void NotifyChanged();
 
-    friend std::ostream& operator<<(std::ostream& os, const TransformComponent& transform);
-
 private:
+	friend class Serializer;
+
 	glm::vec3 _position;
 	glm::quat _rotation;
 	glm::vec3 _scale;

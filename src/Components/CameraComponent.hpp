@@ -16,7 +16,8 @@ enum ProjectionType
 class CameraComponent : public Component
 {
 public:
-	CameraComponent(const Entity* owner, ProjectionType projectionType, float horizontalFov);
+	CameraComponent(const Entity& owner, ProjectionType projectionType, float horizontalFov);
+	explicit CameraComponent(const Entity& owner);
 
 	void SetWindowDimensions(int width, int height);
 
@@ -25,6 +26,8 @@ public:
 	const glm::mat4 &Projection() const;
 
 private:
+	friend class Serializer;
+
 	static constexpr float NearClippingPlane = 0.1f;
 	static constexpr float FarClippingPlane = 1000.0f;
 

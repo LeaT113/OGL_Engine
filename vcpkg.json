@@ -24,5 +24,8 @@
   }, {
     "name" : "stb",
     "version>=" : "2023-04-11#1"
+  }, {
+    "name" : "yaml-cpp",
+    "version>=" : "0.8.0#1"
   } ]
 }

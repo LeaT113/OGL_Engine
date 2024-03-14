@@ -2,7 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <GL/glew.h>
-#include "Texture.hpp"
+#include "../Resources/Texture.hpp"
 
 const std::string TextureLoader::TexturesPath = "res/Textures/";
 
@@ -40,5 +40,5 @@ Handle<Texture> TextureLoader::LoadTexture(const std::string& path)
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return Handle<Texture>::Make(texture);
+    return Handle<Texture>::Make(texture, path);
 }

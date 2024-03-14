@@ -1,6 +1,7 @@
 #ifndef OGL_ENGINE_HYBRIDSINGLETON_HPP
 #define OGL_ENGINE_HYBRIDSINGLETON_HPP
 
+#include <stdexcept>
 
 template <typename T>
 class HybridSingleton

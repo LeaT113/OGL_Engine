@@ -1,12 +1,12 @@
 #ifndef LIGHTINGSYSTEM_HPP
 #define LIGHTINGSYSTEM_HPP
+#include <memory>
 #include <vector>
 
 #include "../Components/LightComponent.hpp"
 #include "../Core/HybridSingleton.hpp"
-#include "../Core/Handle.hpp"
 #include "../OGL/UniformBuffer.hpp"
-#include "../Resources/ShaderStructs.hpp"
+#include "../OGL/ShaderStructs.hpp"
 
 
 class LightingSystem : HybridSingleton<LightingSystem>

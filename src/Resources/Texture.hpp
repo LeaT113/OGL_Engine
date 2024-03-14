@@ -2,11 +2,13 @@
 #define TEXTURE_HPP
 
 #include <GL/glew.h>
+
+#include "Resource.hpp"
 #include "../OGL/IBindable.hpp"
 
 
 
-class Texture : public IBindable
+class Texture : public Resource, public IBindable
 {
 public:
     enum Type
@@ -19,7 +21,7 @@ public:
         Tex2DArray,
     };
 
-    explicit Texture(unsigned int id);
+    explicit Texture(unsigned int id, std::string name);
     ~Texture() override;
 
     unsigned GetBindID() const override;

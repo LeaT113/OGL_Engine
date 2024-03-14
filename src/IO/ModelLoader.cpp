@@ -7,7 +7,7 @@
 #include "../OGL/VertexBuffer.hpp"
 #include "../OGL/IndexBuffer.hpp"
 #include "../OGL/VertexArray.hpp"
-#include "Mesh.hpp"
+#include "../Resources/Mesh.hpp"
 #include "../Systems/ResourceDatabase.hpp"
 
 
@@ -17,7 +17,7 @@ unsigned int ModelLoader::PostProcessingFlags = aiProcess_Triangulate |
                                                 aiProcess_CalcTangentSpace |
                                                 aiProcess_JoinIdenticalVertices;
 
-Entity *ModelLoader::LoadModel(const std::string& path)
+Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(ModelsPath+path, PostProcessingFlags);
@@ -26,41 +26,41 @@ Entity *ModelLoader::LoadModel(const std::string& path)
         throw std::runtime_error("ModelLoader::LoadModel failed on " + path);
 
 
-    const aiMesh* mesh = scene->mMeshes[0];
-    const auto name = mesh->mName;
+    const aiMesh* aiMesh = scene->mMeshes[0];
+    const auto name = aiMesh->mName;
 
-    uint32_t vertexCount = mesh->mNumVertices;
+    uint32_t vertexCount = aiMesh->mNumVertices;
 
 
     // Attributes
     std::vector<VertexAttribute> attributes;
 
-    float* positions = reinterpret_cast<float*>(mesh->mVertices);
+    float* positions = reinterpret_cast<float*>(aiMesh->mVertices);
     attributes.push_back(VertexAttribute::Position);
 
     float* normals = nullptr;
-    if(mesh->HasNormals())
+    if(aiMesh->HasNormals())
     {
-        normals = reinterpret_cast<float*>(mesh->mNormals);
+        normals = reinterpret_cast<float*>(aiMesh->mNormals);
         attributes.push_back(VertexAttribute::Normal);
     }
 
     float* tangents = nullptr;
-    if(mesh->HasTangentsAndBitangents())
+    if(aiMesh->HasTangentsAndBitangents())
     {
-        tangents = reinterpret_cast<float*>(mesh->mTangents);
+        tangents = reinterpret_cast<float*>(aiMesh->mTangents);
         attributes.push_back(VertexAttribute::Tangent);
     }
 
     std::vector<std::vector<float>> UVs;
-    for(int i = 0; i < mesh->GetNumUVChannels(); i++)
+    for(int i = 0; i < aiMesh->GetNumUVChannels(); i++)
     {
         UVs.emplace_back();
         UVs[i].reserve((size_t)vertexCount * 2);
 
         for (size_t j = 0; j < vertexCount; j++)
         {
-            aiVector3D vector = (mesh->mTextureCoords[i])[j];
+            aiVector3D vector = (aiMesh->mTextureCoords[i])[j];
             UVs[i].push_back(vector.x);
             UVs[i].push_back(vector.y);
         }
@@ -69,13 +69,13 @@ Entity *ModelLoader::LoadModel(const std::string& path)
     }
 
     // Indices
-    uint32_t triangleCount = mesh->mNumFaces;
+    uint32_t triangleCount = aiMesh->mNumFaces;
     std::vector<unsigned int> indices(triangleCount * 3);
     for (size_t i = 0; i < triangleCount; i++)
     {
-        indices[i*3 + 0] = mesh->mFaces[i].mIndices[0];
-        indices[i*3 + 1] = mesh->mFaces[i].mIndices[1];
-        indices[i*3 + 2] = mesh->mFaces[i].mIndices[2];
+        indices[i*3 + 0] = aiMesh->mFaces[i].mIndices[0];
+        indices[i*3 + 1] = aiMesh->mFaces[i].mIndices[1];
+        indices[i*3 + 2] = aiMesh->mFaces[i].mIndices[2];
     }
 
     // Buffers
@@ -100,11 +100,9 @@ Entity *ModelLoader::LoadModel(const std::string& path)
     vertexArray->AddVertexBuffer(*vertexBuffer, attributes);
     vertexArray->SetIndexBuffer(*indexBuffer);
 
-    // Mesh
-    // TODO Give mesh to ResourceDatabase with name
-    auto m = Handle<Mesh>::Make(vertexBuffer.Pass(), indexBuffer.Pass(), vertexArray.Pass());
-    m->AddSubmesh({0, static_cast<int>(triangleCount*3)});
-    ResourceDatabase::AddMesh(path, m.Pass());
 
-    return nullptr;
+    auto mesh = Handle<Mesh>::Make(path, vertexBuffer.Pass(), indexBuffer.Pass(), vertexArray.Pass());
+    mesh->AddSubmesh(Submesh{0, static_cast<int>(triangleCount*3)});
+
+    return mesh;
 }

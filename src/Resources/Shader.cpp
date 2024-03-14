@@ -6,8 +6,10 @@
 
 
 Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures)
-    : _shader(id), _name(std::move(name)), _uniforms(std::move(uniforms)), _textures(std::move(textures))
-{}
+    : _shader(id), _uniforms(std::move(uniforms)), _textures(std::move(textures))
+{
+    _name = std::move(name);
+}
 
 Shader::~Shader()
 {
@@ -48,12 +50,12 @@ int Shader::GetUniformLocation(const std::string &name) const
     return -1;
 }
 
-std::unordered_map<std::string, Shader::UniformSlot> Shader::GetUniforms() const
+const std::unordered_map<std::string, Shader::UniformSlot>& Shader::GetUniforms() const
 {
     return _uniforms;
 }
 
-std::unordered_map<std::string, Shader::TextureSlot> Shader::GetTextureSlots() const
+const std::unordered_map<std::string, Shader::TextureSlot>& Shader::GetTextureSlots() const
 {
     return _textures;
 }
@@ -106,7 +108,7 @@ void Shader::SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &
 
 void Shader::BindTextureUnits() const
 {
-    for (auto [name, slot] : _textures)
+    for (const auto& [name, slot] : _textures)
     {
         glUniform1i(slot.location, slot.unit);
     }

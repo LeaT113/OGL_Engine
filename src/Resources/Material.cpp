@@ -3,8 +3,10 @@
 #include "../OGL/Graphics.hpp"
 
 
-Material::Material(const Shader &shader): _shader(shader)
+Material::Material(const Shader &shader, std::string name): _shader(shader)
 {
+    _name = std::move(name);
+
     auto u = _shader.GetUniforms();
     for(const auto &[name, slot] : _shader.GetUniforms())
     {

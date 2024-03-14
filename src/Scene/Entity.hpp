@@ -2,16 +2,20 @@
 #define OGL_ENGINE_ENTITY_HPP
 #include <memory>
 #include <map>
-#include "../Components/Component.hpp"
-#include "../Components/TransformComponent.hpp"
+#include <typeindex>
 
+#include "../Components/Component.hpp"
+#include "../Core/Handle.hpp"
+
+class TransformComponent;
 
 class Entity
 {
 public:
-	Entity();
+	explicit Entity(std::string name = "");
 
 	size_t ID() const;
+	const std::string& GetName() const;
 
 
 	// Components
@@ -21,25 +25,27 @@ public:
 	template <typename T>
 	T* GetComponent() const;
 
-
 	// Shortcuts
 	TransformComponent* Transform();
 
 private:
+	friend class Serializer;
+
 	// Static
 	static size_t _sIndexCounter;
 
 	size_t _id;
+	std::string _name;
 
 	// Components
-	std::map<const std::type_info*, std::unique_ptr<Component>> _components;
+	std::map<std::type_index, Handle<Component>> _components;
 };
 
 
 template<typename T, typename... Args>
 Entity& Entity::AddComponent(Args &&... args)
 {
-	auto [it, isNew] = _components.try_emplace(&typeid(T), std::make_unique<T>(this, std::forward<Args>(args)...));
+	auto [it, isNew] = _components.try_emplace(typeid(T), Handle<T>::Make(*this, std::forward<Args>(args)...));
 
 	return *this;
 }
@@ -50,11 +56,11 @@ Entity& Entity::AddComponent(Args &&... args)
 template<typename T>
 T* Entity::GetComponent() const
 {
-	auto it = _components.find(&typeid(T));
+	auto it = _components.find(typeid(T));
 	if(it == _components.end())
 		return nullptr;
 
-	return dynamic_cast<T*>(it->second.get());
+	return dynamic_cast<T*>(it->second.Access());
 }
 
 #endif //OGL_ENGINE_ENTITY_HPP

@@ -1,19 +1,22 @@
 #include <iostream>
+#include <memory>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <memory>
+
 #include "Systems/InputSystem.hpp"
 #include "Systems/TimeKeeper.hpp"
-#include "Entity/Entity.hpp"
+#include "Scene/Entity.hpp"
 #include "Components/CameraComponent.hpp"
-#include "Components/LightComponent.hpp"
+#include "IO/MaterialLoader.hpp"
+#include "IO/ModelLoader.hpp"
+#include "IO/Serializer.hpp"
+#include "IO/ShaderLoader.hpp"
+#include "IO/TextureLoader.hpp"
 #include "OGL/Graphics.hpp"
 #include "Systems/ResourceDatabase.hpp"
 #include "Systems/RenderSystem.hpp"
-#include "Resources/ModelLoader.hpp"
-#include "Resources/ShaderLoader.hpp"
-#include "Resources/Material.hpp"
-#include "Resources/TextureLoader.hpp"
+#include "Scene/Scene.hpp"
 #include "Systems/LightingSystem.hpp"
 
 
@@ -71,7 +74,6 @@ int main()
             std::cout << std::endl;
        }, nullptr);
 
-
     // Set up rendering
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
@@ -80,120 +82,45 @@ int main()
     glfwGetFramebufferSize(window, &width, &height);
     rendererSystem->SetRenderSize(width, height);
 
-	// Camera
-    Entity camera;
-    camera
-        .AddComponent<TransformComponent>()
-        .AddComponent<CameraComponent>(ProjectionType::Perspective, 75.0f)
-		.AddComponent<LightComponent>(LightComponent::LightType::Spot);
-    rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
-	auto flashLight = camera.GetComponent<LightComponent>();
-	flashLight->SetColor(glm::vec3(255, 243, 207) * 0.5f/100.0f);
-	flashLight->SetDirection(glm::vec3(0, 0, -1));
-	flashLight->SetSpotAngles(10, 90);
+
+		// Resources
+	// Meshes
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Plane.obj"));
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Suzanne.obj"));
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Cube.glb"));
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Icosphere.obj"));
+
+	// Shaders
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PBRShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("EmissionShader.glsl"));
+
+	// Textures
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Albedo.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Displacement.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Normal.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Roughness.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Occlusion.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Albedo.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Displacement.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Normal.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Roughness.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Occlusion.png"));
 
 	// Materials
-	auto shaderPbr = ShaderLoader::LoadShader("PBRShader.glsl");
-
-	auto materialGround = Handle<Material>::Make(*shaderPbr);
-	auto groundAlbedo = TextureLoader::LoadTexture("ForestGround/ForestGround_Albedo.png");
-	auto groundDisplacement = TextureLoader::LoadTexture("ForestGround/ForestGround_Displacement.png");
-	auto groundNormal = TextureLoader::LoadTexture("ForestGround/ForestGround_Normal.png");
-	auto groundRoughness = TextureLoader::LoadTexture("ForestGround/ForestGround_Roughness.png");
-	auto groundOcclusion = TextureLoader::LoadTexture("ForestGround/ForestGround_Occlusion.png");
-	materialGround->Set("AlbedoTex", groundAlbedo.Access());
-	materialGround->Set("NormalTex", groundNormal.Access());
-	materialGround->Set("OcclusionTex", groundOcclusion.Access());
-	materialGround->Set("UseNormalmap", true);
-	materialGround->Set("HeightmapTex", groundDisplacement.Access());
-	materialGround->Set("UseHeightmap", true);
-	materialGround->Set("HeightmapDepth", 0.05f);
-	materialGround->Set("TextureScale", 3.0f);
-	materialGround->Set("NormalMapStrenght", 1.0f);
-
-	auto materialStoneBricks = Handle<Material>::Make(*shaderPbr);
-	auto stoneBricksAlbedo = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Albedo.png");
-	auto stoneBricksDisplacement = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Displacement.png");
-	auto stoneBricksNormal = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Normal.png");
-	auto stoneBricksRoughness = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Roughness.png");
-	auto stoneBricksOcclusion = TextureLoader::LoadTexture("StoneBricks/StoneBricks_Occlusion.png");
-	materialStoneBricks->Set("AlbedoTex", stoneBricksAlbedo.Access());
-	materialStoneBricks->Set("NormalTex", stoneBricksNormal.Access());
-	materialStoneBricks->Set("OcclusionTex", stoneBricksOcclusion.Access());
-	materialStoneBricks->Set("UseNormalmap", true);
-	materialStoneBricks->Set("HeightmapTex", stoneBricksDisplacement.Access());
-	materialStoneBricks->Set("UseHeightmap", true);
-	materialStoneBricks->Set("HeightmapDepth", 0.1f);
-	materialStoneBricks->Set("TextureScale", 4.0f);
-	materialStoneBricks->Set("NormalMapStrenght", 2.0f);
-
-	// Models
-	ModelLoader::LoadModel("Plane.obj");
-    Entity plane;
-    plane
-        .AddComponent<TransformComponent>()
-        .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), *materialGround);
-    plane.Transform()->Scale() = glm::vec3(15, 15, 15);
-    plane.Transform()->Position() = glm::vec3(0, 0, 0);
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("GroundMaterial.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("StoneBricksMaterial.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial1.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial2.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial3.mat"));
 
 
-    ModelLoader::LoadModel("Suzanne.obj");
-    Entity suzanne;
-    suzanne.AddComponent<TransformComponent>()
-            .AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Suzanne.obj"), *materialGround.Access());
-    suzanne.Transform()->Position() = glm::vec3(1, 0.6, -1);
-    suzanne.Transform()->Scale() = glm::vec3(0.4, 0.4, 0.4);
-
-    ModelLoader::LoadModel("Cube.glb");
-    Entity cube;
-    cube.AddComponent<TransformComponent>()
-		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), *materialStoneBricks);
-    cube.Transform()->Position() = glm::vec3(-0.8, 0.5, -1.3);
-
-
-	// Lights
-	auto emissionShader = ShaderLoader::LoadShader("EmissionShader.glsl");
-	ModelLoader::LoadModel("Icosphere.obj");
-
-	auto emissionMaterial0 = Handle<Material>::Make(*emissionShader);
-	auto col0 = glm::vec3(214/255.0f, 96/255.0f, 151/255.0f) * 1.0f;
-	Entity pointLight0;
-	pointLight0
-		.AddComponent<TransformComponent>()
-		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Icosphere.obj"), *emissionMaterial0)
-		.AddComponent<LightComponent>(LightComponent::LightType::Point);
-	pointLight0.Transform()->Position() = glm::vec3(-1.5, 0.3, 0);
-	pointLight0.Transform()->Scale() = glm::vec3(0.1);
-	emissionMaterial0->Set("Color", glm::vec4(col0, 0));
-	auto pl0 = pointLight0.GetComponent<LightComponent>();
-	pl0->SetColor(col0);
-
-	auto emissionMaterial1 = Handle<Material>::Make(*emissionShader);
-	auto col1 = glm::vec3(96.0f/255.0f, 137.0f/255, 214.0f/255) * 1.0f;
-	Entity pointLight1;
-	pointLight1
-		.AddComponent<TransformComponent>()
-		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Icosphere.obj"), *emissionMaterial1)
-		.AddComponent<LightComponent>(LightComponent::LightType::Point);
-	pointLight1.Transform()->Scale() = glm::vec3(0.1);
-	emissionMaterial1->Set("Color", glm::vec4(col1, 0));
-	auto pl1 = pointLight1.GetComponent<LightComponent>();
-	pl1->SetColor(col1);
-
-	auto emissionMaterial2 = Handle<Material>::Make(*emissionShader);
-	auto col2 = glm::vec3(0.8, 0.15, 0.2) * 1.0f;
-	Entity spotLight0;
-	spotLight0
-		.AddComponent<TransformComponent>()
-		.AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Icosphere.obj"), *emissionMaterial2)
-		.AddComponent<LightComponent>(LightComponent::LightType::Spot);
-	spotLight0.Transform()->Scale() = glm::vec3(0.1);
-	spotLight0.Transform()->Position() = glm::vec3(0, 1.5, 0);
-	emissionMaterial2->Set("Color", glm::vec4(col2, 0));
-	auto pl2 = spotLight0.GetComponent<LightComponent>();
-	pl2->SetColor(col2);
-	pl2->SetSpotAngles(20, 80);
-	pl2->SetDirection(glm::vec3(0.7, -0.3, 0));
+	// Scene
+	auto scene = Serializer::LoadScene("DemoScene.scene");
+	Entity& camera = *scene->GetEntity("Camera");
+	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
+	Entity& emissiveSphere1 = *scene->GetEntity("EmissiveSphere1");
+	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
+	Entity& warningLight = *scene->GetEntity("WarningLight");
 
 
 	// Game loop
@@ -242,12 +169,12 @@ int main()
 		// Render
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		pointLight0.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
-		pointLight1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
-		spotLight0.Transform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
+		emissiveSphere1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
+		emissiveSphere2.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
+		warningLight.Transform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
 
-		suzanne.Transform()->AngleAxis(30.0f * timeKeeper->DeltaTime(), glm::vec3(0, 1, 0));
-		suzanne.Transform()->Scale() = glm::vec3(glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()));
+		//suzanne.Transform()->AngleAxis(30.0f * timeKeeper->DeltaTime(), glm::vec3(0, 1, 0));
+		//suzanne.Transform()->Scale() = glm::vec3(glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()));
 
 		lightingSystem->UpdateLights();
         rendererSystem->Render();

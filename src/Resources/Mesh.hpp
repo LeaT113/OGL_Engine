@@ -2,6 +2,8 @@
 #define OGL_ENGINE_MESH_HPP
 
 #include <vector>
+
+#include "Resource.hpp"
 #include "../Core/Handle.hpp"
 #include "../OGL/VertexBuffer.hpp"
 #include "../OGL/IndexBuffer.hpp"
@@ -14,10 +16,10 @@ struct Submesh
     int elementCount;
 };
 
-class Mesh
+class Mesh : public Resource
 {
 public:
-    Mesh(Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray);
+    Mesh(std::string name, Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray);
 
     const VertexArray &GetVertexArray() const;
 

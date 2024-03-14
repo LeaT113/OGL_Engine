@@ -4,15 +4,17 @@
 #include <string>
 #include <variant>
 #include <stdexcept>
+
+#include "Resource.hpp"
 #include "Shader.hpp"
 
 class Texture;
 
 
-class Material
+class Material : public Resource
 {
 public:
-    explicit Material(const Shader &shader);
+    explicit Material(const Shader &shader, std::string name);
 
     template<typename T>
     void Set(int location, const T& value)
@@ -69,6 +71,8 @@ public:
     const Shader &GetShader() const;
 
 private:
+    friend class MaterialLoader;
+
     const Shader &_shader;
 
     std::unordered_map<int, Shader::UniformValue> _uniformValues;

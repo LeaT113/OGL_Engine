@@ -2,14 +2,11 @@
 #include <functional>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <iostream>
-#include <iomanip>
+#include <glm/gtx/string_cast.hpp>
 
-
-TransformComponent::TransformComponent(const Entity* owner): _position(0), _rotation(glm::vec3(0, 0, 0)), _scale(1)
-{
-	_owner = owner;
-}
+TransformComponent::TransformComponent(const Entity& owner)
+	: Component(owner), _position(0), _rotation(glm::vec3(0, 0, 0)), _scale(1)
+{ }
 
 const glm::vec3 &TransformComponent::Position() const
 {
@@ -99,18 +96,4 @@ glm::vec3 TransformComponent::Forward()
 glm::vec3 TransformComponent::Right()
 {
 	return ModelToWorld() * glm::vec4(1, 0, 0, 0);
-}
-
-
-std::ostream& operator<<(std::ostream& os, const TransformComponent& transform)
-{
-    constexpr int floatLength = 6;
-    auto eulerRotation = glm::eulerAngles(transform.Rotation());
-    os
-            << "----- Transform -----"
-            << "\nPos | " << std::setw(floatLength) << transform.Position().x << " | " << std::setw(floatLength) << transform.Position().y << " | " << std::setw(floatLength) << transform.Position().z << " |"
-            << "\nRot | " << std::setw(floatLength) << glm::degrees(eulerRotation.x) << " | " << std::setw(floatLength) << glm::degrees(eulerRotation.y) << " | " << std::setw(floatLength) << glm::degrees(eulerRotation.z) << " |"
-            << "\nScl | " << std::setw(floatLength) << transform.Scale().x << " | " << std::setw(floatLength) << transform.Scale().y << " | " << std::setw(floatLength) << transform.Scale().z << " |";
-
-    return os;
 }

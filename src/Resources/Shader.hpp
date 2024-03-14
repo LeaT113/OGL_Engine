@@ -5,11 +5,13 @@
 #include <typeindex>
 #include <variant>
 #include <glm/glm.hpp>
+
+#include "Resource.hpp"
 #include "Texture.hpp"
 #include "../OGL/IBindable.hpp"
 
 
-class Shader : public IBindable
+class Shader : public Resource, public IBindable
 {
 public:
     using UniformValue = std::variant<bool, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
@@ -36,8 +38,8 @@ public:
 
     int GetUniformLocation(const std::string &name) const;
 
-    std::unordered_map<std::string, UniformSlot> GetUniforms() const;
-    std::unordered_map<std::string, TextureSlot> GetTextureSlots() const;
+    const std::unordered_map<std::string, UniformSlot>& GetUniforms() const;
+    const std::unordered_map<std::string, TextureSlot>& GetTextureSlots() const;
 
     static void SetBool(int location, bool value);
     static void SetFloat(int location, float value);
@@ -53,7 +55,6 @@ public:
 
 private:
     unsigned int _shader;
-    std::string _name;
     std::unordered_map<std::string, UniformSlot> _uniforms;
     std::unordered_map<std::string, TextureSlot> _textures;
 };

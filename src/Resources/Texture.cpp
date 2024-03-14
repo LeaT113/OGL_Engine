@@ -1,7 +1,9 @@
 #include "Texture.hpp"
 
-Texture::Texture(unsigned int id) : _textureId(id)
-{}
+Texture::Texture(unsigned int id, std::string name) : _textureId(id)
+{
+    _name = std::move(name);
+}
 
 Texture::~Texture()
 {

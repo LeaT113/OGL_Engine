@@ -2,9 +2,9 @@
 #define LIGHTCOMPONENT_HPP
 
 #include "Component.hpp"
-#include "TransformComponent.hpp"
-#include "../Resources/ShaderStructs.hpp"
+#include "../OGL/ShaderStructs.hpp"
 
+class TransformComponent;
 
 class LightComponent : public Component
 {
@@ -16,7 +16,8 @@ public:
         Spot
     };
 
-    explicit LightComponent(const Entity *owner, LightType type);
+    LightComponent(const Entity& owner, LightType type);
+    explicit LightComponent(const Entity& owner);
 
     void SetColor(const glm::vec3 &color);
     void SetDirection(const glm::vec3 &direction);
@@ -29,6 +30,8 @@ public:
     SpotLight GetSpotLight() const;
 
 private:
+    friend class Serializer;
+
     TransformComponent *_transform;
 
     LightType _lightType;

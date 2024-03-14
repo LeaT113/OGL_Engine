@@ -11,6 +11,14 @@ add_executable(${PROJECT_NAME}
         src/Core/HybridSingleton.hpp
         src/Core/Singleton.hpp
 
+        # IO
+        src/IO/YAMLExtensions.hpp src/IO/YAMLExtensions.cpp
+        src/IO/MaterialLoader.hpp src/IO/MaterialLoader.cpp
+        src/IO/Serializer.hpp src/IO/Serializer.cpp
+        src/IO/TextureLoader.hpp src/IO/TextureLoader.cpp
+        src/IO/ShaderLoader.hpp src/IO/ShaderLoader.cpp
+        src/IO/ModelLoader.hpp src/IO/ModelLoader.cpp
+
         # Components
         src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
         src/Components/Component.hpp src/Components/Component.cpp
@@ -18,12 +26,9 @@ add_executable(${PROJECT_NAME}
         src/Components/TransformComponent.hpp src/Components/TransformComponent.cpp
         src/Components/LightComponent.hpp src/Components/LightComponent.cpp
 
-        # Data
-        src/Data/MaterialData.hpp src/Data/MaterialData.cpp
-        src/Data/ShaderData.hpp src/Data/ShaderData.cpp
-
-        # Entity
-        src/Entity/Entity.hpp src/Entity/Entity.cpp
+        # Scene
+        src/Scene/Entity.hpp src/Scene/Entity.cpp
+        src/Scene/Scene.hpp src/Scene/Scene.cpp
 
         # Systems
         src/Systems/InputSystem.hpp src/Systems/InputSystem.cpp
@@ -40,16 +45,14 @@ add_executable(${PROJECT_NAME}
         src/OGL/VertexAttributes.hpp src/OGL/VertexAttributes.cpp
         src/OGL/VertexBuffer.hpp src/OGL/VertexBuffer.cpp
         src/OGL/UniformBuffer.hpp src/OGL/UniformBuffer.cpp
+        src/OGL/ShaderStructs.hpp src/OGL/ShaderStructs.cpp
 
         # Resources
+        src/Resources/Resource.hpp src/Resources/Resource.cpp
         src/Resources/Mesh.hpp src/Resources/Mesh.cpp
-        src/Resources/ModelLoader.hpp src/Resources/ModelLoader.cpp
         src/Resources/Shader.hpp src/Resources/Shader.cpp
-        src/Resources/ShaderLoader.hpp src/Resources/ShaderLoader.cpp
         src/Resources/Material.hpp src/Resources/Material.cpp
-        src/Resources/ShaderStructs.hpp src/Resources/ShaderStructs.cpp
         src/Resources/Texture.hpp src/Resources/Texture.cpp
-        src/Resources/TextureLoader.hpp src/Resources/TextureLoader.cpp
 )
 
 # Libraries
@@ -67,6 +70,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
 find_package(assimp CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE assimp::assimp)
+
+find_package(yaml-cpp CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
 
 # Resources
 set(source_dir "${CMAKE_SOURCE_DIR}/res")
