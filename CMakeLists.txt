@@ -73,8 +73,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE assimp::assimp)
 
 find_package(yaml-cpp CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
-
-# Resources
-set(source_dir "${CMAKE_SOURCE_DIR}/res")
-set(destination_dir "${CMAKE_BINARY_DIR}")
-file(COPY ${source_dir} DESTINATION ${destination_dir})
