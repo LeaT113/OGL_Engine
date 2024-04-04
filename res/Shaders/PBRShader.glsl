@@ -72,7 +72,7 @@ void frag()
     float occlusion = texture(OcclusionTex, uv).a;
     vec3 lighting = ApplyLights(positionWS, normalWS, cameraPos);
 
-    vec3 col = pow(albedo.rgb, vec3(2.2)) * lighting * occlusion;
+    vec3 col = albedo.rgb * lighting * occlusion;
     col = FilmicToneMapping(col);
     //col = fract(positionWS.y).xxx;
     //col = texture(HeightmapTex, uv).aaa;

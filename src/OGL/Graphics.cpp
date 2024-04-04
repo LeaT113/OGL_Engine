@@ -40,7 +40,31 @@ void Graphics::Bind(const UniformBuffer& uniformBuffer, unsigned int slot)
 void Graphics::Bind(const Texture& texture, unsigned slot)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture.GetBindID());
+
+    switch (texture.GetType())
+    {
+    case Texture::Tex1D:
+        glBindTexture(GL_TEXTURE_1D, texture.GetBindID());
+        break;
+
+    case Texture::Tex2D:
+        glBindTexture(GL_TEXTURE_2D, texture.GetBindID());
+        break;
+
+    case Texture::Tex3D:
+        glBindTexture(GL_TEXTURE_3D, texture.GetBindID());
+        break;
+
+    case Texture::TexCubemap:
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture.GetBindID());
+        break;
+
+    default:
+    case Texture::Tex1DArray:
+    case Texture::Tex2DArray:
+        throw std::runtime_error("Graphics::Bind Unsupported texture type");
+        break;
+    }
 }
 
 

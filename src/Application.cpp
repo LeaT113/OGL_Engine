@@ -93,18 +93,20 @@ int main()
 	// Shaders
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PBRShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("EmissionShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SkyboxShader.glsl"));
 
 	// Textures
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Albedo.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Displacement.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Normal.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Roughness.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("ForestGround/ForestGround_Occlusion.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Albedo.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Displacement.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Normal.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Roughness.png"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture("StoneBricks/StoneBricks_Occlusion.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Displacement", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Normal", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Roughness", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Occlusion", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Albedo"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Displacement", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Normal", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Roughness", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Occlusion", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night", {false, true, Texture::Repeat::Extend}));
 
 	// Materials
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("GroundMaterial.mat"));
@@ -122,6 +124,10 @@ int main()
 	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
 	Entity& warningLight = *scene->GetEntity("WarningLight");
 
+	Entity skybox;
+	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMax");
+	skybox.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), &skyboxMat);
+	skyboxMat.Set("SkyboxTex", ResourceDatabase::GetTexture("Skybox/Night"));
 
 	// Game loop
 	bool mouse = true;

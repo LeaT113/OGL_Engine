@@ -102,6 +102,7 @@ void Shader::SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &
     SetMat3(GetUniformLocation("_ObjectToWorldNormalMatrix"), glm::transpose(glm::inverse(glm::mat3(modelToWorld))));
     SetMat4(GetUniformLocation("_WorldToViewMatrix"), view);
     SetMat4(GetUniformLocation("_ViewToWorldMatrix"), glm::inverse(view));
+    SetMat4(GetUniformLocation("_ViewToClip"), projection);
 
     SetMat4(GetUniformLocation("_ObjectToClipMatrix"), projection * view * modelToWorld);
 }

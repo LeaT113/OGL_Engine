@@ -21,13 +21,32 @@ public:
         Tex2DArray,
     };
 
-    explicit Texture(unsigned int id, std::string name);
+    enum Repeat
+    {
+        Clamp,
+        Extend,
+        Repeat,
+        MirrorRepeat
+    };
+
+    struct Params
+    {
+        bool Mipmaps = true;
+        bool sRGB = true;
+        enum Repeat Repeat = Repeat::Repeat;
+        // TODO BitDepth like byte, float? for hdr, Point sampling
+    };
+
+    explicit Texture(unsigned int id, std::string name, Type type);
     ~Texture() override;
 
     unsigned GetBindID() const override;
 
+    Type GetType() const;
+
 private:
     GLuint _textureId;
+    Type _type;
 };
 
 #endif

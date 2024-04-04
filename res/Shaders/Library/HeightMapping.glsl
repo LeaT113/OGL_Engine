@@ -14,7 +14,7 @@ vec3 ParallaxOcclusionMapping_Offset(sampler2D heightmap, vec2 uv, vec3 viewDirT
     float stepSize = 1.0 / float(RELIEF_LINEAR_STEPS);
     for(int i = 1; i < RELIEF_LINEAR_STEPS; i++)
     {
-        h = texture(heightmap, rayPos.xy).a;
+        h = texture(heightmap, rayPos.xy).r;
 
         if (rayPos.z / scale + 1.0 < h)
             break;
@@ -27,7 +27,7 @@ vec3 ParallaxOcclusionMapping_Offset(sampler2D heightmap, vec2 uv, vec3 viewDirT
     for(int i = 0; i < RELIEF_BINARY_STEPS; i++)
     {
         stepSize *= 0.5;
-        h = texture(heightmap, rayPos.xy).a;
+        h = texture(heightmap, rayPos.xy).r;
 
         if(rayPos.z / scale + 1.0 < h)
         {
@@ -43,10 +43,10 @@ vec3 ParallaxOcclusionMapping_Offset(sampler2D heightmap, vec2 uv, vec3 viewDirT
 
 vec3 ParallaxOcclusionMapping_CalcNormal(sampler2D heightmap, vec2 uv, float scale)
 {
-    float sx0 = texture(heightmap, uv - vec2(NORMAL_SAMPLE_EPSILON, 0)).a;
-    float sx1 = texture(heightmap, uv + vec2(NORMAL_SAMPLE_EPSILON, 0)).a;
-    float sy0 = texture(heightmap, uv - vec2(0, NORMAL_SAMPLE_EPSILON)).a;
-    float sy1 = texture(heightmap, uv + vec2(0, NORMAL_SAMPLE_EPSILON)).a;
+    float sx0 = texture(heightmap, uv - vec2(NORMAL_SAMPLE_EPSILON, 0)).r;
+    float sx1 = texture(heightmap, uv + vec2(NORMAL_SAMPLE_EPSILON, 0)).r;
+    float sy0 = texture(heightmap, uv - vec2(0, NORMAL_SAMPLE_EPSILON)).r;
+    float sy1 = texture(heightmap, uv + vec2(0, NORMAL_SAMPLE_EPSILON)).r;
 
     vec3 v0 = vec3(NORMAL_SAMPLE_EPSILON, 0, (sx1 - sx0) * scale);
     vec3 v1 = vec3(0, NORMAL_SAMPLE_EPSILON, (sy1 - sy0) * scale);

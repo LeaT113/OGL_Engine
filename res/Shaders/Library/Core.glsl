@@ -4,6 +4,7 @@ uniform mat3 _ObjectToWorldNormalMatrix;
 uniform mat4 _WorldToViewMatrix;
 uniform mat4 _ViewToWorldMatrix;
 uniform mat4 _ObjectToClipMatrix;
+uniform mat4 _ViewToClip;
 
 uniform float _Time;
 uniform vec3 _WorldSpaceCameraPos;
