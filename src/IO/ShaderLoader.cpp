@@ -84,7 +84,7 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     }
 
 
-    return Handle<Shader>::Make(program, path, uniforms, textures);
+    return Handle<Shader>::Make(program, path, uniforms, textures, parsedShader.cull, parsedShader.depthWrite, parsedShader.depthTest, parsedShader.alphaBlend);
 }
 
 ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
@@ -128,6 +128,53 @@ ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
             {
                 result.uniforms.emplace_back(line.substr(8, line.length() - 9));
                 result.shared << line << '\n';
+            }
+            else if (line.starts_with("#pragma"))
+            {
+                auto nameStart = line.find_first_not_of(' ', 7);
+                auto nameEnd = line.find_first_of('(', nameStart + 1);
+                auto name = line.substr(nameStart, nameEnd - nameStart);
+
+                auto valueStart = nameEnd + 1;
+                auto valueEnd = line.find_first_of(')', valueStart + 1);
+                auto value = line.substr(valueStart, valueEnd - valueStart);
+
+                if (name == "Cull")
+                {
+                    if (value == "Off")
+                        result.cull = Shader::Cull::Off;
+                    else if (value == "Back")
+                        result.cull = Shader::Cull::Back;
+                    else if (value == "Front")
+                        result.cull = Shader::Cull::Front;
+                }
+                else if (name == "DepthWrite")
+                {
+                    if (value == "On")
+                        result.depthWrite = true;
+                    else if (value == "Off")
+                        result.depthWrite = false;
+                }
+                else if (name == "DepthTest")
+                {
+                    if (value == "Off")
+                        result.depthTest = Shader::DepthTest::Off;
+                    else if (value == "Less")
+                        result.depthTest = Shader::DepthTest::Less;
+                    else if (value == "Equal")
+                        result.depthTest = Shader::DepthTest::Equal;
+                    else if (value == "LEqual")
+                        result.depthTest = Shader::DepthTest::LEqual;
+                    else if (value == "GEqual")
+                        result.depthTest = Shader::DepthTest::GEqual;
+                    else if (value == "Greater")
+                        result.depthTest = Shader::DepthTest::Greater;
+
+                }
+                else if (name == "Blend")
+                {
+                    // TODO Pipeline alpha blend
+                }
             }
             else
             {

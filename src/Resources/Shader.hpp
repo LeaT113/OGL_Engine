@@ -16,20 +16,45 @@ class Shader : public Resource, public IBindable
 public:
     using UniformValue = std::variant<bool, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
 
-    struct UniformSlot {
+    enum class Cull
+    {
+        Off = 0,
+        Back = GL_BACK,
+        Front = GL_FRONT,
+
+        Default = Back
+    };
+
+    enum class DepthTest
+    {
+        Off = GL_ALWAYS,
+        Less = GL_LESS,
+        Equal = GL_EQUAL,
+        LEqual = GL_LEQUAL,
+        GEqual = GL_GEQUAL,
+        Greater = GL_GREATER,
+
+        Default = LEqual,
+    };
+
+    struct UniformSlot
+    {
         int location;
         std::type_index type;
         UniformValue defaultValue;
     };
 
-    struct TextureSlot {
+    struct TextureSlot
+    {
         int location;
         int unit;
         Texture::Type type;
     };
 
 
-    Shader(unsigned int id, std::string name, std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures);
+    Shader(unsigned int id, std::string name,
+        std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures,
+        Cull cull, bool depthWrite, DepthTest depthTest, bool alphaBlend);
     ~Shader() override;
 
     void Replace(Shader&& other) noexcept;
@@ -53,10 +78,18 @@ public:
 
     void BindTextureUnits() const;
 
+    void SetPipelineState() const;
+
 private:
     unsigned int _shader;
     std::unordered_map<std::string, UniformSlot> _uniforms;
     std::unordered_map<std::string, TextureSlot> _textures;
+
+    // Pipeline states
+    Cull _cull;
+    bool _depthWrite;
+    DepthTest _depthTest;
+    bool _alphaBlend;
 };
 
 

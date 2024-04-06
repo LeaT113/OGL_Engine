@@ -27,6 +27,11 @@ private:
 
         std::vector<std::string> includes;
         std::vector<std::string> uniforms;
+
+        Shader::Cull cull = Shader::Cull::Default;
+        bool depthWrite = true;
+        Shader::DepthTest depthTest = Shader::DepthTest::Default;
+        bool alphaBlend = false;
     };
 
     // Parse and compile

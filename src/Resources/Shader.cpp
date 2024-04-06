@@ -5,8 +5,11 @@
 #include "Shader.hpp"
 
 
-Shader::Shader(unsigned int id, std::string name, std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures)
-    : _shader(id), _uniforms(std::move(uniforms)), _textures(std::move(textures))
+Shader::Shader(unsigned int id, std::string name,
+    std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures,
+    Cull cull, bool depthWrite, DepthTest depthTest, bool alphaBlend)
+    : _shader(id), _uniforms(std::move(uniforms)), _textures(std::move(textures)),
+    _cull(cull), _depthWrite(depthWrite), _depthTest(depthTest), _alphaBlend(alphaBlend)
 {
     _name = std::move(name);
 }
@@ -113,4 +116,31 @@ void Shader::BindTextureUnits() const
     {
         glUniform1i(slot.location, slot.unit);
     }
+}
+
+void Shader::SetPipelineState() const
+{
+    if (_cull == Cull::Off)
+    {
+        glDisable(GL_CULL_FACE);
+    }
+    else
+    {
+        glEnable(GL_CULL_FACE);
+        glCullFace(static_cast<GLenum>(_cull));
+    }
+
+    glDepthMask(_depthWrite ? GL_TRUE : GL_FALSE);
+
+    if (_depthTest == DepthTest::Off)
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(static_cast<GLenum>(_depthTest));
+    }
+
+    // TODO Pipeline alpha blending
 }

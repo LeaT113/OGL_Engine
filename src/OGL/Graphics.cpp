@@ -87,7 +87,8 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm
 
     // Set universal uniforms
 
-    // set pipeline settings like depth write, blending
+    // Set pipeline settings like depth write, blending
+    shader.SetPipelineState();
 
     // Call draw
     auto submesh = mesh.GetSubmesh(submeshIndex);

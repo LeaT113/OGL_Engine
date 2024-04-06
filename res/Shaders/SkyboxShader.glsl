@@ -1,6 +1,11 @@
 #include "Library/Core.glsl"
 #include "Library/Tonemapping.glsl"
 
+#pragma Cull(Off)
+#pragma DepthWrite(On)
+#pragma DepthTest(LEqual)
+#pragma Blend(Off)
+
 in vec3 aPosition;
 
 uniform samplerCube SkyboxTex;

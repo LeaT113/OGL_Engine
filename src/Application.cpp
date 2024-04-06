@@ -75,9 +75,6 @@ int main()
        }, nullptr);
 
     // Set up rendering
-    glCullFace(GL_BACK);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     rendererSystem->SetRenderSize(width, height);
