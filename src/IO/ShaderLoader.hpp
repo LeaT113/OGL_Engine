@@ -31,7 +31,7 @@ private:
         Shader::Cull cull = Shader::Cull::Default;
         bool depthWrite = true;
         Shader::DepthTest depthTest = Shader::DepthTest::Default;
-        bool alphaBlend = false;
+        Shader::Blending blending = Shader::Blending::Off;
     };
 
     // Parse and compile

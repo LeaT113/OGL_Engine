@@ -24,6 +24,5 @@ void vert()
 void frag()
 {
     vec3 col = texture(SkyboxTex, v2f.uvw).rgb;
-    col = pow(col, vec3(1.0/2.2));
     color = vec4(col, 1.0);
 }

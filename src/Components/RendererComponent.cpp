@@ -16,11 +16,19 @@ RendererComponent::RendererComponent(const Entity& owner, const Mesh* mesh, cons
 RendererComponent::RendererComponent(const Entity& owner) : Component(owner)
 {
 	_transform = _owner->GetComponent<TransformComponent>();
-
-	RenderSystem::RegisterRenderer(this);
 }
 
-void RendererComponent::Render(const CameraComponent &camera) const
+const Mesh& RendererComponent::GetMesh() const
 {
-	Graphics::RenderMesh(*_mesh, 0, _transform->ModelToWorld(), *_material, camera);
+	return *_mesh;
+}
+
+const Material& RendererComponent::GetMaterial() const
+{
+	return *_material;
+}
+
+TransformComponent& RendererComponent::GetTransform() const
+{
+	return *_transform;
 }

@@ -2,10 +2,8 @@
 
 
 Mesh::Mesh(std::string name, Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray)
-    : _vertexBuffer(vertexBuffer.Pass()), _indexBuffer(indexBuffer.Pass()), _vertexArray(vertexArray.Pass())
-{
-    _name = std::move(name);
-}
+    : _vertexBuffer(vertexBuffer.Pass()), _indexBuffer(indexBuffer.Pass()), _vertexArray(vertexArray.Pass()), Resource(std::move(name))
+{}
 
 
 const VertexArray &Mesh::GetVertexArray() const

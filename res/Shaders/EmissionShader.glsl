@@ -21,6 +21,5 @@ void vert()
 void frag()
 {
     vec3 col = Color.xyz;
-    col = FilmicToneMapping(col);
     color = vec4(col, 1);
 }

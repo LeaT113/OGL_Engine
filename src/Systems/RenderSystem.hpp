@@ -5,11 +5,14 @@
 #include "../Components/CameraComponent.hpp"
 #include "../Components/RendererComponent.hpp"
 #include "../Core/HybridSingleton.hpp"
+#include "../OGL/FrameBuffer.hpp"
 
 
 class RenderSystem : public HybridSingleton<RenderSystem>
 {
 public:
+	RenderSystem();
+
 	void SetRenderSize(int width, int height);
 	void SetRenderCamera(CameraComponent *camera);
 
@@ -20,8 +23,17 @@ public:
 private:
     int _width = 1, _height = 1;
 
-	CameraComponent* _camera;
-	std::vector<RendererComponent*> _renderers;
+	CameraComponent* _camera = nullptr;
+
+	// Passes
+	FrameBuffer _renderBuffer;
+	FrameBuffer _opaqueBuffer;
+	std::vector<RendererComponent*> _opaqueRenderers;
+
+	FrameBuffer _reflectionBuffer;
+	std::vector<RendererComponent*> _transparentRenderers;
+
+	Handle<Material> _postprocessMaterial;
 };
 
 

@@ -10,6 +10,7 @@
 #include "../Components/TransformComponent.hpp"
 #include "YAMLExtensions.hpp"
 #include "../Scene/Scene.hpp"
+#include "../Systems/RenderSystem.hpp"
 #include "../Systems/ResourceDatabase.hpp"
 
 Handle<Scene> Serializer::LoadScene(std::string path)
@@ -173,6 +174,8 @@ Handle<RendererComponent> Serializer::DeserializeComponent(const YAML::Node& com
 
     component->_mesh = ResourceDatabase::GetMesh(componentYaml["_mesh"].as<std::string>());
     component->_material = ResourceDatabase::GetMaterial(componentYaml["_material"].as<std::string>());
+
+    RenderSystem::RegisterRenderer(component.Access());
 
     return component;
 }

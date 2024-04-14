@@ -9,6 +9,7 @@
 #include "Scene/Entity.hpp"
 #include "Components/CameraComponent.hpp"
 #include "IO/MaterialLoader.hpp"
+#include "IO/MeshFactory.hpp"
 #include "IO/ModelLoader.hpp"
 #include "IO/Serializer.hpp"
 #include "IO/ShaderLoader.hpp"
@@ -86,11 +87,14 @@ int main()
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Suzanne.obj"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Cube.glb"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Icosphere.obj"));
+	ResourceDatabase::AddMesh(MeshFactory::CreateQuad());
 
 	// Shaders
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PBRShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("EmissionShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SkyboxShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PostprocessShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SimpleTransparentShader.glsl"));
 
 	// Textures
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo"));
@@ -103,7 +107,7 @@ int main()
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Normal", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Roughness", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Occlusion", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night", {false, true, Texture::Repeat::Extend}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night", {false, true, Texture::Tiling::Extend}));
 
 	// Materials
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("GroundMaterial.mat"));
@@ -125,6 +129,13 @@ int main()
 	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMax");
 	skybox.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), &skyboxMat);
 	skyboxMat.Set("SkyboxTex", ResourceDatabase::GetTexture("Skybox/Night"));
+
+	Entity alphaTest;
+	Material alphaMat(*ResourceDatabase::GetShader("SimpleTransparentShader.glsl"), "AlphaMat");
+	alphaTest.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), &alphaMat);
+	alphaTest.Transform()->Position() = glm::vec3(0, 3, 0);
+
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	// Game loop
 	bool mouse = true;
@@ -170,8 +181,6 @@ int main()
         camera.Transform()->Position() += static_cast<float>(timeKeeper->DeltaTime() * 2) * movement;
 
 		// Render
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		emissiveSphere1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
 		emissiveSphere2.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
 		warningLight.Transform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));

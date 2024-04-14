@@ -73,7 +73,6 @@ void frag()
     vec3 lighting = ApplyLights(positionWS, normalWS, cameraPos);
 
     vec3 col = albedo.rgb * lighting * occlusion;
-    col = FilmicToneMapping(col);
     //col = fract(positionWS.y).xxx;
     //col = texture(HeightmapTex, uv).aaa;
     color = vec4(col, 1);

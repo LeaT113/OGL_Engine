@@ -8,7 +8,7 @@ using SerializedResource = std::unordered_map<std::string, std::string>;
 class Resource
 {
 public:
-    Resource() = default;
+    Resource(std::string name);
     virtual ~Resource() = default;
 
     std::string Name() const;

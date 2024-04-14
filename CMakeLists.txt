@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
         src/IO/TextureLoader.hpp src/IO/TextureLoader.cpp
         src/IO/ShaderLoader.hpp src/IO/ShaderLoader.cpp
         src/IO/ModelLoader.hpp src/IO/ModelLoader.cpp
+        src/IO/MeshFactory.hpp src/IO/MeshFactory.cpp
 
         # Components
         src/Components/CameraComponent.hpp src/Components/CameraComponent.cpp
@@ -46,6 +47,7 @@ add_executable(${PROJECT_NAME}
         src/OGL/VertexBuffer.hpp src/OGL/VertexBuffer.cpp
         src/OGL/UniformBuffer.hpp src/OGL/UniformBuffer.cpp
         src/OGL/ShaderStructs.hpp src/OGL/ShaderStructs.cpp
+        src/OGL/FrameBuffer.hpp src/OGL/FrameBuffer.cpp
 
         # Resources
         src/Resources/Resource.hpp src/Resources/Resource.cpp

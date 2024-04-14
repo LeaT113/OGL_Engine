@@ -84,7 +84,7 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     }
 
 
-    return Handle<Shader>::Make(program, path, uniforms, textures, parsedShader.cull, parsedShader.depthWrite, parsedShader.depthTest, parsedShader.alphaBlend);
+    return Handle<Shader>::Make(program, path, uniforms, textures, parsedShader.cull, parsedShader.depthWrite, parsedShader.depthTest, parsedShader.blending);
 }
 
 ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
@@ -173,7 +173,12 @@ ShaderLoader::ShaderParseResult ShaderLoader::ParseShader(std::ifstream &stream)
                 }
                 else if (name == "Blend")
                 {
-                    // TODO Pipeline alpha blend
+                    if (value == "Off")
+                        result.blending = Shader::Blending::Off;
+                    else if (value == "Alpha")
+                        result.blending = Shader::Blending::Alpha;
+                    else if (value == "Add")
+                        result.blending = Shader::Blending::Additive;
                 }
             }
             else
@@ -337,7 +342,7 @@ ShaderLoader::ProcessUniforms(const std::vector<std::string>& uniformStrings)
         else
         {
             // Texture
-            textures.emplace(std::move(name), Shader::TextureSlot{-1, ConvertTextureType(type)});
+            textures.emplace(std::move(name), Shader::TextureSlot{-1, 0, ConvertTextureType(type)}); // Todo check unit??
         }
     }
 
@@ -371,8 +376,6 @@ Texture::Type ShaderLoader::ConvertTextureType(const std::string& type)
         {"sampler2D", Texture::Type::Tex2D},
         {"sampler3D", Texture::Type::Tex3D},
         {"samplerCube", Texture::Type::TexCubemap},
-        {"sampler1DArray", Texture::Type::Tex1DArray},
-        {"sampler2DArray", Texture::Type::Tex2DArray},
     };
 
     auto it = textureTypeMap.find(type);

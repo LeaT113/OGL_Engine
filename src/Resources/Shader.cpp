@@ -7,12 +7,10 @@
 
 Shader::Shader(unsigned int id, std::string name,
     std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures,
-    Cull cull, bool depthWrite, DepthTest depthTest, bool alphaBlend)
+    Cull cull, bool depthWrite, DepthTest depthTest, Blending alphaBlend)
     : _shader(id), _uniforms(std::move(uniforms)), _textures(std::move(textures)),
-    _cull(cull), _depthWrite(depthWrite), _depthTest(depthTest), _alphaBlend(alphaBlend)
-{
-    _name = std::move(name);
-}
+    _cull(cull), _depthWrite(depthWrite), _depthTest(depthTest), _blending(alphaBlend), Resource(std::move(name))
+{}
 
 Shader::~Shader()
 {
@@ -142,5 +140,28 @@ void Shader::SetPipelineState() const
         glDepthFunc(static_cast<GLenum>(_depthTest));
     }
 
-    // TODO Pipeline alpha blending
+    if (_blending == Blending::Off)
+    {
+        glDisable(GL_BLEND);
+    }
+    else
+    {
+        glEnable(GL_BLEND);
+
+        switch (_blending)
+        {
+        case Blending::Alpha:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+
+        case Blending::Additive:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            break;
+        }
+    }
+}
+
+bool Shader::IsOpaque() const
+{
+    return _blending == Blending::Off;
 }

@@ -37,6 +37,13 @@ public:
         Default = LEqual,
     };
 
+    enum class Blending
+    {
+        Off,
+        Alpha,
+        Additive
+    };
+
     struct UniformSlot
     {
         int location;
@@ -54,7 +61,7 @@ public:
 
     Shader(unsigned int id, std::string name,
         std::unordered_map<std::string, UniformSlot> uniforms, std::unordered_map<std::string, TextureSlot> textures,
-        Cull cull, bool depthWrite, DepthTest depthTest, bool alphaBlend);
+        Cull cull, bool depthWrite, DepthTest depthTest, Blending alphaBlend);
     ~Shader() override;
 
     void Replace(Shader&& other) noexcept;
@@ -80,6 +87,8 @@ public:
 
     void SetPipelineState() const;
 
+    bool IsOpaque() const;
+
 private:
     unsigned int _shader;
     std::unordered_map<std::string, UniformSlot> _uniforms;
@@ -89,7 +98,7 @@ private:
     Cull _cull;
     bool _depthWrite;
     DepthTest _depthTest;
-    bool _alphaBlend;
+    Blending _blending;
 };
 
 

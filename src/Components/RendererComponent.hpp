@@ -15,7 +15,12 @@ public:
     RendererComponent(const Entity& owner, const Mesh* mesh, const Material* material);
     explicit RendererComponent(const Entity& owner);
 
-	void Render(const CameraComponent &camera) const;
+	const Mesh& GetMesh() const;
+    const Material& GetMaterial() const;
+
+    TransformComponent& GetTransform() const;
+
+    const void Render() const;
 
 private:
     friend class Serializer;
