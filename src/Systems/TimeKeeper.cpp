@@ -7,16 +7,6 @@ TimeKeeper::TimeKeeper(): _startupTime(std::chrono::steady_clock::now())
 	Update();
 }
 
-double TimeKeeper::TimeSinceStartup() const
-{
-	return _timeSinceStartup;
-}
-
-double TimeKeeper::DeltaTime() const
-{
-	return _deltaTime;
-}
-
 void TimeKeeper::Update()
 {
 	TimePoint currentTime = std::chrono::steady_clock::now();
@@ -29,6 +19,16 @@ void TimeKeeper::Update()
 
 	if(_logging)
 		std::cout << std::setprecision(1) << std::fixed << TimeSinceStartup() << "s | " << DeltaTime() * 1000 << "ms | " << 1 / DeltaTime() << "FPS" << std::endl;
+}
+
+double TimeKeeper::TimeSinceStartup()
+{
+	return Instance()._timeSinceStartup;
+}
+
+double TimeKeeper::DeltaTime()
+{
+	return Instance()._deltaTime;
 }
 
 void TimeKeeper::EnableLogging(bool enable)

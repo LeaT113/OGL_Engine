@@ -166,24 +166,24 @@ int main()
         inputSystem->GetRelativeMouse(rotationX, rotationY);
         inputSystem->RestartRelativeMouse();
 
-        camera.Transform()->AngleAxis(-rotationX * timeKeeper->DeltaTime() * 3*1.77f, glm::vec3(0, 1, 0));
-        camera.Transform()->AngleAxis(-rotationY * timeKeeper->DeltaTime() * 3, camera.Transform()->Right());
+        camera.GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 3*1.77f, glm::vec3(0, 1, 0));
+        camera.GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 3, camera.GetTransform()->Right());
 
         float movementRight = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_D)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_A));
         float movementForward = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_W)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_S));
         float movementUp = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT));
 
-        glm::vec3 movementHorizontal = movementRight * camera.Transform()->Right() + movementForward * camera.Transform()->Forward();
+        glm::vec3 movementHorizontal = movementRight * camera.GetTransform()->Right() + movementForward * camera.GetTransform()->Forward();
         if(glm::length(movementHorizontal) > 0)
             movementHorizontal = glm::normalize(movementHorizontal);
-        glm::vec3 movement = movementHorizontal + movementUp * camera.Transform()->Up();
+        glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
 
-        camera.Transform()->Position() += static_cast<float>(timeKeeper->DeltaTime() * 2) * movement;
+        camera.GetTransform()->Position() += static_cast<float>(TimeKeeper::DeltaTime() * 2) * movement;
 
 		// Render
-		emissiveSphere1.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
-		emissiveSphere2.Transform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
-		warningLight.Transform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
+		emissiveSphere1.GetTransform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
+		emissiveSphere2.GetTransform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
+		warningLight.GetTransform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
 
 		//suzanne.Transform()->AngleAxis(30.0f * timeKeeper->DeltaTime(), glm::vec3(0, 1, 0));
 		//suzanne.Transform()->Scale() = glm::vec3(glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()));

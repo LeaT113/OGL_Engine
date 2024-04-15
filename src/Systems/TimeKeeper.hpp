@@ -2,11 +2,14 @@
 #define OGL_ENGINE_TIMEKEEPER_HPP
 #include <chrono>
 
-class TimeKeeper
+#include "../Core/HybridSingleton.hpp"
+#include "../Core/Singleton.hpp"
+
+class TimeKeeper : public HybridSingleton<TimeKeeper>
 {
 public:
-	double TimeSinceStartup() const;
-	double DeltaTime() const;
+	static double TimeSinceStartup();
+	static double DeltaTime();
 
 	void EnableLogging(bool enable);
 
