@@ -95,6 +95,7 @@ int main()
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SkyboxShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PostprocessShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SimpleTransparentShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("WaterShader.glsl"));
 
 	// Textures
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo"));
@@ -130,10 +131,12 @@ int main()
 	skybox.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), &skyboxMat);
 	skyboxMat.Set("SkyboxTex", ResourceDatabase::GetTexture("Skybox/Night"));
 
-	Entity alphaTest;
-	Material alphaMat(*ResourceDatabase::GetShader("SimpleTransparentShader.glsl"), "AlphaMat");
-	alphaTest.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), &alphaMat);
-	alphaTest.Transform()->Position() = glm::vec3(0, 3, 0);
+	Entity water;
+	Material waterMat(*ResourceDatabase::GetShader("WaterShader.glsl"), "WaterMat");
+	waterMat.Set("Color", glm::vec3(0, 0.4, 0.2));
+	water.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), &waterMat);
+	water.GetTransform()->Position() = glm::vec3(0, 0.8, 0);
+	water.GetTransform()->Scale() = glm::vec3(5);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 

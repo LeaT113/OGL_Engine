@@ -50,7 +50,7 @@ DirectLight LightComponent::GetDirectLight() const
 
 PointLight LightComponent::GetPointLight() const
 {
-    return PointLight(_color, 0, _transform->Position());
+    return PointLight(_color, 0, GetTransform()->Position());
 }
 
 SpotLight LightComponent::GetSpotLight() const

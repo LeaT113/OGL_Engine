@@ -57,3 +57,8 @@ const glm::mat4 &CameraComponent::Projection() const
 
 	return _projectionMatrix;
 }
+
+glm::vec2 CameraComponent::GetNearFar() const
+{
+	return glm::vec2(NearClippingPlane, FarClippingPlane);
+}

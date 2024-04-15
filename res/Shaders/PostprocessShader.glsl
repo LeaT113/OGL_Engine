@@ -22,5 +22,7 @@ void vert()
 
 void frag()
 {
-    color = vec4(FilmicToneMapping(texture(SourceTex, v2f.uv).rgb), 1.0);
+    vec3 col = texture(SourceTex, v2f.uv).rgb;
+    col = FilmicToneMapping(col);
+    color = vec4(col, 1.0);
 }

@@ -83,6 +83,8 @@ public:
 
     void SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const;
 
+    void SetTextures(unsigned int sceneColor, unsigned int sceneDepth, unsigned int cubemap) const;
+
     void BindTextureUnits() const;
 
     void SetPipelineState() const;

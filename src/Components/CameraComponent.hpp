@@ -25,6 +25,8 @@ public:
 	const glm::mat4 &View() const;
 	const glm::mat4 &Projection() const;
 
+	glm::vec2 GetNearFar() const;
+
 private:
 	friend class Serializer;
 

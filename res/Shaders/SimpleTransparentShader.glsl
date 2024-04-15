@@ -1,8 +1,12 @@
 #include "Library/Core.glsl"
 
 #pragma Blend(Alpha)
+#pragma DepthWrite(Off)
+#pragma Cull(Off)
 
 in vec3 aPosition;
+
+uniform vec3 Color;
 
 struct v2f
 {
@@ -16,5 +20,5 @@ void vert()
 
 void frag()
 {
-    color = vec4(0, 0.3, 0.5, 0.3);
+    color = vec4(Color, 0.3);
 }

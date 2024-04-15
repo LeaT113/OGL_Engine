@@ -1,4 +1,3 @@
-#include <stdexcept>
 #include <utility>
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -104,8 +103,33 @@ void Shader::SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &
     SetMat4(GetUniformLocation("_WorldToViewMatrix"), view);
     SetMat4(GetUniformLocation("_ViewToWorldMatrix"), glm::inverse(view));
     SetMat4(GetUniformLocation("_ViewToClip"), projection);
+    SetMat4(GetUniformLocation("_ClipToView"), inverse(projection));
 
     SetMat4(GetUniformLocation("_ObjectToClipMatrix"), projection * view * modelToWorld);
+}
+
+void Shader::SetTextures(unsigned int sceneColor, unsigned int sceneDepth, unsigned int cubemap) const
+{
+    auto it = _textures.find("_SceneColorTex");
+    if (it != _textures.end())
+    {
+        glActiveTexture(GL_TEXTURE0 + it->second.unit);
+        glBindTexture(GL_TEXTURE_2D, sceneColor);
+    }
+
+    it = _textures.find("_SceneDepthTex");
+    if (it != _textures.end())
+    {
+        glActiveTexture(GL_TEXTURE0 + it->second.unit);
+        glBindTexture(GL_TEXTURE_2D, sceneDepth);
+    }
+
+    it = _textures.find("_CubemapTex");
+    if (it != _textures.end())
+    {
+        glActiveTexture(GL_TEXTURE0 + it->second.unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap);
+    }
 }
 
 void Shader::BindTextureUnits() const

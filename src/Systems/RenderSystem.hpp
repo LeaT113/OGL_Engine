@@ -8,6 +8,8 @@
 #include "../OGL/FrameBuffer.hpp"
 
 
+class UniformBuffer;
+
 class RenderSystem : public HybridSingleton<RenderSystem>
 {
 public:
@@ -24,16 +26,15 @@ private:
     int _width = 1, _height = 1;
 
 	CameraComponent* _camera = nullptr;
+	std::unique_ptr<UniformBuffer> _coreUniformBuffer;
+	Handle<Material> _postprocessMaterial;
 
 	// Passes
 	FrameBuffer _renderBuffer;
 	FrameBuffer _opaqueBuffer;
-	std::vector<RendererComponent*> _opaqueRenderers;
-
 	FrameBuffer _reflectionBuffer;
+	std::vector<RendererComponent*> _opaqueRenderers;
 	std::vector<RendererComponent*> _transparentRenderers;
-
-	Handle<Material> _postprocessMaterial;
 };
 
 

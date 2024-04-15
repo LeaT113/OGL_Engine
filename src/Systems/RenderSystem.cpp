@@ -1,7 +1,12 @@
 #include "RenderSystem.hpp"
 
+#include <algorithm>
+#include <glm/gtx/norm.hpp>
+
 #include "ResourceDatabase.hpp"
+#include "TimeKeeper.hpp"
 #include "../OGL/Graphics.hpp"
+#include "../OGL/UniformBuffer.hpp"
 
 
 RenderSystem::RenderSystem()
@@ -41,8 +46,18 @@ void RenderSystem::RegisterRenderer(RendererComponent *renderer)
 
 void RenderSystem::Render()
 {
-    // TODO Set universal uniforms like _Time in uniform buffer
-    // TODO Set main camera params
+    // Set core uniforms
+    if (Instance()._coreUniformBuffer == nullptr)
+    {
+        Instance()._coreUniformBuffer = std::make_unique<UniformBuffer>(sizeof(float) + sizeof(glm::vec2)*2);
+        Graphics::Bind(*Instance()._coreUniformBuffer, 1);
+    }
+    glm::vec2 screenSize(Instance()._width, Instance()._height);
+    Instance()._coreUniformBuffer->SetData(0, sizeof(glm::vec2), &screenSize);
+    auto cameraNearFar = Instance()._camera->GetNearFar();
+    Instance()._coreUniformBuffer->SetData(sizeof(glm::vec2), sizeof(glm::vec2), &cameraNearFar);
+    auto time = static_cast<float>(TimeKeeper::TimeSinceStartup());
+    Instance()._coreUniformBuffer->SetData(sizeof(glm::vec2) * 2, sizeof(float), &time);
 
     // Opaque pass
     auto& renderBuffer = Instance()._renderBuffer;
@@ -55,14 +70,22 @@ void RenderSystem::Render()
     }
 
     // Copy and bind opaque buffer
+    opaqueBuffer.Clear();
     Graphics::Blit(renderBuffer, opaqueBuffer);
 
-    // TODO Render reflection texture and generate mipmaps
-
     // Transparent pass
-    // TODO sort transparencies
+    Graphics::Bind(renderBuffer);
+    std::ranges::sort(Instance()._transparentRenderers, [](RendererComponent* a, RendererComponent* b)
+    {
+        auto dist1 = length2(a->GetTransform()->Position() - Instance()._camera->GetTransform()->Position());
+        auto dist2 = length2(b->GetTransform()->Position() - Instance()._camera->GetTransform()->Position());
+        return dist1 > dist2;
+    });
     for (auto renderer : Instance()._transparentRenderers)
     {
+        auto& shader = renderer->GetMaterial().GetShader();
+        shader.SetTextures(opaqueBuffer.GetColorTexture(), opaqueBuffer.GetDepthTexture(), ResourceDatabase::GetTexture("Skybox/Night")->GetBindID());
+
         Graphics::Render(*renderer, *Instance()._camera);
     }
 

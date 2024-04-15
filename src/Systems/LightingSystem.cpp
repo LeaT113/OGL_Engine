@@ -15,7 +15,7 @@ void LightingSystem::UpdateLights()
 {
     if(Instance()._lightsUniformBuffer == nullptr) {
         Instance()._lightsUniformBuffer = std::make_unique<UniformBuffer>(sizeof(_data));
-        Graphics::Bind(*Instance()._lightsUniformBuffer, 1);
+        Graphics::Bind(*Instance()._lightsUniformBuffer, 2);
     }
 
     int pointLightIndex = 0;

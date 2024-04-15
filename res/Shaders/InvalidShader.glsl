@@ -1,5 +1,4 @@
 #include "Library/Core.glsl"
-#include "Library/Math.glsl"
 #include "Library/Blending.glsl"
 #include "Library/Tonemapping.glsl"
 

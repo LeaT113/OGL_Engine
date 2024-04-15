@@ -68,8 +68,8 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     glValidateProgram(program);
     GLint glValidationStatus = 0;
     glGetProgramiv(program, GL_VALIDATE_STATUS, &glValidationStatus);
-    if (glValidationStatus == GL_FALSE)
-        return Handle<Shader>::Empty();
+    // if (glValidationStatus == GL_FALSE) // TODO Disabled because texture unit collision
+    //     return Handle<Shader>::Empty();
 
     // Bind uniform and texture locations
     for (auto & [name, slot] : uniforms)
@@ -252,7 +252,7 @@ unsigned int ShaderLoader::CompileShader(const std::string &source, unsigned int
         glGetShaderInfoLog(shader, length, &length, message);
         std::string mes = "Shader failed to compile: ";
         mes += message;
-        std::ofstream failedShader("shader_compile_failure.log");
+        std::ofstream failedShader("shader_compile_failure.glsl");
         failedShader << source;
         failedShader.close();
         throw std::runtime_error(mes);
@@ -401,7 +401,7 @@ Shader::UniformValue ShaderLoader::ConvertDefaultValue(std::type_index type, con
     }
     if (type == typeid(glm::vec2) || type == typeid(glm::vec3) || type == typeid(glm::vec4))
     {
-        std::istringstream iss(&value ? value : "");
+        std::istringstream iss(value.empty() ? "" : value.substr(5, value.size() - 6));
         char ignore;
         if (type == typeid(glm::vec2))
         {

@@ -90,12 +90,12 @@ void Graphics::Render(const RendererComponent& renderer, const CameraComponent& 
     // Or not here and rely on pipeline?
 
     // TODO Iterate through submeshes
-    RenderMesh(renderer.GetMesh(), 0, renderer.GetTransform().ModelToWorld(), renderer.GetMaterial(), camera);
+    RenderMesh(renderer.GetMesh(), 0, renderer.GetTransform()->ModelToWorld(), renderer.GetMaterial(), camera);
 }
 
 void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination)
 {
-    glBlitNamedFramebuffer(source.GetBindID(), destination.GetBindID(), 0, 0, source.GetWidth(), source.GetHeight(), 0, 0, destination.GetWidth(), destination.GetHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBlitNamedFramebuffer(source.GetBindID(), destination.GetBindID(), 0, 0, source.GetWidth(), source.GetHeight(), 0, 0, destination.GetWidth(), destination.GetHeight(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 }
 
 void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination, const Material& material)
@@ -110,14 +110,14 @@ void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination, c
 
     // Apply material
     material.ApplyValues();
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, source.GetColorTexture());
 
     // Set pipeline settings like depth write, blending
     shader.SetPipelineState();
 
     Graphics::Bind(destination);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDrawElements(GL_TRIANGLES, 4 * 3, GL_UNSIGNED_INT, (void*)0);
 }

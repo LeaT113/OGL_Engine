@@ -27,7 +27,7 @@ struct SpotLight
 };
 
 
-layout (std140, binding = 1) uniform lights
+layout (std140, binding = 2) uniform lights
 {
     AmbientLight ambientLight;
     DirectLight directLight;
