@@ -26,7 +26,7 @@ public:
 	T* GetComponent() const;
 
 	// Shortcuts
-	TransformComponent* Transform();
+	TransformComponent* GetTransform() const;
 
 private:
 	friend class Serializer;
@@ -39,6 +39,7 @@ private:
 
 	// Components
 	std::map<std::type_index, Handle<Component>> _components;
+	mutable TransformComponent* _transform = nullptr;
 };
 
 

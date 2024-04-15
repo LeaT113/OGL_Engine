@@ -1,6 +1,7 @@
 #ifndef OGL_ENGINE_COMPONENT_HPP
 #define OGL_ENGINE_COMPONENT_HPP
 
+class TransformComponent;
 class Entity;
 
 class Component
@@ -11,6 +12,8 @@ protected:
 
 public:
 	virtual ~Component();
+
+	TransformComponent* GetTransform() const;
 
 private:
 	friend class Serializer;

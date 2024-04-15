@@ -8,15 +8,11 @@
 LightComponent::LightComponent(const Entity& owner, LightType type)
     : Component(owner), _lightType(type), _color(1), _direction(0, -1, 0), _spotInnerAngle(20), _spotOuterAngle(30)
 {
-    _transform = _owner->GetComponent<TransformComponent>();
-
     LightingSystem::RegisterLight(this);
 }
 
 LightComponent::LightComponent(const Entity& owner) : Component(owner)
 {
-    _transform = _owner->GetComponent<TransformComponent>();
-
     LightingSystem::RegisterLight(this);
 }
 
@@ -68,7 +64,7 @@ SpotLight LightComponent::GetSpotLight() const
     //float spotA = 1 / (glm::cos(glm::radians(_spotInnerAngle/2)) - glm::cos(glm::radians(_spotOuterAngle/2)));
     //float spotB = - glm::cos(glm::radians(_spotInnerAngle/2));
 
-    glm::vec3 dirWS = glm::normalize(_transform->ModelToWorld() * glm::vec4(_direction, 0));
+    glm::vec3 dirWS = glm::normalize(GetTransform()->ModelToWorld() * glm::vec4(_direction, 0));
 
-    return SpotLight(_color, a, _transform->Position(), b, dirWS);
+    return SpotLight(_color, a, GetTransform()->Position(), b, dirWS);
 }

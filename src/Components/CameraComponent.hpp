@@ -39,8 +39,6 @@ private:
 
 	mutable glm::mat4 _projectionMatrix;
 	mutable bool _projectionValid;
-
-	TransformComponent* _transform;
 };
 
 

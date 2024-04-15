@@ -18,17 +18,11 @@ public:
 	const Mesh& GetMesh() const;
     const Material& GetMaterial() const;
 
-    TransformComponent& GetTransform() const;
-
-    const void Render() const;
-
 private:
     friend class Serializer;
 
-    const Mesh* _mesh;
-    const Material* _material;
-
-    TransformComponent* _transform;
+    const Mesh* _mesh = nullptr;
+    const Material* _material = nullptr;
 };
 
 

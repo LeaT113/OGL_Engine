@@ -22,7 +22,9 @@ const std::string& Entity::GetName() const
 
 
 // Shortcuts
-TransformComponent* Entity::Transform()
+TransformComponent* Entity::GetTransform() const
 {
-	return dynamic_cast<TransformComponent *>(GetComponent<TransformComponent>());
+	if (!_transform)
+		_transform = GetComponent<TransformComponent>();
+	return _transform;
 }

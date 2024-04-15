@@ -32,8 +32,6 @@ public:
 private:
     friend class Serializer;
 
-    TransformComponent *_transform;
-
     LightType _lightType;
     glm::vec3 _color;
     glm::vec3 _direction;

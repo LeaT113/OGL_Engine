@@ -6,7 +6,7 @@
 
 TransformComponent::TransformComponent(const Entity& owner)
 	: Component(owner), _position(0), _rotation(glm::vec3(0, 0, 0)), _scale(1)
-{ }
+{}
 
 const glm::vec3 &TransformComponent::Position() const
 {

@@ -4,17 +4,11 @@
 CameraComponent::CameraComponent(const Entity &owner, ProjectionType projectionType, float horizontalFov)
 		: Component(owner), _projectionType(projectionType), _horizontalFov(horizontalFov), _projectionValid(false)
 {
-	_transform = _owner->GetComponent<TransformComponent>();
-	if (_transform == nullptr)
-		throw std::runtime_error("Entity must have Transform for Camera to work");
-
 	SetWindowDimensions(1, 1);
 }
 
 CameraComponent::CameraComponent(const Entity& owner) : Component(owner)
 {
-	_transform = _owner->GetComponent<TransformComponent>();
-
 	SetWindowDimensions(1, 1);
 }
 
@@ -28,7 +22,7 @@ void CameraComponent::SetWindowDimensions(int width, int height)
 
 const glm::mat4 &CameraComponent::View() const
 {
-	return _transform->WorldToModel();
+	return GetTransform()->WorldToModel();
 }
 
 const glm::mat4 &CameraComponent::Projection() const
