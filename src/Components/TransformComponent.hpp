@@ -4,57 +4,65 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-
 class TransformComponent : public Component
 {
 public:
 	explicit TransformComponent(const Entity& owner);
 
-	// Accessors
-	const glm::vec3 &Position() const;
-	glm::vec3 &Position();
-	const glm::quat &Rotation() const;
-	glm::quat &Rotation();
-	const glm::vec3 &Scale() const;
-	glm::vec3 &Scale();
+	glm::vec3 Position() const;
+	void Position(const glm::vec3 &position);
+	glm::quat Rotation() const;
+	void Rotation(const glm::quat &rotation);
+	glm::vec3 Scale() const;
+	void Scale(const glm::vec3 &scale);
 
-	// Directions
-	glm::vec3 Up();
-	glm::vec3 Forward();
-	glm::vec3 Right();
+	glm::vec3 LocalPosition() const;
+	void LocalPosition(const glm::vec3 &position);
+	glm::quat LocalRotation() const;
+	void LocalRotation(const glm::quat &rotation);
 
-	// Space conversion
-	const glm::mat4 &ModelToWorld();
-	const glm::mat4 &WorldToModel();
+	void SetParent(TransformComponent* parent);
+
+	glm::vec3 Up() const;
+	glm::vec3 Forward() const;
+	glm::vec3 Right() const;
+
+	glm::mat4 ModelToWorld() const;
+	glm::mat4 WorldToModel() const;
 
 	/// Rotation of <i>angle</i> degrees around <i>axis</i> around the local origin
 	/// \param angle How many degrees to rotate
 	/// \param axis Vector around which to rotate
 	void AngleAxis(float angle, const glm::vec3& axis);
 
-	/// Rotation of <i>angle</i> degrees around <i>axis</i> around <i>point</i>
+	/// Rotation of <i>angle</i> degrees around <i>axis</i> around origin <i>point</i>
 	/// \param angle How many degrees to rotate
 	/// \param axis Vector around which to rotate
 	/// \param point Rotation origin
 	void AngleAxisPoint(float angle, const glm::vec3& axis, const glm::vec3& point);
 
+	/// Rotate to face <i>direction</i>, aligning with <i>up</i>
+	/// @param direction Direction to face
+	/// @param up Vector to align own up vector with
 	void LookAt(glm::vec3 direction, glm::vec3 up);
 
 	void AlignWith(const TransformComponent& other);
 
-	void NotifyChanged();
-
 private:
 	friend class Serializer;
 
-	glm::vec3 _position;
-	glm::quat _rotation;
-	glm::vec3 _scale;
-	glm::mat4 _modelToWorld;
-	glm::mat4 _worldToModel;
+	glm::vec3 _position = glm::vec3(0);
+	glm::quat _rotation = glm::quat(glm::vec3(0));
+	glm::vec3 _scale = glm::vec3(1);
 
-	uint8_t _validMatrixBits = 0;
+	TransformComponent* _parent = nullptr;
+
+	mutable glm::mat4 _modelToWorld = glm::mat4(0);
+	mutable glm::mat4 _worldToModel = glm::mat4(0);
+	mutable bool _valid = false;
+
+	void Update() const;
 };
 
 
-#endif //OGL_ENGINE_TRANSFORMCOMPONENT_HPP
+#endif

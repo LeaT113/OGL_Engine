@@ -138,8 +138,8 @@ int main()
 	Entity camera("Camera");
 	camera
 		.AddComponent<TransformComponent>()
-		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 90);
-	camera.GetTransform()->Position() = glm::vec3(-2, 1.6, -0.5);
+		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 75);
+	camera.GetTransform()->Position(glm::vec3(-2, 1.6, -0.5));
 	camera.GetTransform()->AngleAxis(45, glm::vec3(0, 1, 0));
 	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 
@@ -147,6 +147,9 @@ int main()
 	flashlight
 	    .AddComponent<TransformComponent>()
 	    .AddComponent<LightComponent>(LightComponent::Type::Spot);
+	flashlight.GetTransform()->SetParent(camera.GetTransform());
+	flashlight.GetTransform()->LocalPosition(glm::vec3(0.2f, -0.5f, 0.1f));
+	flashlight.GetTransform()->LocalRotation(glm::vec3(0));
 	flashlight.GetComponent<LightComponent>()->SetSpotAngles(10, 90);
 	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
 	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(2));
@@ -198,14 +201,12 @@ int main()
             movementHorizontal = glm::normalize(movementHorizontal);
         glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
 
-        camera.GetTransform()->Position() += static_cast<float>(TimeKeeper::DeltaTime() * 2) * movement;
-		flashlight.GetTransform()->AlignWith(*camera.GetTransform());
-		flashlight.GetTransform()->Position() += camera.GetTransform()->Right() * 0.2f + camera.GetTransform()->Up() * -0.5f + camera.GetTransform()->Forward() * 0.1f;
+        camera.GetTransform()->Position(camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 2) * movement);
 
 		// Objects
-		emissiveSphere1.GetTransform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
-		emissiveSphere2.GetTransform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
-		warningLight.GetTransform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
+		emissiveSphere1.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7));
+		emissiveSphere2.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0));
+		warningLight.GetTransform()->AngleAxis(TimeKeeper::DeltaTime() * 80, glm::vec3(0, 1, 0));
 
 		// Render
 		lightingSystem->UpdateLights();

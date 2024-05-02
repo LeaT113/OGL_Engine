@@ -1,114 +1,151 @@
 #include "TransformComponent.hpp"
-#include <functional>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
 
 TransformComponent::TransformComponent(const Entity& owner)
-	: Component(owner), _position(0), _rotation(glm::vec3(0, 0, 0)), _scale(1)
+	: Component(owner)
 {}
 
-const glm::vec3 &TransformComponent::Position() const
+glm::vec3 TransformComponent::Position() const
 {
-	return std::cref(_position);
-}
-
-glm::vec3 &TransformComponent::Position()
-{
-	NotifyChanged();
+	if (_parent)
+		return _parent->ModelToWorld() * glm::vec4(_position, 1);
 	return _position;
 }
 
-const glm::quat &TransformComponent::Rotation() const
+void TransformComponent::Position(const glm::vec3 &position)
 {
-	return std::cref(_rotation);
+	if (_parent)
+		_position = _parent->WorldToModel() * glm::vec4(position, 1);
+	else
+		_position = position;
+
+	_valid = false;
 }
 
-glm::quat &TransformComponent::Rotation()
+glm::quat TransformComponent::Rotation() const
 {
-	NotifyChanged();
+	if (_parent)
+		return _rotation * _parent->Rotation();
 	return _rotation;
 }
 
-const glm::vec3 &TransformComponent::Scale() const
+void TransformComponent::Rotation(const glm::quat &rotation)
 {
-	return std::cref(_scale);
+	if (_parent)
+		_rotation = inverse(_parent->Rotation()) * rotation;
+	else
+		_rotation = rotation;
+
+	_valid = false;
 }
 
-glm::vec3 &TransformComponent::Scale()
+glm::vec3 TransformComponent::Scale() const
 {
-	NotifyChanged();
-	return _scale;
+	return _scale; // TODO How to handle global scale
 }
 
-const glm::mat4 &TransformComponent::ModelToWorld()
+void TransformComponent::Scale(const glm::vec3 &scale)
 {
-	bool valid = _validMatrixBits & 1;
-	if(!valid)
-	{
-		_modelToWorld = glm::translate(_position) * glm::toMat4(_rotation) * glm::scale(_scale);
-		_validMatrixBits |= 1;
-	}
+	_scale = scale;
+	_valid = false;
+}
 
+glm::vec3 TransformComponent::LocalPosition() const
+{
+	return _position;
+}
+
+void TransformComponent::LocalPosition(const glm::vec3& position)
+{
+	_position = position;
+	_valid = false;
+}
+
+glm::quat TransformComponent::LocalRotation() const
+{
+	return _rotation;
+}
+
+void TransformComponent::LocalRotation(const glm::quat& rotation)
+{
+	_rotation = rotation;
+	_valid = false;
+}
+
+void TransformComponent::SetParent(TransformComponent* parent)
+{
+	if (parent == _parent)
+		return;
+
+	_parent = parent;
+	Position(_position);
+	Rotation(_rotation);
+}
+
+glm::mat4 TransformComponent::ModelToWorld() const
+{
+	if(!_valid)
+		Update();
+
+	if (_parent)
+		return _modelToWorld * _parent->ModelToWorld();
 	return _modelToWorld;
 }
 
-const glm::mat4 &TransformComponent::WorldToModel()
+glm::mat4 TransformComponent::WorldToModel() const
 {
-	bool valid = _validMatrixBits & 2;
-	if(!valid)
-	{
-		_worldToModel = glm::inverse(ModelToWorld());
-		_validMatrixBits |= 2;
-	}
+	if(!_valid)
+		Update();
 
+	if (_parent)
+		return _worldToModel * _parent->WorldToModel(); // TODO Switch order?
 	return _worldToModel;
 }
 
 
-void TransformComponent::NotifyChanged()
-{
-	_validMatrixBits = 0;
-}
-
 void TransformComponent::AngleAxis(float angle, const glm::vec3 &axis)
 {
-	Rotation() = glm::angleAxis(glm::radians(angle),  glm::normalize(axis)) * _rotation;
+	Rotation(angleAxis(glm::radians(angle), normalize(axis)) * Rotation());
 }
 
 void TransformComponent::AngleAxisPoint(float angle, const glm::vec3 &axis, const glm::vec3 &point) // TODO Check correctness
 {
-	auto rot = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
-	Rotation() = rot * _rotation;
-	Position() = rot * _position;
+	auto rot = angleAxis(glm::radians(angle), normalize(axis));
+	Rotation(rot * _rotation);
+	Position(rot * _position);
 }
 
 void TransformComponent::LookAt(glm::vec3 direction, glm::vec3 up)
 {
-	_rotation = quatLookAt(direction, up);
-
-	NotifyChanged();
+	Rotation(quatLookAt(direction, up));
 }
 
 void TransformComponent::AlignWith(const TransformComponent& other)
 {
-	_position = other._position;
-	_rotation = other._rotation;
-
-	NotifyChanged();
+	Position(other.Position());
+	Rotation(other.Rotation());
 }
 
-glm::vec3 TransformComponent::Up()
+void TransformComponent::Update() const
+{
+	_modelToWorld = translate(_position) * toMat4(_rotation) * scale(_scale);
+	_worldToModel = inverse(_modelToWorld);
+	_valid = true;
+}
+
+glm::vec3 TransformComponent::Up() const
 {
 	return ModelToWorld() * glm::vec4(0, 1, 0, 0);
 }
 
-glm::vec3 TransformComponent::Forward()
+glm::vec3 TransformComponent::Forward() const
 {
 	return ModelToWorld() * glm::vec4(0, 0, -1, 0);
 }
 
-glm::vec3 TransformComponent::Right()
+glm::vec3 TransformComponent::Right() const
 {
 	return ModelToWorld() * glm::vec4(1, 0, 0, 0);
 }

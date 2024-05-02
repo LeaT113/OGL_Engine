@@ -27,7 +27,7 @@ void CameraComponent::SetFOV(float horizontalFov)
 	_projectionValid = false;
 }
 
-const glm::mat4 &CameraComponent::View() const
+glm::mat4 CameraComponent::View() const
 {
 	return GetTransform()->WorldToModel();
 }

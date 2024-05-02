@@ -23,7 +23,7 @@ public:
 	void SetFOV(float horizontalFov);
 
 	// Matrices
-	const glm::mat4 &View() const;
+	glm::mat4 View() const;
 	const glm::mat4 &Projection() const;
 
 	glm::vec2 GetNearFar() const;

@@ -97,7 +97,7 @@ void RenderSystem::Render()
 
             shadowCamera.SetWindowDimensions(LightingSystem::POINT_LIGHT_SHADOW_RESOLUTION, LightingSystem::POINT_LIGHT_SHADOW_RESOLUTION);
             glViewport(0, 0, LightingSystem::POINT_LIGHT_SHADOW_RESOLUTION, LightingSystem::POINT_LIGHT_SHADOW_RESOLUTION);
-            shadowCamera.GetTransform()->Position() = light->GetTransform()->Position();
+            shadowCamera.GetTransform()->Position(light->GetTransform()->Position());
             shadowCamera.SetFOV(90);
 
             auto &shadowTexture = LightingSystem::GetShadowTexture(light->GetType(), shadowCubeCount);
@@ -128,7 +128,7 @@ void RenderSystem::Render()
             }
 
             // Pass metadata
-            shadowCamera.GetTransform()->Rotation() = glm::quat(glm::vec3(0));
+            shadowCamera.GetTransform()->Rotation(glm::quat(glm::vec3(0)));
             LightingSystem::SetShadowMatrix(light->GetType(), shadowCubeCount, shadowCamera.View());
             light->SetShadowIndex(shadowCubeCount++);
         }
