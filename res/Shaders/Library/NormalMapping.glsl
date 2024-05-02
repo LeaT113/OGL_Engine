@@ -1,3 +1,13 @@
+#include "Library/Core.glsl"
+
+mat3 CreateTBNMatrix(vec3 normal, vec3 tangent)
+{
+    vec3 N = ObjectToWorldNormal(normal);
+    vec3 T = ObjectToWorldNormal(tangent);
+    vec3 B = cross(N, T);
+    return mat3(T, B, N);
+}
+
 vec3 UnpackNormal(vec3 packedNormal, float scale)
 {
     vec3 normal;

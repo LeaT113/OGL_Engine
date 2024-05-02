@@ -20,6 +20,13 @@ void CameraComponent::SetWindowDimensions(int width, int height)
 	_projectionValid = false;
 }
 
+void CameraComponent::SetFOV(float horizontalFov)
+{
+	_horizontalFov = horizontalFov;
+
+	_projectionValid = false;
+}
+
 const glm::mat4 &CameraComponent::View() const
 {
 	return GetTransform()->WorldToModel();

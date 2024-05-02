@@ -9,21 +9,25 @@ class TransformComponent;
 class LightComponent : public Component
 {
 public:
-    enum LightType {
+    enum class Type {
         Ambient,
         Direct,
         Point,
         Spot
     };
 
-    LightComponent(const Entity& owner, LightType type);
-    explicit LightComponent(const Entity& owner);
+    LightComponent(const Entity& owner, Type type);
 
     void SetColor(const glm::vec3 &color);
     void SetDirection(const glm::vec3 &direction);
     void SetSpotAngles(float innerAngle, float outerAngle);
+    std::pair<float, float> GetSpotAngles() const;
 
-    LightType GetType() const;
+    void SetShadowCasting(bool enable);
+    bool IsShadowCasting() const;
+    void SetShadowIndex(int index);
+
+    Type GetType() const;
     AmbientLight GetAmbientLight() const;
     DirectLight GetDirectLight() const;
     PointLight GetPointLight() const;
@@ -32,11 +36,14 @@ public:
 private:
     friend class Serializer;
 
-    LightType _lightType;
-    glm::vec3 _color;
-    glm::vec3 _direction;
-    float _spotInnerAngle;
-    float _spotOuterAngle;
+    Type _lightType = Type::Ambient;
+    glm::vec3 _color = glm::vec3(0);
+    glm::vec3 _direction = glm::vec3(0, 0, -1);
+    float _spotInnerAngle = 0;
+    float _spotOuterAngle = 0;
+
+    bool _shadowCasting = false;
+    int _shadowMapIndex = -1;
 };
 
 

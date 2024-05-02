@@ -10,7 +10,7 @@
 #include "../Resources/Material.hpp"
 #include "../Resources/Texture.hpp"
 #include "../Components/CameraComponent.hpp"
-#include "../IO/MeshFactory.hpp"
+#include "../Systems/LightingSystem.hpp"
 #include "../Systems/ResourceDatabase.hpp"
 
 
@@ -65,7 +65,8 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm
 
     // Bind shader
     const Shader &shader = material.GetShader();
-    Graphics::Bind(shader);
+    Bind(shader);
+    LightingSystem::BindShadowMaps(shader);
 
     // Apply material
     material.ApplyValues();
@@ -73,8 +74,6 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm
 
     // Set transformation matrices
     shader.SetTransformations(modelToWorld, camera.View(), camera.Projection());
-
-    // Set universal uniforms
 
     // Set pipeline settings like depth write, blending
     shader.SetPipelineState();
@@ -91,6 +90,25 @@ void Graphics::Render(const RendererComponent& renderer, const CameraComponent& 
 
     // TODO Iterate through submeshes
     RenderMesh(renderer.GetMesh(), 0, renderer.GetTransform()->ModelToWorld(), renderer.GetMaterial(), camera);
+}
+
+void Graphics::RenderWithShader(const RendererComponent& renderer, const CameraComponent& camera, const Shader& shader)
+{
+    // TODO Rework
+    Bind(renderer.GetMesh().GetVertexArray());
+
+    // Bind shader
+    Bind(shader);
+
+    // Set transformation matrices
+    shader.SetTransformations(renderer.GetTransform()->ModelToWorld(), camera.View(), camera.Projection());
+
+    // Set pipeline settings like depth write, blending
+    shader.SetPipelineState();
+
+    // Call draw
+    auto submesh = renderer.GetMesh().GetSubmesh(0);
+    glDrawElements(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset);
 }
 
 void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination)
@@ -110,7 +128,7 @@ void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination, c
 
     // Apply material
     material.ApplyValues();
-    glActiveTexture(GL_TEXTURE3);
+    glActiveTexture(GL_TEXTURE0 + shader.GetUniformLocation("SourceTex"));
     glBindTexture(GL_TEXTURE_2D, source.GetColorTexture());
 
     // Set pipeline settings like depth write, blending

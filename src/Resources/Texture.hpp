@@ -7,6 +7,7 @@
 #include "../OGL/IBindable.hpp"
 
 
+class FrameBuffer;
 
 class Texture : public Resource, public IBindable
 {
@@ -39,7 +40,10 @@ public:
         R8,
         RGB8,
         RGBA8,
-        // TODO Add more formats
+
+        Depth16,
+        Depth32,
+        Depth32F,
     };
 
     struct Params
@@ -50,18 +54,18 @@ public:
         Filtering filtering = Filtering::Trilinear;
     };
 
+    static Params DefaultParams;
+
     Texture(Type type, Format format, unsigned int width, unsigned int height, std::string name, void* data = nullptr, Params params = DefaultParams);
     ~Texture() override;
 
     void Resize(unsigned int width, unsigned int height);
     void Fill(void* data, int index = 0);
+    void Copy(const FrameBuffer &buffer, int subIndex = 0);
 
     unsigned GetBindID() const override;
 
     Type GetType() const;
-
-    static Params DefaultParams;
-
 private:
     GLuint _textureId = 0;
 

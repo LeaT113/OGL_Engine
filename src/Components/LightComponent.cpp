@@ -5,17 +5,11 @@
 #include "TransformComponent.hpp"
 
 
-LightComponent::LightComponent(const Entity& owner, LightType type)
-    : Component(owner), _lightType(type), _color(1), _direction(0, -1, 0), _spotInnerAngle(20), _spotOuterAngle(30)
+LightComponent::LightComponent(const Entity& owner, Type type)
+    : Component(owner), _lightType(type)
 {
     LightingSystem::RegisterLight(this);
 }
-
-LightComponent::LightComponent(const Entity& owner) : Component(owner)
-{
-    LightingSystem::RegisterLight(this);
-}
-
 
 void LightComponent::SetColor(const glm::vec3& color)
 {
@@ -33,9 +27,33 @@ void LightComponent::SetSpotAngles(float innerAngle, float outerAngle)
     _spotOuterAngle = outerAngle;
 }
 
-LightComponent::LightType LightComponent::GetType() const
+std::pair<float, float> LightComponent::GetSpotAngles() const
+{
+    return std::make_pair(_spotInnerAngle, _spotOuterAngle);
+}
+
+void LightComponent::SetShadowCasting(bool enable)
+{
+    if (_lightType == Type::Ambient)
+        throw std::runtime_error("LightComponent Shadows not supported for ambient light");
+
+
+    _shadowCasting = enable;
+}
+
+LightComponent::Type LightComponent::GetType() const
 {
     return _lightType;
+}
+
+bool LightComponent::IsShadowCasting() const
+{
+    return _shadowCasting;
+}
+
+void LightComponent::SetShadowIndex(int index)
+{
+    _shadowMapIndex = index;
 }
 
 AmbientLight LightComponent::GetAmbientLight() const
@@ -50,7 +68,7 @@ DirectLight LightComponent::GetDirectLight() const
 
 PointLight LightComponent::GetPointLight() const
 {
-    return PointLight(_color, 0, GetTransform()->Position());
+    return PointLight(_color, _shadowMapIndex, GetTransform()->Position());
 }
 
 SpotLight LightComponent::GetSpotLight() const
@@ -61,10 +79,7 @@ SpotLight LightComponent::GetSpotLight() const
     float a = 1 / glm::max(innerCos - outerCos, 0.001f);
     float b = -outerCos * a;
 
-    //float spotA = 1 / (glm::cos(glm::radians(_spotInnerAngle/2)) - glm::cos(glm::radians(_spotOuterAngle/2)));
-    //float spotB = - glm::cos(glm::radians(_spotInnerAngle/2));
-
     glm::vec3 dirWS = glm::normalize(GetTransform()->ModelToWorld() * glm::vec4(_direction, 0));
 
-    return SpotLight(_color, a, GetTransform()->Position(), b, dirWS);
+    return SpotLight(_color, a, GetTransform()->Position(), b, dirWS, _shadowMapIndex);
 }

@@ -22,6 +22,16 @@ vec3 FilmicToneMapping(vec3 color)
     return color;
 }
 
+vec3 ACESFilm(vec3 x)
+{
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0, 1);
+}
+
 vec3 AcesTonemapping(vec3 color){
     mat3 m1 = mat3(
     0.59719, 0.07600, 0.02840,

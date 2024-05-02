@@ -1,11 +1,10 @@
 #ifndef OGL_ENGINE_VERTEXATTRIBUTES_HPP
 #define OGL_ENGINE_VERTEXATTRIBUTES_HPP
 
-#include <GL/glew.h>
 #include <stdexcept>
 
 
-enum VertexAttribute
+enum class VertexAttribute
 {
     Position = 0,
     Normal = 1,

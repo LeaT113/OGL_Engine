@@ -1,4 +1,5 @@
 #include "VertexAttributes.hpp"
+#include <GL/glew.h>
 
 const VertexAttributeInfo &GetVertexAttributeInfo(VertexAttribute attribute)
 {
@@ -16,5 +17,5 @@ const VertexAttributeInfo &GetVertexAttributeInfo(VertexAttribute attribute)
     if((int)attribute >= (int)VertexAttribute::COUNT)
         throw std::runtime_error("Shader::GetAttributeInfo out of range");
 
-    return attributeInfos[attribute];
+    return attributeInfos[static_cast<int>(attribute)];
 }

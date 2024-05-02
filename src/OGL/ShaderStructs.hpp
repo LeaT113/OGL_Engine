@@ -19,7 +19,7 @@ struct DirectLight
 struct PointLight
 {
     glm::vec3 color;
-    float _padding0;
+    int shadowIndex;
     glm::vec3 position;
     float radius;
 };
@@ -31,7 +31,7 @@ struct SpotLight
     glm::vec3 position;
     float b;
     glm::vec3 direction;
-    float _padding0;
+    int shadowIndex;
 };
 
 

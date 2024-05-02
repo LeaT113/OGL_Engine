@@ -9,7 +9,7 @@ class Handle
 {
     // TODO Add error when accessing handle that's been moved
 public:
-    Handle() = delete;
+    Handle() = default;
 
     // Move constructor
     Handle(Handle&& other) noexcept : _ptr(std::move(other._ptr))

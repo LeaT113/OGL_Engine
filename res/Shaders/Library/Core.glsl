@@ -1,11 +1,11 @@
-uniform mat4 _ObjectToWorldMatrix;
-uniform mat4 _WorldToObjectMatrix;
-uniform mat3 _ObjectToWorldNormalMatrix;
-uniform mat4 _WorldToViewMatrix;
-uniform mat4 _ViewToWorldMatrix;
-uniform mat4 _ObjectToClipMatrix;
-uniform mat4 _ViewToClip;
-uniform mat4 _ClipToView;
+uniform mat4 _ModelMatrix;
+uniform mat4 _InvModelMatrix;
+uniform mat4 _ViewMatrix;
+uniform mat4 _InvViewMatrix;
+uniform mat4 _ProjectionMatrix;
+uniform mat4 _InvProjectionMatrix;
+uniform mat3 _ModelNormalMatrix;
+uniform mat4 _MVPMatrix;
 
 layout (std140, binding = 1) uniform core
 {
@@ -15,9 +15,9 @@ layout (std140, binding = 1) uniform core
 } Core;
 
 uniform vec3 _WorldSpaceCameraPos;
-uniform sampler2D _SceneColorTex;
-uniform sampler2D _SceneDepthTex;
 uniform samplerCube _CubemapTex;
+uniform sampler2D _ShadowMap;
+uniform mat4 _ShadowMatrix;
 
 #define _ScreenPos (gl_FragCoord.xy/Core.screenSize)
 
@@ -26,32 +26,32 @@ uniform samplerCube _CubemapTex;
 // Position
 vec3 ObjectToWorldPos(vec3 pos)
 {
-    return (_ObjectToWorldMatrix * vec4(pos, 1.0)).xyz;
+    return (_ModelMatrix * vec4(pos, 1.0)).xyz;
 }
 vec3 WorldToObjectPos(vec3 pos)
 {
-    return (_WorldToObjectMatrix * vec4(pos, 1.0)).xyz;
+    return (_InvModelMatrix * vec4(pos, 1.0)).xyz;
 }
 
 vec3 WorldToViewPos(vec3 pos)
 {
-    return (_WorldToViewMatrix * vec4(pos, 1.0)).xyz;
+    return (_ViewMatrix * vec4(pos, 1.0)).xyz;
 }
 vec3 ViewToWorldPos(vec3 pos)
 {
-    return (_ViewToWorldMatrix * vec4(pos, 1.0)).xyz;
+    return (_InvViewMatrix * vec4(pos, 1.0)).xyz;
 }
 
 vec4 ObjectToClipPos(vec3 pos)
 {
-    return _ObjectToClipMatrix * vec4(pos, 1.0);
+    return _MVPMatrix * vec4(pos, 1.0);
 }
 
 // Normal
 vec3 ObjectToWorldNormal(vec3 normal)
 {
     // https://zhangdoa.com/normal-and-normal-mapping
-    return normalize(_ObjectToWorldNormalMatrix * normal);
+    return normalize(_ModelNormalMatrix * normal);
 }
 
 // Mapping

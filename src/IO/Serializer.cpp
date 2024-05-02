@@ -147,7 +147,7 @@ Handle<CameraComponent> Serializer::DeserializeComponent(const YAML::Node& compo
 {
     auto component = Handle<CameraComponent>::Make(owner);
 
-    component->_projectionType = static_cast<ProjectionType>(componentYaml["_projectionType"].as<int>());
+    component->_projectionType = static_cast<CameraComponent::ProjectionType>(componentYaml["_projectionType"].as<int>());
     component->_horizontalFov = componentYaml["_horizontalFov"].as<float>();
 
     return component;
@@ -156,9 +156,8 @@ Handle<CameraComponent> Serializer::DeserializeComponent(const YAML::Node& compo
 template<>
 Handle<LightComponent> Serializer::DeserializeComponent(const YAML::Node& componentYaml, const Entity& owner)
 {
-    auto component = Handle<LightComponent>::Make(owner);
+    auto component = Handle<LightComponent>::Make(owner, static_cast<LightComponent::Type>(componentYaml["_lightType"].as<int>()));
 
-    component->_lightType = static_cast<LightComponent::LightType>(componentYaml["_lightType"].as<int>());
     component->_color = componentYaml["_color"].as<glm::vec3>();
     component->_direction = componentYaml["_direction"].as<glm::vec3>();
     component->_spotInnerAngle = componentYaml["_spotInnerAngle"].as<float>();

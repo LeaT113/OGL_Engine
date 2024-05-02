@@ -20,47 +20,52 @@
 #include "Scene/Scene.hpp"
 #include "Systems/LightingSystem.hpp"
 
-
-std::unique_ptr<TimeKeeper> timeKeeper = std::make_unique<TimeKeeper>();
-std::unique_ptr<InputSystem> inputSystem = std::make_unique<InputSystem>();
-std::unique_ptr<RenderSystem> rendererSystem = std::make_unique<RenderSystem>();
-std::unique_ptr<LightingSystem> lightingSystem = std::make_unique<LightingSystem>();
+std::unique_ptr<TimeKeeper> timeKeeper;
+std::unique_ptr<InputSystem> inputSystem;
+std::unique_ptr<RenderSystem> rendererSystem;
+std::unique_ptr<LightingSystem> lightingSystem;
 
 int main()
 {
-	GLFWwindow *window;
+	// Systems
+	timeKeeper = std::make_unique<TimeKeeper>();
+	inputSystem = std::make_unique<InputSystem>();
+	rendererSystem = std::make_unique<RenderSystem>();
+	lightingSystem = std::make_unique<LightingSystem>();
 
 	// GLFW window
 	if (!glfwInit())
 		return -1;
-	window = glfwCreateWindow(1280, 720, "Hello World", nullptr, nullptr);
-	if (!window)
+	GLFWwindow *mainWindow;
+	mainWindow = glfwCreateWindow(1280, 720, "OGL_Engine", nullptr, nullptr);
+	if (!mainWindow)
 	{
 		glfwTerminate();
 		return -1;
 	}
-	glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+	glfwMakeContextCurrent(mainWindow);
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLEW
 	if (glewInit() != GLEW_OK)
+	{
 		std::cout << "GLEW failed to initialize" << std::endl;
+		return -1;
+	}
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
-
 	// GLFW callbacks
-	glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+	glfwSetFramebufferSizeCallback(mainWindow, [](GLFWwindow* window, int width, int height) {
+		glViewport(0, 0, width, height);
+		rendererSystem->SetRenderSize(width, height);
+	});
+	glfwSetKeyCallback(mainWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
 		inputSystem->OnKeyChanged(key, action);
 	});
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        glViewport(0, 0, width, height);
-        rendererSystem->SetRenderSize(width, height);
-    });
-    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+    glfwSetCursorPosCallback(mainWindow, [](GLFWwindow* window, double xpos, double ypos) {
         inputSystem->OnMouseMoved(xpos, ypos);
     });
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+    glfwSetMouseButtonCallback(mainWindow, [](GLFWwindow* window, int button, int action, int mods) {
        inputSystem->OnMouseButtonChanged(button, action);
     });
 
@@ -77,9 +82,9 @@ int main()
 
     // Set up rendering
     int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
+    glfwGetFramebufferSize(mainWindow, &width, &height);
     rendererSystem->SetRenderSize(width, height);
-
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		// Resources
 	// Meshes
@@ -90,12 +95,15 @@ int main()
 	ResourceDatabase::AddMesh(MeshFactory::CreateQuad());
 
 	// Shaders
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("ShadowShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PointShadowShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PBRShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("EmissionShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SkyboxShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PostprocessShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SimpleTransparentShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("WaterShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("FireShader.glsl"));
 
 	// Textures
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo"));
@@ -109,6 +117,7 @@ int main()
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Roughness", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Occlusion", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night", {false, true, Texture::Tiling::Extend}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("FireNoiseSeamless"));
 
 	// Materials
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("GroundMaterial.mat"));
@@ -125,9 +134,15 @@ int main()
 	Entity& emissiveSphere1 = *scene->GetEntity("EmissiveSphere1");
 	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
 	Entity& warningLight = *scene->GetEntity("WarningLight");
+	warningLight.GetComponent<LightComponent>()->SetShadowCasting(true);
+	emissiveSphere1.GetComponent<LightComponent>()->SetShadowCasting(true);
+	emissiveSphere2.GetComponent<LightComponent>()->SetShadowCasting(true);
+	warningLight.GetTransform()->AngleAxis(-35, glm::vec3(1, 0, 0));
+	camera.GetTransform()->Position() = glm::vec3(-2, 1.6, -0.5);
+	camera.GetTransform()->AngleAxis(45, glm::vec3(0, 1, 0));
 
 	Entity skybox;
-	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMax");
+	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMat");
 	skybox.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), &skyboxMat);
 	skyboxMat.Set("SkyboxTex", ResourceDatabase::GetTexture("Skybox/Night"));
 
@@ -138,24 +153,37 @@ int main()
 	water.GetTransform()->Position() = glm::vec3(0, 0.8, 0);
 	water.GetTransform()->Scale() = glm::vec3(5);
 
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+	Entity fire;
+	Material fireMat(*ResourceDatabase::GetShader("FireShader.glsl"), "FireMat");
+	fireMat.Set("FireNoiseTex", ResourceDatabase::GetTexture("FireNoiseSeamless"));
+	fire.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), &fireMat);
+	fire.GetTransform()->Position() = glm::vec3(-0.8, 3, -1);
+	fire.GetTransform()->AngleAxis(90, glm::vec3(1, 0, 0));
+
+	Entity flashlight;
+	flashlight
+		.AddComponent<TransformComponent>()
+		.AddComponent<LightComponent>(LightComponent::Type::Spot);
+	flashlight.GetComponent<LightComponent>()->SetSpotAngles(10, 90);
+	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
+	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(2));
 
 	// Game loop
 	bool mouse = true;
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(mainWindow))
 	{
 		// Update state
 		timeKeeper->Update();
 
 		if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE))
 		{
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			mouse = false;
         }
 
 		if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
 		{
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			inputSystem->RestartRelativeMouse();
 			mouse = true;
 		}
@@ -182,21 +210,18 @@ int main()
         glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
 
         camera.GetTransform()->Position() += static_cast<float>(TimeKeeper::DeltaTime() * 2) * movement;
+		flashlight.GetTransform()->AlignWith(*camera.GetTransform());
+		flashlight.GetTransform()->Position() += camera.GetTransform()->Right() * 0.2f + camera.GetTransform()->Up() * -0.5f + camera.GetTransform()->Forward() * 0.1f;
 
-		// Render
+		// Objects
 		emissiveSphere1.GetTransform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 1.5) * 2, 0.5, sin(timeKeeper->TimeSinceStartup() * 3) * 0.7);
 		emissiveSphere2.GetTransform()->Position() = glm::vec3(sin(timeKeeper->TimeSinceStartup() * 2), sin(timeKeeper->TimeSinceStartup() * 4) * 0.4 + 0.5, 0);
 		warningLight.GetTransform()->AngleAxis(timeKeeper->DeltaTime() * 80, glm::vec3(0, 1, 0));
 
-		//suzanne.Transform()->AngleAxis(30.0f * timeKeeper->DeltaTime(), glm::vec3(0, 1, 0));
-		//suzanne.Transform()->Scale() = glm::vec3(glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()), glm::sin(timeKeeper->TimeSinceStartup()));
-
+		// Render
 		lightingSystem->UpdateLights();
         rendererSystem->Render();
-
-		glfwSwapBuffers(window);
-
-		// Get input
+		glfwSwapBuffers(mainWindow);
 		glfwPollEvents();
 	}
 

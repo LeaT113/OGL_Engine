@@ -32,9 +32,11 @@ private:
 	// Passes
 	FrameBuffer _renderBuffer;
 	FrameBuffer _opaqueBuffer;
-	FrameBuffer _reflectionBuffer;
+	FrameBuffer _shadowBuffer;
 	std::vector<RendererComponent*> _opaqueRenderers;
 	std::vector<RendererComponent*> _transparentRenderers;
+	const Shader* _shadowShader = nullptr;
+	const Shader* _pointShadowShader = nullptr;
 };
 
 

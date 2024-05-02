@@ -69,6 +69,7 @@ public:
     unsigned int GetBindID() const override;
 
     int GetUniformLocation(const std::string &name) const;
+    int GetTextureUnit(const std::string &name) const;
 
     const std::unordered_map<std::string, UniformSlot>& GetUniforms() const;
     const std::unordered_map<std::string, TextureSlot>& GetTextureSlots() const;
@@ -83,6 +84,7 @@ public:
 
     void SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const;
 
+    void SetTexture(const std::string& name, unsigned int textureId) const;
     void SetTextures(unsigned int sceneColor, unsigned int sceneDepth, unsigned int cubemap) const;
 
     void BindTextureUnits() const;

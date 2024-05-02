@@ -83,6 +83,21 @@ void TransformComponent::AngleAxisPoint(float angle, const glm::vec3 &axis, cons
 	Position() = rot * _position;
 }
 
+void TransformComponent::LookAt(glm::vec3 direction, glm::vec3 up)
+{
+	_rotation = quatLookAt(direction, up);
+
+	NotifyChanged();
+}
+
+void TransformComponent::AlignWith(const TransformComponent& other)
+{
+	_position = other._position;
+	_rotation = other._rotation;
+
+	NotifyChanged();
+}
+
 glm::vec3 TransformComponent::Up()
 {
 	return ModelToWorld() * glm::vec4(0, 1, 0, 0);

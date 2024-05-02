@@ -1,8 +1,10 @@
 #include "Library/Core.glsl"
+#include "Library/Shadows.glsl"
 #include "Library/Lights.glsl"
 #include "Library/Tonemapping.glsl"
 #include "Library/NormalMapping.glsl"
 #include "Library/HeightMapping.glsl"
+#include "Library/Scene.glsl"
 
 in vec3 aPosition;
 in vec3 aNormal;
@@ -35,11 +37,7 @@ void vert()
     v2f.position = ObjectToWorldPos(aPosition);
     v2f.normal = ObjectToWorldNormal(aNormal);
     v2f.uv = aTexCoord0;
-
-    vec3 N = ObjectToWorldNormal(aNormal);
-    vec3 T = ObjectToWorldNormal(aTangent);
-    vec3 B = cross(N, T);
-    v2f.tbn = mat3(T, B, N);
+    v2f.tbn = CreateTBNMatrix(aNormal, aTangent);
 
     gl_Position = ObjectToClipPos(aPosition);
 }
@@ -47,6 +45,7 @@ void vert()
 void frag()
 {
     vec3 positionWS = v2f.position;
+    vec3 originalPosWS = v2f.position;
     vec3 normalWS = normalize(v2f.normal);
     vec3 cameraPos = ViewToWorldPos((0).xxx);
     vec2 uv = v2f.uv * TextureScale;
@@ -69,11 +68,9 @@ void frag()
 
     // Shading
     vec4 albedo = texture(AlbedoTex, uv);
-    float occlusion = texture(OcclusionTex, uv).a;
-    vec3 lighting = ApplyLights(positionWS, normalWS, cameraPos);
+    float occlusion = texture(OcclusionTex, uv).r;
+    vec3 lighting = ApplyLights(originalPosWS, normalWS, cameraPos);
 
-    vec3 col = albedo.rgb * lighting * occlusion;
-    //col = fract(positionWS.y).xxx;
-    //col = texture(HeightmapTex, uv).aaa;
+    vec3 col = albedo.rgb * lighting * occlusion * occlusion * occlusion;
     color = vec4(col, 1);
 }

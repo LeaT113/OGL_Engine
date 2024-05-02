@@ -33,6 +33,7 @@ public:
     // Render
     static void RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld, const Material &material, const CameraComponent &camera);
     static void Render(const RendererComponent& renderer, const CameraComponent& camera);
+    static void RenderWithShader(const RendererComponent& renderer, const CameraComponent& camera, const Shader& shader);
     static void Blit(const FrameBuffer& source, const FrameBuffer& destination);
     static void Blit(const FrameBuffer& source, const FrameBuffer& destination, const Material& material);
     //static void DrawMesh(const MeshData* mesh, );

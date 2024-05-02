@@ -1,3 +1,19 @@
+#include "Library/Core.glsl"<
+
+uniform sampler2D _SceneColorTex;
+uniform sampler2D _SceneDepthTex;
+
+
+vec4 SceneColor(vec2 uv)
+{
+    return texture(_SceneColorTex, uv);
+}
+
+float SceneDepth(vec2 uv)
+{
+    return texture(_SceneDepthTex, uv).r;
+}
+
 float DepthToLinear(float depth)
 {
     float z = depth * 2 - 1;
@@ -6,18 +22,12 @@ float DepthToLinear(float depth)
     return (2.0 * near * far) / (far + near - z * (far - near));;
 }
 
-vec2 WorldPosToUV(vec3 worldPos)
+vec3 WorldPosToNormalizedViewport(vec3 worldPos)
 {
-    vec4 projected = _ViewToClip * _WorldToViewMatrix * vec4(worldPos, 1);
-    projected.xyz /= projected.w;
-    return projected.xy * 0.5 + 0.5;
-}
-
-float WorldPosToFragZ(vec3 worldPos)
-{
-    vec4 clipPos = _ViewToClip * _WorldToViewMatrix * vec4(worldPos, 1);
-    float ndc_z = clipPos.z / clipPos.w;
-    return ndc_z * 0.5 + 0.5;
+    // Returns position where xy is ScreenPos and z is Depth
+    vec4 projectedPos = _ProjectionMatrix * _ViewMatrix * vec4(worldPos, 1);
+    projectedPos.xyz /= projectedPos.w;
+    return projectedPos.xyz * 0.5 + 0.5;
 }
 
 vec3 WorldPosAtUvDepth(vec2 uv, float depth)
@@ -26,10 +36,10 @@ vec3 WorldPosAtUvDepth(vec2 uv, float depth)
     vec2 ndcXY = uv * 2 - 1;
     vec4 ndcPos = vec4(ndcXY, ndcDepth, 1.0);
 
-    vec4 cameraPos = _ClipToView * ndcPos;
+    vec4 cameraPos = _InvProjectionMatrix * ndcPos;
     cameraPos /= cameraPos.w;
 
-    vec4 worldPos = _ViewToWorldMatrix * cameraPos;
+    vec4 worldPos = _InvViewMatrix * cameraPos;
 
     return worldPos.xyz;
 }

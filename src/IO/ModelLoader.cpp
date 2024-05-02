@@ -65,7 +65,7 @@ Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
             UVs[i].push_back(vector.y);
         }
 
-        attributes.push_back((VertexAttribute)(TexCoord0 + i));
+        attributes.push_back(static_cast<VertexAttribute>(static_cast<int>(VertexAttribute::TexCoord0) + i));
     }
 
     // Indices
@@ -91,7 +91,7 @@ Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
         vertexBuffer->InsertAttribute(VertexAttribute::Tangent, offset, tangents, vertexCount);
     for (int i = 0; i < UVs.size(); i++)
     {
-        vertexBuffer->InsertAttribute((VertexAttribute)(TexCoord0 + i), offset, UVs[i].data(), vertexCount);
+        vertexBuffer->InsertAttribute(static_cast<VertexAttribute>(static_cast<int>(VertexAttribute::TexCoord0) + i), offset, UVs[i].data(), vertexCount);
     }
 
     auto indexBuffer = Handle<IndexBuffer>::Make(indices.data(), indices.size() * sizeof(unsigned int));

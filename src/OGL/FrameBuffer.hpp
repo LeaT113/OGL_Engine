@@ -17,8 +17,9 @@ public:
         RGBA8,
         RGBA16F,
 
+        Depth16,
         Depth24Stencil8,
-        Depth32,
+        Depth32F,
     };
 
     FrameBuffer(int width, int height, std::initializer_list<TextureFormat> attachmentFormats);

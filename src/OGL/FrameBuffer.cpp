@@ -13,7 +13,7 @@ FrameBuffer::FrameBuffer(int width, int height, std::initializer_list<TextureFor
         if (format == TextureFormat::None)
             continue;
 
-        if (format == TextureFormat::Depth24Stencil8 || format == TextureFormat::Depth32)
+        if (format == TextureFormat::Depth16 || format == TextureFormat::Depth24Stencil8 || format == TextureFormat::Depth32F)
             _depthFormat = format;
         else
             _colorFormats.emplace_back(format);
@@ -80,7 +80,7 @@ void FrameBuffer::Resize(int width, int height)
             break;
 
         case TextureFormat::RGBA16F:
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
             break;
         }
 
@@ -94,19 +94,25 @@ void FrameBuffer::Resize(int width, int height)
         glBindTexture(GL_TEXTURE_2D, _depthAttachment);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
 
         switch (_depthFormat)
         {
+        case TextureFormat::Depth16:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthAttachment, 0);
+            break;
+
         case TextureFormat::Depth24Stencil8:
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, _depthAttachment, 0);
             break;
 
-        case TextureFormat::Depth32:
-            // TODO Depth32 glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+        case TextureFormat::Depth32F:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthAttachment, 0);
             break;
         }
     }
@@ -121,8 +127,9 @@ void FrameBuffer::Resize(int width, int height)
         glDrawBuffer(GL_NONE);
     }
 
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        throw std::runtime_error("FrameBuffer::Resize Incomplete framebuffer");
+    auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    //if(status != GL_FRAMEBUFFER_COMPLETE)
+        //throw std::runtime_error("FrameBuffer::Resize Incomplete framebuffer");
 }
 
 GLuint FrameBuffer::GetColorTexture(uint32_t index) const

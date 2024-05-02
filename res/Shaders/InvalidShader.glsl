@@ -8,7 +8,6 @@ in vec3 aPosition;
 in vec3 aNormal;
 
 
-
 float BluredWave(float x, float blur)
 {
     float wave = cos(x);

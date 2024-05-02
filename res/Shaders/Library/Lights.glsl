@@ -14,6 +14,7 @@ struct DirectLight
 struct PointLight
 {
     vec3 color;
+    int shadowIndex;
     vec3 position;
 };
 
@@ -24,6 +25,7 @@ struct SpotLight
     vec3 position;
     float spotB;
     vec3 direction;
+    int shadowIndex;
 };
 
 
@@ -60,7 +62,12 @@ vec3 ApplyPointLight(vec3 position, vec3 normal, vec3 cameraPos, PointLight poin
     vec3 halfDir = normalize(viewDir + lightDir);
     float specAttenuation = pow(max(dot(normal, halfDir), 0.0), 10);
 
-    return pointLight.color * angleAttenuation * distanceAttenuation;
+    float shadowAttenuation = 1;
+    #ifdef SHADOWS
+        shadowAttenuation = PointLight_Shadow(pointLight.shadowIndex, position);
+    #endif
+
+    return pointLight.color * angleAttenuation * distanceAttenuation * shadowAttenuation;
 }
 
 vec3 ApplySpotLight(vec3 position, vec3 normal, vec3 cameraPos, SpotLight spotLight)
@@ -75,7 +82,12 @@ vec3 ApplySpotLight(vec3 position, vec3 normal, vec3 cameraPos, SpotLight spotLi
     float spotAttenuation = clamp(spotDot * spotLight.spotA + spotLight.spotB, 0, 1);
     spotAttenuation = spotAttenuation * spotAttenuation;
 
-    return spotLight.color * angleAttenuation * distanceAttenuation * spotAttenuation;
+    float shadowAttenuation = 1;
+    #ifdef SHADOWS
+        shadowAttenuation = SpotLight_Shadow(spotLight.shadowIndex, position);
+    #endif
+
+    return spotLight.color * angleAttenuation * distanceAttenuation * spotAttenuation * shadowAttenuation;
 }
 
 vec3 ApplyLights(vec3 position, vec3 normal, vec3 cameraPos)

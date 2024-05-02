@@ -71,13 +71,12 @@ void frag()
         rayLen += stepSize;
         stepSize *= 1.04;
         vec3 rayPos = rayStart + rayDir * rayLen;
+        vec3 rayProjected = WorldPosToNormalizedViewport(rayPos);
 
-        vec4 rayProjected = _ViewToClip * _WorldToViewMatrix * vec4(rayPos, 1);
-        vec3 rayUvDepth = (rayProjected.xyz / rayProjected.w) * 0.5 + 0.5;
-        refractionUv = rayUvDepth.xy;
+        refractionUv = rayProjected.xy;
 
-        float sampleDepth = texture(_SceneDepthTex, refractionUv).r;
-        float depthDiff = DepthToLinear(rayUvDepth.z) - DepthToLinear(sampleDepth);
+        float sampleDepth = SceneDepth(refractionUv);
+        float depthDiff = DepthToLinear(rayProjected.z) - DepthToLinear(sampleDepth);
 
         if (depthDiff > 0 && depthDiff < DEPTH_THICKNESS)
             break;
@@ -86,14 +85,19 @@ void frag()
     {
         refractionUv = _ScreenPos;
 
-        vec3 floorPos = WorldPosAtUvDepth(_ScreenPos, texture(_SceneDepthTex, _ScreenPos).r);
+        vec3 floorPos = WorldPosAtUvDepth(_ScreenPos, SceneDepth(_ScreenPos));
         float viewDist = length(floorPos - v2f.position);
         float refractedDist = viewDist * -viewDir.y / -refractedRay.y;
         rayLen = refractedDist;
     }
 
+    // Blend screen edges
+    vec2 screenEdgeUV = abs(refractionUv - 0.5);
+    float screenEdgeFactor = max(screenEdgeUV.x, screenEdgeUV.y) * 2;
+    screenEdgeFactor = RemapClamped(screenEdgeFactor, 0.85, 1, 0, 1);
+
     // Transmission
-    vec3 transmissionCol = texture(_SceneColorTex, refractionUv).rgb;
+    vec3 transmissionCol = mix(SceneColor(refractionUv).rgb, SceneColor(_ScreenPos).rgb, screenEdgeFactor);
     transmissionCol = BeerLambertAbsorption(transmissionCol, AbsorptionsColor, rayLen*2);
 
     // Reflection

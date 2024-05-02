@@ -50,6 +50,15 @@ int Shader::GetUniformLocation(const std::string &name) const
     return -1;
 }
 
+int Shader::GetTextureUnit(const std::string& name) const
+{
+    auto it = _textures.find(name);
+    if(it != _textures.end())
+        return it->second.unit;
+
+    return -1;
+}
+
 const std::unordered_map<std::string, Shader::UniformSlot>& Shader::GetUniforms() const
 {
     return _uniforms;
@@ -97,15 +106,24 @@ void Shader::SetMat4(int location, glm::mat4 value)
 
 void Shader::SetTransformations(const glm::mat4 &modelToWorld, const glm::mat4 &view, const glm::mat4 &projection) const
 {
-    SetMat4(GetUniformLocation("_ObjectToWorldMatrix"), modelToWorld);
-    SetMat4(GetUniformLocation("_WorldToObjectMatrix"), glm::inverse(modelToWorld));
-    SetMat3(GetUniformLocation("_ObjectToWorldNormalMatrix"), glm::transpose(glm::inverse(glm::mat3(modelToWorld))));
-    SetMat4(GetUniformLocation("_WorldToViewMatrix"), view);
-    SetMat4(GetUniformLocation("_ViewToWorldMatrix"), glm::inverse(view));
-    SetMat4(GetUniformLocation("_ViewToClip"), projection);
-    SetMat4(GetUniformLocation("_ClipToView"), inverse(projection));
+    SetMat4(GetUniformLocation("_ModelMatrix"), modelToWorld);
+    SetMat4(GetUniformLocation("_InvModelMatrix"), glm::inverse(modelToWorld));
+    SetMat4(GetUniformLocation("_ViewMatrix"), view);
+    SetMat4(GetUniformLocation("_InvViewMatrix"), glm::inverse(view));
+    SetMat4(GetUniformLocation("_ProjectionMatrix"), projection);
+    SetMat4(GetUniformLocation("_InvProjectionMatrix"), inverse(projection));
+    SetMat4(GetUniformLocation("_MVPMatrix"), projection * view * modelToWorld);
+    SetMat3(GetUniformLocation("_ModelNormalMatrix"), glm::transpose(glm::inverse(glm::mat3(modelToWorld))));
+}
 
-    SetMat4(GetUniformLocation("_ObjectToClipMatrix"), projection * view * modelToWorld);
+void Shader::SetTexture(const std::string& name, unsigned int textureId) const
+{
+    auto it = _textures.find(name);
+    if (it != _textures.end())
+    {
+        glActiveTexture(GL_TEXTURE0 + it->second.unit);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+    }
 }
 
 void Shader::SetTextures(unsigned int sceneColor, unsigned int sceneDepth, unsigned int cubemap) const

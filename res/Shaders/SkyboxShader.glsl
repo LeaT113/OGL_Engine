@@ -17,7 +17,7 @@ struct v2f
 
 void vert()
 {
-    gl_Position = (_ViewToClip * vec4(mat3(_WorldToViewMatrix) * aPosition, 1.0)).xyww;
+    gl_Position = (_ProjectionMatrix * vec4(mat3(_ViewMatrix) * aPosition, 1.0)).xyww;
     v2f.uvw = aPosition;
 }
 

@@ -7,19 +7,20 @@
 
 class Entity;
 
-enum ProjectionType
-{
-	Orthographic,
-	Perspective
-};
-
 class CameraComponent : public Component
 {
 public:
+	enum class ProjectionType
+	{
+		Orthographic,
+		Perspective
+	};
+
 	CameraComponent(const Entity& owner, ProjectionType projectionType, float horizontalFov);
 	explicit CameraComponent(const Entity& owner);
 
 	void SetWindowDimensions(int width, int height);
+	void SetFOV(float horizontalFov);
 
 	// Matrices
 	const glm::mat4 &View() const;

@@ -38,6 +38,10 @@ public:
 	/// \param point Rotation origin
 	void AngleAxisPoint(float angle, const glm::vec3& axis, const glm::vec3& point);
 
+	void LookAt(glm::vec3 direction, glm::vec3 up);
+
+	void AlignWith(const TransformComponent& other);
+
 	void NotifyChanged();
 
 private:
