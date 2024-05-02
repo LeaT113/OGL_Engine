@@ -1,0 +1,14 @@
+_name: StoneBricksMaterial
+_shader: PBRShader.glsl
+_uniforms:
+  UseHeightmap: true
+  HeightmapDepth: 0.2
+  NormalMapStrenght: 1
+  UseNormalmap: true
+  TextureScale: 4
+_textures:
+  AlbedoTex: StoneBricks/StoneBricks_Albedo
+  RoughnessTex: ~
+  OcclusionTex: StoneBricks/StoneBricks_Occlusion
+  HeightmapTex: StoneBricks/StoneBricks_Displacement
+  NormalTex: StoneBricks/StoneBricks_Normal

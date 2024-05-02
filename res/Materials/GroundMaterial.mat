@@ -1,0 +1,14 @@
+_name: GroundMaterial
+_shader: PBRShader.glsl
+_uniforms:
+  UseHeightmap: true
+  HeightmapDepth: 0.04
+  NormalMapStrenght: 1
+  UseNormalmap: true
+  TextureScale: 3
+_textures:
+  AlbedoTex: ForestGround/ForestGround_Albedo
+  RoughnessTex: ~
+  OcclusionTex: ForestGround/ForestGround_Occlusion
+  HeightmapTex: ForestGround/ForestGround_Displacement
+  NormalTex: ForestGround/ForestGround_Normal

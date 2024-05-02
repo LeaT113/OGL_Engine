@@ -1,0 +1,88 @@
+- Entity:
+    _name: WarningLight
+    _components:
+      LightComponent:
+        _lightType: 3
+        _color: [3, 0.28, 0.42]
+        _direction: [0, 0, -1]
+        _spotInnerAngle: 30
+        _spotOuterAngle: 110
+      RendererComponent:
+        _mesh: Icosphere.obj
+        _material: EmissionMaterial3.mat
+      TransformComponent:
+        _position: [0, 1.5, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.100000001, 0.100000001, 0.100000001]
+- Entity:
+    _name: Camera
+    _components:
+      CameraComponent:
+        _projectionType: 1
+        _horizontalFov: 75
+      TransformComponent:
+        _position: [0, 0, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: EmissiveSphere2
+    _components:
+      LightComponent:
+        _lightType: 2
+        _color: [0.0784313753, 1.20000005, 1.88235295]
+        _direction: [0, -1, 0]
+        _spotInnerAngle: 20
+        _spotOuterAngle: 30
+      RendererComponent:
+        _mesh: Icosphere.obj
+        _material: EmissionMaterial2.mat
+      TransformComponent:
+        _position: [0, 0, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.100000001, 0.100000001, 0.100000001]
+- Entity:
+    _name: Plane
+    _components:
+      RendererComponent:
+        _mesh: Plane.obj
+        _material: GroundMaterial.mat
+      TransformComponent:
+        _position: [0, 0, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [15, 15, 15]
+- Entity:
+    _name: Cube
+    _components:
+      RendererComponent:
+        _mesh: Cube.glb
+        _material: StoneBricksMaterial.mat
+      TransformComponent:
+        _position: [-0.800000012, 0.5, -1.29999995]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: EmissiveSphere1
+    _components:
+      LightComponent:
+        _lightType: 2
+        _color: [1.09098041, 0.489411741, 0.769803941]
+        _direction: [0, -1, 0]
+        _spotInnerAngle: 20
+        _spotOuterAngle: 30
+      RendererComponent:
+        _mesh: Icosphere.obj
+        _material: EmissionMaterial1.mat
+      TransformComponent:
+        _position: [-1.5, 0.300000012, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.100000001, 0.100000001, 0.100000001]
+- Entity:
+    _name: Suzanne
+    _components:
+      RendererComponent:
+        _mesh: Suzanne.obj
+        _material: GroundMaterial.mat
+      TransformComponent:
+        _position: [1, 0.600000024, -1]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.400000006, 0.400000006, 0.400000006]
