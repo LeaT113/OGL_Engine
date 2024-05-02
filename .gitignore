@@ -4,3 +4,6 @@ doc
 
 # IDE
 .idea
+
+# Misc
+shader_compile_failure.glsl
