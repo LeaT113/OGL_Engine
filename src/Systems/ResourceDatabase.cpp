@@ -11,7 +11,7 @@ const std::string ResourceDatabase::ShadersPath = "res/Shaders/";
 bool ResourceDatabase::AddMesh(Handle<Mesh> mesh)
 {
 	auto name = mesh->Name();
-	auto existing = GetMaterial(name);
+	auto existing = GetMesh(name);
 	if (existing != nullptr)
 		throw std::runtime_error("ResourceDatabase::AddMesh Mesh with name '" + mesh->Name() + "' already exists");
 
@@ -33,7 +33,7 @@ const Mesh *ResourceDatabase::GetMesh(const std::string &name)
 bool ResourceDatabase::AddShader(Handle<Shader> shader)
 {
 	auto name = shader->Name();
-	auto existing = GetMaterial(name);
+	auto existing = GetShader(name);
 	if (existing != nullptr)
 		throw std::runtime_error("ResourceDatabase::AddShader Shader with name '" + shader->Name() + "' already exists");
 

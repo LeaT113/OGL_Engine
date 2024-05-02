@@ -1,4 +1,4 @@
-_name: EmissionMaterial3.mat
+_name: EmissionMaterial3
 _shader: EmissionShader.glsl
 _uniforms:
   Color: [1.96078432, 0.172549024, 0.258823544, 0]

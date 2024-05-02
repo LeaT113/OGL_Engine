@@ -22,7 +22,7 @@ Handle<Material> MaterialLoader::LoadMaterial(const std::string& path)
     if(!matYaml["_uniforms"].IsMap() || !matYaml["_textures"].IsMap())
         throw std::runtime_error("MaterialLoader::LoadMaterial Invalid material");
 
-    auto material = Handle<Material>::Make(*shader, path);
+    auto material = Handle<Material>::Make(*shader, name);
 
     // Apply uniforms
     for (auto uniform : matYaml["_uniforms"])
@@ -108,14 +108,13 @@ void MaterialLoader::SaveMaterial(const Material& material)
                 name = textureSlot.first;
                 break;
             }
-
         if(texture.second == nullptr)
             node["_textures"][name] = YAML::Null;
         else
             node["_textures"][name] = texture.second->Name();
     }
 
-    std::ofstream out(MaterialsPath + material._name);
+    std::ofstream out(MaterialsPath + material._name + ".mat");
     out << node << std::endl;
     out.close();
 }

@@ -125,48 +125,37 @@ int main()
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial1.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial2.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial3.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("FireMaterial.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("WaterMaterial.mat"));
 
 
 	// Scene
 	auto scene = Serializer::LoadScene("DemoScene.scene");
-	Entity& camera = *scene->GetEntity("Camera");
-	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 	Entity& emissiveSphere1 = *scene->GetEntity("EmissiveSphere1");
 	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
 	Entity& warningLight = *scene->GetEntity("WarningLight");
-	warningLight.GetComponent<LightComponent>()->SetShadowCasting(true);
-	emissiveSphere1.GetComponent<LightComponent>()->SetShadowCasting(true);
-	emissiveSphere2.GetComponent<LightComponent>()->SetShadowCasting(true);
-	warningLight.GetTransform()->AngleAxis(-35, glm::vec3(1, 0, 0));
+
+	Entity camera("Camera");
+	camera
+		.AddComponent<TransformComponent>()
+		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 90);
 	camera.GetTransform()->Position() = glm::vec3(-2, 1.6, -0.5);
 	camera.GetTransform()->AngleAxis(45, glm::vec3(0, 1, 0));
+	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
+
+	Entity flashlight;
+	flashlight
+	    .AddComponent<TransformComponent>()
+	    .AddComponent<LightComponent>(LightComponent::Type::Spot);
+	flashlight.GetComponent<LightComponent>()->SetSpotAngles(10, 90);
+	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
+	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(2));
 
 	Entity skybox;
 	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMat");
 	skybox.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Cube.glb"), &skyboxMat);
 	skyboxMat.Set("SkyboxTex", ResourceDatabase::GetTexture("Skybox/Night"));
 
-	Entity water;
-	Material waterMat(*ResourceDatabase::GetShader("WaterShader.glsl"), "WaterMat");
-	waterMat.Set("Color", glm::vec3(0, 0.4, 0.2));
-	water.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), &waterMat);
-	water.GetTransform()->Position() = glm::vec3(0, 0.8, 0);
-	water.GetTransform()->Scale() = glm::vec3(5);
-
-	Entity fire;
-	Material fireMat(*ResourceDatabase::GetShader("FireShader.glsl"), "FireMat");
-	fireMat.Set("FireNoiseTex", ResourceDatabase::GetTexture("FireNoiseSeamless"));
-	fire.AddComponent<TransformComponent>().AddComponent<RendererComponent>(ResourceDatabase::GetMesh("Plane.obj"), &fireMat);
-	fire.GetTransform()->Position() = glm::vec3(-0.8, 3, -1);
-	fire.GetTransform()->AngleAxis(90, glm::vec3(1, 0, 0));
-
-	Entity flashlight;
-	flashlight
-		.AddComponent<TransformComponent>()
-		.AddComponent<LightComponent>(LightComponent::Type::Spot);
-	flashlight.GetComponent<LightComponent>()->SetSpotAngles(10, 90);
-	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
-	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(2));
 
 	// Game loop
 	bool mouse = true;

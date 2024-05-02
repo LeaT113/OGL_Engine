@@ -1,0 +1,10 @@
+_name: FireMaterial
+_shader: FireShader.glsl
+_uniforms:
+  Threshold: 4.05999994
+  Smoothness: 5
+  Intensity: 5
+_textures:
+  _CubemapTex: ~
+  _ShadowMap: ~
+  FireNoiseTex: FireNoiseSeamless

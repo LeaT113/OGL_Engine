@@ -115,6 +115,7 @@ YAML::Node Serializer::SerializeComponent<LightComponent>(const LightComponent& 
     properties["_direction"] = component._direction;
     properties["_spotInnerAngle"] = component._spotInnerAngle;
     properties["_spotOuterAngle"] = component._spotOuterAngle;
+    properties["_shadowCasting"] = component._shadowCasting;
 
     return properties;
 }
@@ -162,6 +163,7 @@ Handle<LightComponent> Serializer::DeserializeComponent(const YAML::Node& compon
     component->_direction = componentYaml["_direction"].as<glm::vec3>();
     component->_spotInnerAngle = componentYaml["_spotInnerAngle"].as<float>();
     component->_spotOuterAngle = componentYaml["_spotOuterAngle"].as<float>();
+    component->_shadowCasting = componentYaml["_shadowCasting"].as<bool>();
 
     return component;
 }

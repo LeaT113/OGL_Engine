@@ -1,0 +1,12 @@
+_name: WaterMaterial
+_shader: WaterShader.glsl
+_uniforms:
+  WaveSpeed: 6
+  WaveStrength: 0.150000006
+  WaveScale: 12
+  AbsorptionsColor: [0.600000024, 0.200000003, 0.300000012]
+_textures:
+  _CubemapTex: ~
+  _ShadowMap: ~
+  _SceneColorTex: ~
+  _SceneDepthTex: ~
