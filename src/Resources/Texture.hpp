@@ -37,11 +37,18 @@ public:
 
     enum class Format
     {
+        None = 0,
+
         R8,
+        R32UI,
         RGB8,
         RGBA8,
 
+        RGBA16F,
+
+        // Depth
         Depth16,
+        Depth24Stencil8,
         Depth32,
         Depth32F,
     };
@@ -66,7 +73,17 @@ public:
     unsigned GetBindID() const override;
 
     Type GetType() const;
+
+    static bool IsDepthFormat(Format format);
 private:
+    struct FormatInfo
+    {
+        int internalFormat;
+        unsigned int format;
+        unsigned int dataType;
+    };
+    static FormatInfo GetFormatInfo(Format format, bool sRGB = false);
+
     GLuint _textureId = 0;
 
     unsigned int _width = 0, _height = 0;

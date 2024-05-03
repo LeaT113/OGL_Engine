@@ -20,33 +20,6 @@ unsigned int GetTextureDataTarget(Texture::Type type)
     }
 }
 
-std::tuple<int, unsigned int, unsigned int> GetFormatInfo(Texture::Format format, bool sRGB)
-{
-    switch (format)
-    {
-    case Texture::Format::R8:
-        return { GL_R8, GL_RED, GL_UNSIGNED_BYTE };
-
-    case Texture::Format::RGB8:
-        return { sRGB ? GL_SRGB8 : GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE };
-
-    case Texture::Format::RGBA8:
-        return { sRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE };
-
-    case Texture::Format::Depth16:
-        return { GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT };
-
-    case Texture::Format::Depth32:
-        return { GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT };
-
-    case Texture::Format::Depth32F:
-        return { GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT };
-
-    default:
-        return { 0, 0, 0 };
-    }
-}
-
 std::pair<int, int> GetMinMagFilter(Texture::Filtering filtering, bool mipmaps)
 {
     switch (filtering)
@@ -107,12 +80,12 @@ void Texture::Fill(void* data, int index)
     if (_type == Type::TexCubemap)
         target += index;
 
-    auto [internalFormat, format, dataType] = GetFormatInfo(_format, _params.sRGB);
+    auto formatInfo = GetFormatInfo(_format, _params.sRGB);
 
     if (_invalid)
-        glTexImage2D(target, 0, internalFormat, static_cast<int>(_width), static_cast<int>(_height), 0, format, dataType, data);
+        glTexImage2D(target, 0, formatInfo.internalFormat, static_cast<int>(_width), static_cast<int>(_height), 0, formatInfo.format, formatInfo.dataType, data);
     else
-        glTexSubImage2D(target, 0, 0, 0, static_cast<int>(_width), static_cast<int>(_height), format, dataType, data);
+        glTexSubImage2D(target, 0, 0, 0, static_cast<int>(_width), static_cast<int>(_height), formatInfo.format, formatInfo.dataType, data);
 
     if (_type != Type::TexCubemap || index == 5)
     {
@@ -132,10 +105,10 @@ void Texture::Copy(const FrameBuffer& buffer, int subIndex)
     if (_type == Type::TexCubemap)
         target += subIndex;
 
-    auto [internalFormat, format, dataType] = GetFormatInfo(_format, _params.sRGB);
+    auto formatInfo = GetFormatInfo(_format, _params.sRGB);
 
     if (_invalid)
-        glCopyTexImage2D(target, 0, internalFormat, 0, 0, static_cast<int>(_width), static_cast<int>(_height), 0);
+        glCopyTexImage2D(target, 0, formatInfo.internalFormat, 0, 0, static_cast<int>(_width), static_cast<int>(_height), 0);
     else
         glCopyTexSubImage2D(target, 0, 0, 0, 0 , 0, static_cast<int>(_width), static_cast<int>(_height));
 
@@ -156,5 +129,48 @@ unsigned Texture::GetBindID() const
 Texture::Type Texture::GetType() const
 {
     return _type;
+}
+
+bool Texture::IsDepthFormat(Format format)
+{
+    auto internalFormat = GetFormatInfo(format, false).format;
+    return internalFormat == GL_DEPTH_COMPONENT || internalFormat == GL_DEPTH_STENCIL;
+}
+
+Texture::FormatInfo Texture::GetFormatInfo(Format format, bool sRGB)
+{
+    switch (format)
+    {
+    case Format::R8:
+        return { GL_R8, GL_RED, GL_UNSIGNED_BYTE };
+
+    case Format::R32UI:
+        return { GL_R32UI, GL_RED, GL_UNSIGNED_INT };
+
+    case Format::RGB8:
+        return { sRGB ? GL_SRGB8 : GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE };
+
+    case Format::RGBA8:
+        return { sRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE };
+
+    case Format::RGBA16F:
+        return { GL_RGBA16F, GL_RGBA, GL_FLOAT };
+
+    // Depth
+    case Format::Depth16:
+        return { GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT };
+
+    case Format::Depth24Stencil8:
+        return { GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8 };
+
+    case Format::Depth32:
+        return { GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT };
+
+    case Format::Depth32F:
+        return { GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT };
+
+    default:
+        throw std::runtime_error("Texture Unknown format");
+    }
 }
 

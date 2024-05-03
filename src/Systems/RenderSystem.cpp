@@ -12,9 +12,9 @@
 
 
 RenderSystem::RenderSystem()
-    : _renderBuffer(0, 0, { FrameBuffer::TextureFormat::RGBA16F, FrameBuffer::TextureFormat::Depth24Stencil8 }),
-    _opaqueBuffer(0, 0, { FrameBuffer::TextureFormat::RGBA16F, FrameBuffer::TextureFormat::Depth24Stencil8 }),
-    _shadowBuffer(0, 0, { FrameBuffer::TextureFormat::Depth16 }),
+    : _renderBuffer(0, 0, { FrameBuffer::RenderFormat::RGBA16F, FrameBuffer::RenderFormat::Depth24Stencil8 }),
+    _opaqueBuffer(0, 0, { FrameBuffer::RenderFormat::RGBA16F, FrameBuffer::RenderFormat::Depth24Stencil8 }),
+    _shadowBuffer(0, 0, { FrameBuffer::RenderFormat::Depth16 }),
     _postprocessMaterial(Handle<Material>::Empty())
 {}
 
