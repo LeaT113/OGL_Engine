@@ -12,9 +12,8 @@
 
 
 RenderSystem::RenderSystem()
-    : _renderBuffer(0, 0, { FrameBuffer::RenderFormat::RGBA16F, FrameBuffer::RenderFormat::Depth24Stencil8 }),
-    _opaqueBuffer(0, 0, { FrameBuffer::RenderFormat::RGBA16F, FrameBuffer::RenderFormat::Depth24Stencil8 }),
-    _shadowBuffer(0, 0, { FrameBuffer::RenderFormat::Depth16 }),
+    : _renderBuffer(0, 0, { RenderFormatColor, RenderFormatDepth }),
+    _shadowBuffer(0, 0, { LightingSystem::SHADOW_TEX_FORMAT }),
     _postprocessMaterial(Handle<Material>::Empty())
 {}
 
@@ -24,7 +23,14 @@ void RenderSystem::SetRenderSize(int width, int height)
     _height = height;
 
     _renderBuffer.Resize(width, height);
-    _opaqueBuffer.Resize(width, height);
+    if (_opaqueTexture.Access() == nullptr)
+    {
+        _opaqueTexture = Handle<Texture>::Make(Texture::Type::Tex2D, RenderFormatColor, Texture::Params { .settings = { .mipmaps = false, .sRGB =  false } });
+        _depthTexture = Handle<Texture>::Make(Texture::Type::Tex2D, RenderFormatDepth, Texture::Params { .settings = { .mipmaps = false } });
+    }
+    _opaqueTexture->Resize(width, height);
+    _depthTexture->Resize(width, height);
+
     auto shadowRes = std::max(LightingSystem::DIRECT_LIGHT_SHADOW_RESOLUTION, std::max(LightingSystem::POINT_LIGHT_SHADOW_RESOLUTION, LightingSystem::SPOT_LIGHT_SHADOW_RESOLUTION));
     _shadowBuffer.Resize(shadowRes, shadowRes);
 
@@ -165,7 +171,6 @@ void RenderSystem::Render()
 
     // Opaque pass
     auto& renderBuffer = Instance()._renderBuffer;
-    auto& opaqueBuffer = Instance()._opaqueBuffer;
     Graphics::Bind(renderBuffer);
     renderBuffer.Clear();
     glViewport(0, 0, Instance()._width, Instance()._height);
@@ -175,8 +180,8 @@ void RenderSystem::Render()
     }
 
     // Copy opaque buffer
-    opaqueBuffer.Clear();
-    Graphics::Blit(renderBuffer, opaqueBuffer);
+    Instance()._opaqueTexture->Copy(renderBuffer);
+    Instance()._depthTexture->Copy(renderBuffer);
 
     // Transparent pass
     Graphics::Bind(renderBuffer);
@@ -189,7 +194,7 @@ void RenderSystem::Render()
     for (auto renderer : Instance()._transparentRenderers)
     {
         auto& shader = renderer->GetMaterial().GetShader();
-        shader.SetTextures(opaqueBuffer.GetColorTexture(), opaqueBuffer.GetDepthTexture(), ResourceDatabase::GetTexture("Skybox/Night")->GetBindID());
+        shader.SetTextures(Instance()._opaqueTexture->GetBindID(), Instance()._depthTexture->GetBindID(), ResourceDatabase::GetTexture("Skybox/Night")->GetBindID());
 
         Graphics::Render(*renderer, *Instance()._camera);
     }

@@ -24,6 +24,8 @@ public:
 
 private:
     int _width = 1, _height = 1;
+	static inline FrameBuffer::RenderFormat RenderFormatColor = FrameBuffer::RenderFormat::RGBA16F;
+	static inline FrameBuffer::RenderFormat RenderFormatDepth = FrameBuffer::RenderFormat::Depth24Stencil8;
 
 	CameraComponent* _camera = nullptr;
 	std::unique_ptr<UniformBuffer> _coreUniformBuffer;
@@ -31,10 +33,11 @@ private:
 
 	// Passes
 	FrameBuffer _renderBuffer;
-	FrameBuffer _opaqueBuffer;
 	FrameBuffer _shadowBuffer;
 	std::vector<RendererComponent*> _opaqueRenderers;
 	std::vector<RendererComponent*> _transparentRenderers;
+	Handle<Texture> _opaqueTexture;
+	Handle<Texture> _depthTexture;
 	const Shader* _shadowShader = nullptr;
 	const Shader* _pointShadowShader = nullptr;
 };

@@ -20,21 +20,6 @@ public:
         TexCubemap = GL_TEXTURE_CUBE_MAP,
     };
 
-    enum class Tiling
-    {
-        Clamp = GL_CLAMP_TO_BORDER,
-        Extend = GL_CLAMP_TO_EDGE,
-        Repeat = GL_REPEAT,
-        MirrorRepeat = GL_MIRRORED_REPEAT
-    };
-
-    enum class Filtering
-    {
-        Point,
-        Bilinear,
-        Trilinear
-    };
-
     enum class Format
     {
         None = 0,
@@ -53,17 +38,55 @@ public:
         Depth32F,
     };
 
-    struct Params
+    enum class Tiling
+    {
+        Clamp = GL_CLAMP_TO_BORDER,
+        Extend = GL_CLAMP_TO_EDGE,
+        Repeat = GL_REPEAT,
+        MirrorRepeat = GL_MIRRORED_REPEAT
+    };
+
+    enum class Filtering
+    {
+        Point,
+        Bilinear,
+        Trilinear
+    };
+
+    enum class CopyType
+    {
+        Depth = GL_NONE,
+
+        Color0 = GL_COLOR_ATTACHMENT0,
+        Color1 = GL_COLOR_ATTACHMENT1,
+        Color2 = GL_COLOR_ATTACHMENT2,
+        Color3 = GL_COLOR_ATTACHMENT3,
+
+        Default,
+    };
+
+    struct Settings
     {
         bool mipmaps = true;
         bool sRGB = true;
         Tiling tiling = Tiling::Repeat;
         Filtering filtering = Filtering::Trilinear;
+
+        static Settings Default() { return {}; }
     };
 
-    static Params DefaultParams;
+    struct Params
+    {
+        unsigned int width = 0;
+        unsigned int height = 0;
+        std::string name;
+        void* data = nullptr;
+        Settings settings = Settings::Default();
 
-    Texture(Type type, Format format, unsigned int width, unsigned int height, std::string name, void* data = nullptr, Params params = DefaultParams);
+        static Params Default() { return {}; }
+    };
+
+    Texture(Type type, Format format, Params params = Params::Default());
     ~Texture() override;
 
     void Resize(unsigned int width, unsigned int height);
@@ -90,7 +113,7 @@ private:
 
     Type _type;
     Format _format;
-    Params _params;
+    Settings _settings;
 
     bool _invalid = true;
 };

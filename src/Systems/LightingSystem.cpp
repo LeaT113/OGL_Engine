@@ -63,28 +63,34 @@ std::vector<LightComponent*> LightingSystem::GetShadowCasters()
 
 Texture& LightingSystem::GetShadowTexture(LightComponent::Type lightType, int index)
 {
-    if (lightType == LightComponent::Type::Ambient)
+    switch (lightType)
     {
+    case LightComponent::Type::Ambient:
         throw std::runtime_error("LightingSystem Ambient lights do not have shadows");
-    }
-    if (lightType == LightComponent::Type::Direct)
-    {
+
+    case LightComponent::Type::Direct:
         throw std::runtime_error("LightingSystem Attempted to access shadow for unsupported light");
-    }
-    if (lightType == LightComponent::Type::Point)
-    {
+
+    case LightComponent::Type::Point:
         if (Instance()._shadowMapsCube[index].Access() == nullptr)
-            Instance()._shadowMapsCube[index] = Handle<Texture>::Make(Texture::Type::TexCubemap, SHADOW_TEX_FORMAT, POINT_LIGHT_SHADOW_RESOLUTION, POINT_LIGHT_SHADOW_RESOLUTION, "ShadowMapCube", nullptr, Texture::Params{ .mipmaps = false, .tiling = Texture::Tiling::Extend  });
+            Instance()._shadowMapsCube[index] = Handle<Texture>::Make(Texture::Type::TexCubemap, SHADOW_TEX_FORMAT, Texture::Params {
+                .width = POINT_LIGHT_SHADOW_RESOLUTION, .height = POINT_LIGHT_SHADOW_RESOLUTION,
+                .settings = { .mipmaps = false, .tiling = Texture::Tiling::Extend }
+            });
 
         return *Instance()._shadowMapsCube[index];
-    }
-    if (lightType == LightComponent::Type::Spot)
-    {
+
+    case LightComponent::Type::Spot:
         if (Instance()._shadowMaps2D[index].Access() == nullptr)
-            Instance()._shadowMaps2D[index] = Handle<Texture>::Make(Texture::Type::Tex2D, SHADOW_TEX_FORMAT, SPOT_LIGHT_SHADOW_RESOLUTION, SPOT_LIGHT_SHADOW_RESOLUTION, "ShadowMap2D", nullptr, Texture::Params{ .mipmaps = false, .tiling = Texture::Tiling::Clamp  });
+            Instance()._shadowMaps2D[index] = Handle<Texture>::Make(Texture::Type::Tex2D, SHADOW_TEX_FORMAT, Texture::Params {
+                .width = SPOT_LIGHT_SHADOW_RESOLUTION, .height = SPOT_LIGHT_SHADOW_RESOLUTION,
+                .settings = { .mipmaps = false, .tiling = Texture::Tiling::Clamp }
+            });
 
         return *Instance()._shadowMaps2D[index];
     }
+
+    throw std::runtime_error("LightingSystem Invalid light type");
 }
 
 void LightingSystem::SetShadowMatrix(LightComponent::Type lightType, int index, glm::mat4 matrix)

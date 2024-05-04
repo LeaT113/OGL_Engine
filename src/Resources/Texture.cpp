@@ -38,26 +38,27 @@ std::pair<int, int> GetMinMagFilter(Texture::Filtering filtering, bool mipmaps)
     }
 }
 
-Texture::Params Texture::DefaultParams = { true, true, Tiling::Repeat, Filtering::Trilinear };
-
-Texture::Texture(Type type, Format format, unsigned int width, unsigned int height, std::string name, void* data, Params params)
-    : _type(type), _format(format), _width(width), _height(height), Resource(std::move(name)), _params(params)
+Texture::Texture(Type type, Format format, Params params)
+    : _type(type), _format(format), _width(params.width), _height(params.height), Resource(std::move(params.name)), _settings(params.settings)
 {
     glGenTextures(1, &_textureId);
+    if (_textureId == 0)
+        throw std::runtime_error("Texture creation failed");
     auto target = static_cast<unsigned int>(_type);
     glBindTexture(target, _textureId);
 
-    auto [minFilter, magFilter] = GetMinMagFilter(_params.filtering, _params.mipmaps);
+    auto [minFilter, magFilter] = GetMinMagFilter(_settings.filtering, _settings.mipmaps);
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFilter);
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, magFilter);
 
-    auto tiling = static_cast<int>(_params.tiling);
+    auto tiling = static_cast<int>(_settings.tiling);
     glTexParameteri(target, GL_TEXTURE_WRAP_S, tiling);
     glTexParameteri(target, GL_TEXTURE_WRAP_T, tiling);
     glTexParameteri(target, GL_TEXTURE_WRAP_R, tiling);
 
+    // TODO Should this be called when dimensions are 0?
     if (_type != Type::TexCubemap)
-        Fill(data);
+        Fill(params.data);
 }
 
 Texture::~Texture()
@@ -80,7 +81,7 @@ void Texture::Fill(void* data, int index)
     if (_type == Type::TexCubemap)
         target += index;
 
-    auto formatInfo = GetFormatInfo(_format, _params.sRGB);
+    auto formatInfo = GetFormatInfo(_format, _settings.sRGB);
 
     if (_invalid)
         glTexImage2D(target, 0, formatInfo.internalFormat, static_cast<int>(_width), static_cast<int>(_height), 0, formatInfo.format, formatInfo.dataType, data);
@@ -89,7 +90,7 @@ void Texture::Fill(void* data, int index)
 
     if (_type != Type::TexCubemap || index == 5)
     {
-        if (_params.mipmaps)
+        if (_settings.mipmaps && data != nullptr)
             glGenerateMipmap(static_cast<unsigned int>(_type));
 
         _invalid = false;
@@ -100,12 +101,14 @@ void Texture::Copy(const FrameBuffer& buffer, int subIndex)
 {
     glBindTexture(static_cast<unsigned int>(_type), _textureId);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, buffer.GetBindID());
+    // if (type != CopyType::Default)
+    //     glReadBuffer(static_cast<unsigned int>(type));
 
     unsigned int target = GetTextureDataTarget(_type);
     if (_type == Type::TexCubemap)
         target += subIndex;
 
-    auto formatInfo = GetFormatInfo(_format, _params.sRGB);
+    auto formatInfo = GetFormatInfo(_format, _settings.sRGB);
 
     if (_invalid)
         glCopyTexImage2D(target, 0, formatInfo.internalFormat, 0, 0, static_cast<int>(_width), static_cast<int>(_height), 0);
@@ -114,7 +117,7 @@ void Texture::Copy(const FrameBuffer& buffer, int subIndex)
 
     if (_type != Type::TexCubemap || subIndex == 5)
     {
-        if (_params.mipmaps)
+        if (_settings.mipmaps)
             glGenerateMipmap(static_cast<unsigned int>(_type));
 
         _invalid = false;

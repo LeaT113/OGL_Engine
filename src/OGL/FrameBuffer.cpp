@@ -55,14 +55,20 @@ void FrameBuffer::Resize(int width, int height)
 
     for (auto format : _colorFormats)
     {
-        _colorAttachments.emplace_back(Handle<Texture>::Make(Texture::Type::Tex2D, format, width, height, "FrameBufferColor", nullptr, Texture::Params {.mipmaps = false, .sRGB =  false, .tiling = Texture::Tiling::Extend, .filtering = Texture::Filtering::Trilinear}));
+        _colorAttachments.emplace_back(Handle<Texture>::Make(Texture::Type::Tex2D, format, Texture::Params {
+            .width = _width, .height = _height,
+            .settings = { .mipmaps = false, .sRGB =  false }
+        }));
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _colorAttachments.size() - 1, GL_TEXTURE_2D, _colorAttachments.back()->GetBindID(), 0);
     }
 
     if (_depthFormat != RenderFormat::None)
     {
-        _depthAttachment = Handle<Texture>::Make(Texture::Type::Tex2D, _depthFormat, width, height, "FrameBufferDepth", nullptr, Texture::Params {.mipmaps = false, .sRGB =  false, .tiling = Texture::Tiling::Extend, .filtering = Texture::Filtering::Trilinear});
+        _depthAttachment = Handle<Texture>::Make(Texture::Type::Tex2D, _depthFormat, Texture::Params {
+            .width = _width, .height = _height,
+            .settings = { .mipmaps = false, .sRGB =  false }
+        });
 
         unsigned int attachmentType;
         switch (_depthFormat)

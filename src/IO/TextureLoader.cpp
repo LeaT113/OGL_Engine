@@ -7,7 +7,7 @@
 
 const std::string TextureLoader::TexturesPath = "res/Textures/";
 
-Handle<Texture> TextureLoader::LoadTexture2D(const std::string &name, const Texture::Params& params)
+Handle<Texture> TextureLoader::LoadTexture2D(const std::string &name, const Texture::Settings& settings)
 {
     stbi_set_flip_vertically_on_load(1);
 
@@ -24,14 +24,17 @@ Handle<Texture> TextureLoader::LoadTexture2D(const std::string &name, const Text
     else if (channelCount == 4)
         format = Texture::Format::RGBA8;
 
-    auto tex = Handle<Texture>::Make(Texture::Type::Tex2D, format, width, height, name, imageData, params);
+    auto tex = Handle<Texture>::Make(Texture::Type::Tex2D, format, Texture::Params {
+        .width = static_cast<unsigned int>(width), .height = static_cast<unsigned int>(height),
+        .name = name, .data = imageData, .settings = settings
+    });
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return tex;
 }
 
-Handle<Texture> TextureLoader::LoadCubemap(const std::string& name, const Texture::Params& params)
+Handle<Texture> TextureLoader::LoadCubemap(const std::string& name, const Texture::Settings& settings)
 {
     stbi_set_flip_vertically_on_load(0);
 
@@ -46,7 +49,10 @@ Handle<Texture> TextureLoader::LoadCubemap(const std::string& name, const Textur
             throw std::runtime_error("TextureLoader Failed to load image");
 
         if (tex.Access() == nullptr)
-            tex = Handle<Texture>::Make(Texture::Type::TexCubemap, Texture::Format::RGB8, width, height, name, nullptr, params);
+            tex = Handle<Texture>::Make(Texture::Type::TexCubemap, Texture::Format::RGB8, Texture::Params {
+                .width = static_cast<unsigned int>(width), .height = static_cast<unsigned int>(height),
+                .name = name, .settings = settings
+            });
 
         tex->Fill(imageData, i);
     }
