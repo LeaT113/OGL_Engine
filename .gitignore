@@ -5,5 +5,8 @@ doc
 # IDE
 .idea
 
+# Debugging
+vgcore.*
+
 # Misc
 shader_compile_failure.glsl
