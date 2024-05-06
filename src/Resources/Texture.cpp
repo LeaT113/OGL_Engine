@@ -148,7 +148,7 @@ Texture::FormatInfo Texture::GetFormatInfo(Format format, bool sRGB)
         return { GL_R8, GL_RED, GL_UNSIGNED_BYTE };
 
     case Format::R32UI:
-        return { GL_R32UI, GL_RED, GL_UNSIGNED_INT };
+        return { GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT };
 
     case Format::RGB8:
         return { sRGB ? GL_SRGB8 : GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE };

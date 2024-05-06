@@ -12,6 +12,7 @@ void InputSystem::OnKeyChanged(int key, int action)
 		return;
 
     _keyState[key] = action == GLFW_PRESS;
+    _keyPress[key] = _keyState[key];
 }
 
 bool InputSystem::IsKeyPressed(int key) const
@@ -20,6 +21,13 @@ bool InputSystem::IsKeyPressed(int key) const
         return false;
 
     return _keyState[key];
+}
+
+bool InputSystem::GetKeyPress(int key)
+{
+    bool val = Instance()._keyPress[key];
+    Instance()._keyPress[key] = false;
+    return val;
 }
 
 
@@ -32,6 +40,7 @@ void InputSystem::OnMouseButtonChanged(int button, int action)
         return;
 
     _mouseButtonState[button] = action == GLFW_PRESS;
+    _mouseButtonPress[button] = _mouseButtonState[button];
 }
 
 bool InputSystem::IsMouseButtonPressed(int button) const
@@ -59,6 +68,18 @@ void InputSystem::GetRelativeMouse(float &movementX, float &movementY) const
 {
     movementX = _mouseCurrentX - _mouseStartX;
     movementY = _mouseCurrentY - _mouseStartY;
+}
+
+std::pair<unsigned int, unsigned int> InputSystem::GetMousePosition()
+{
+    return std::make_pair<unsigned int, unsigned int>(Instance()._mouseCurrentX, Instance()._mouseCurrentY);
+}
+
+bool InputSystem::GetMouseButtonPress(int button)
+{
+    bool val = Instance()._mouseButtonPress[button];
+    Instance()._mouseButtonPress[button] = false;
+    return val;
 }
 
 

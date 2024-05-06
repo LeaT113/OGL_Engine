@@ -14,6 +14,7 @@
 RenderSystem::RenderSystem()
     : _renderBuffer(0, 0, { RenderFormatColor, RenderFormatDepth }),
     _shadowBuffer(0, 0, { LightingSystem::SHADOW_TEX_FORMAT }),
+    _entityIdBuffer(0, 0, { RenderFormatEntityId, RenderFormatDepth }),
     _postprocessMaterial(Handle<Material>::Empty())
 {}
 
@@ -30,6 +31,7 @@ void RenderSystem::SetRenderSize(int width, int height)
     }
     _opaqueTexture->Resize(width, height);
     _depthTexture->Resize(width, height);
+    _entityIdBuffer.Resize(static_cast<int>(width / EntityIdDownscaleFactor), static_cast<int>(height / EntityIdDownscaleFactor));
 
     auto shadowRes = std::max(LightingSystem::DIRECT_LIGHT_SHADOW_RESOLUTION, std::max(LightingSystem::POINT_LIGHT_SHADOW_RESOLUTION, LightingSystem::SPOT_LIGHT_SHADOW_RESOLUTION));
     _shadowBuffer.Resize(shadowRes, shadowRes);
@@ -43,6 +45,11 @@ void RenderSystem::SetRenderCamera(CameraComponent *camera)
 {
 	_camera = camera;
     _camera->SetWindowDimensions(_width, _height);
+}
+
+void RenderSystem::EnableEntityIds(bool enable)
+{
+    _enableEntityIds = enable;
 }
 
 void RenderSystem::RegisterRenderer(RendererComponent *renderer)
@@ -199,8 +206,67 @@ void RenderSystem::Render()
         Graphics::Render(*renderer, *Instance()._camera);
     }
 
+    // Entity ids and highlight
+    if (Instance()._enableEntityIds && Instance()._highlightEntity)
+    {
+        if (!Instance()._entityHighlightShader)
+        {
+            Instance()._entityHighlightShader = ResourceDatabase::GetShader("Internal/EntityHighlightShader.glsl");
+        }
+        auto &shader = *Instance()._entityHighlightShader;
+        Graphics::Bind(shader);
+        // shader.SetTexture("EntityIds", Instance()._entityIdBuffer.GetColorTexture()->GetBindID());
+        // Shader::SetUint(shader.GetUniformLocation("Id"), 5);
+
+        Graphics::RenderWithShader(*Instance()._highlightEntity->GetComponent<RendererComponent>(), *Instance()._camera, shader);
+    }
+
     // Post process
     if (Instance()._postprocessMaterial.Access() == nullptr)
         Instance()._postprocessMaterial = Handle<Material>::Make(*ResourceDatabase::GetShader("PostprocessShader.glsl"), "PostprocessMaterial");
     Graphics::Blit(renderBuffer, FrameBuffer::None, *Instance()._postprocessMaterial);
+
+    if (Instance()._enableEntityIds)
+        RenderEntityIds();
+}
+
+unsigned int RenderSystem::GetEntityId(unsigned int x, unsigned int y)
+{
+    Graphics::Bind(Instance()._entityIdBuffer);
+    unsigned int value;
+    glReadPixels(static_cast<int>(x / EntityIdDownscaleFactor), static_cast<int>((Instance()._height - 1 - y)/EntityIdDownscaleFactor), 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &value);
+    return value;
+}
+
+void RenderSystem::SetHighlightEntity(const Entity* entity)
+{
+    _highlightEntity = entity;
+}
+
+void RenderSystem::RenderEntityIds()
+{
+    auto& buffer = Instance()._entityIdBuffer;
+    Graphics::Bind(buffer);
+    buffer.Clear();
+    glViewport(0, 0, static_cast<int>(buffer.GetWidth()), static_cast<int>(buffer.GetHeight()));
+
+    if (!Instance()._entityIdShader)
+    {
+        Instance()._entityIdShader = ResourceDatabase::GetShader("Internal/EntityIdShader.glsl");
+        Instance()._entityHighlightShader = ResourceDatabase::GetShader("Internal/EntityHighlightShader.glsl");
+    }
+
+    auto &shader = *Instance()._entityIdShader;
+
+    Graphics::Bind(shader);
+    for (auto renderer : Instance()._opaqueRenderers)
+    {
+        Shader::SetUint(shader.GetUniformLocation("Id"), renderer->GetEntity().ID());
+        Graphics::RenderWithShader(*renderer, *Instance()._camera, shader);
+    }
+    for (auto renderer : Instance()._transparentRenderers)
+    {
+        Shader::SetUint(shader.GetUniformLocation("Id"), renderer->GetEntity().ID());
+        Graphics::RenderWithShader(*renderer, *Instance()._camera, shader);
+    }
 }

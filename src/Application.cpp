@@ -95,6 +95,9 @@ int main()
 	ResourceDatabase::AddMesh(MeshFactory::CreateQuad());
 
 	// Shaders
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("Internal/EntityIdShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("Internal/EntityHighlightShader.glsl"));
+
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("ShadowShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PointShadowShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("PBRShader.glsl"));
@@ -139,8 +142,8 @@ int main()
 	camera
 		.AddComponent<TransformComponent>()
 		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 75);
-	camera.GetTransform()->Position(glm::vec3(-2, 1.6, -0.5));
-	camera.GetTransform()->AngleAxis(45, glm::vec3(0, 1, 0));
+	camera.GetTransform()->Position(glm::vec3(-2, 1.6, 0.3));
+	camera.GetTransform()->AngleAxis(-40, glm::vec3(0, 1, 0));
 	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 
 	Entity flashlight;
@@ -161,46 +164,56 @@ int main()
 
 
 	// Game loop
-	bool mouse = true;
+	bool editMode = false;
 	while (!glfwWindowShouldClose(mainWindow))
 	{
 		// Update state
 		timeKeeper->Update();
 
-		if(inputSystem->IsKeyPressed(GLFW_KEY_ESCAPE))
+		// Edit mode
+		if(InputSystem::GetKeyPress(GLFW_KEY_ESCAPE))
 		{
-			glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			mouse = false;
+			editMode = !editMode;
+			rendererSystem->EnableEntityIds(editMode);
+			glfwSetInputMode(mainWindow, GLFW_CURSOR, editMode ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
-
-		if(inputSystem->IsMouseButtonPressed(GLFW_MOUSE_BUTTON_1))
+		if (editMode)
 		{
-			glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			inputSystem->RestartRelativeMouse();
-			mouse = true;
+
+			auto [x, y] = InputSystem::GetMousePosition();
+			auto id = RenderSystem::GetEntityId(x, y);
+			Entity* ent = Entity::GetById(id);
+			rendererSystem->SetHighlightEntity(ent);
+
+			if (InputSystem::GetMouseButtonPress(GLFW_MOUSE_BUTTON_1))
+			{
+				if (ent)
+				{
+					if (ent->GetTransform()->GetParent())
+						ent->GetTransform()->SetParent(nullptr);
+					else
+						ent->GetTransform()->SetParent(camera.GetTransform());
+				}
+			}
 		}
 
-		if(!mouse)
-			inputSystem->RestartRelativeMouse();
 
 
         // Camera movement
         float rotationX, rotationY;
         inputSystem->GetRelativeMouse(rotationX, rotationY);
         inputSystem->RestartRelativeMouse();
-
         camera.GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 3*1.77f, glm::vec3(0, 1, 0));
         camera.GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 3, camera.GetTransform()->Right());
 
         float movementRight = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_D)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_A));
         float movementForward = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_W)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_S));
         float movementUp = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT));
-
         glm::vec3 movementHorizontal = movementRight * camera.GetTransform()->Right() + movementForward * camera.GetTransform()->Forward();
         if(glm::length(movementHorizontal) > 0)
             movementHorizontal = glm::normalize(movementHorizontal);
         glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
-
         camera.GetTransform()->Position(camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 2) * movement);
 
 		// Objects
