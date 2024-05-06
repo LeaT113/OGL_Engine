@@ -129,7 +129,7 @@ void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination, c
     // Apply material
     material.ApplyValues();
     glActiveTexture(GL_TEXTURE0 + shader.GetUniformLocation("SourceTex"));
-    glBindTexture(GL_TEXTURE_2D, source.GetColorTexture());
+    glBindTexture(GL_TEXTURE_2D, source.GetColorTexture()->GetBindID());
 
     // Set pipeline settings like depth write, blending
     shader.SetPipelineState();

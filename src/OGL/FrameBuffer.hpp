@@ -18,8 +18,8 @@ public:
 
     void Resize(int width, int height);
 
-    GLuint GetColorTexture(uint32_t index = 0) const;
-    GLuint GetDepthTexture() const;
+    const Texture* GetColorTexture(uint32_t index = 0) const;
+    const Texture* GetDepthTexture() const;
 
     void Clear() const;
 

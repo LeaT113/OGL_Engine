@@ -101,17 +101,17 @@ void FrameBuffer::Resize(int width, int height)
     }
 }
 
-GLuint FrameBuffer::GetColorTexture(uint32_t index) const
+const Texture* FrameBuffer::GetColorTexture(uint32_t index) const
 {
     if (index > _colorAttachments.size())
         throw std::runtime_error("FrameBuffer::GetColorTexture Index out of range");
 
-    return _colorAttachments[index]->GetBindID();
+    return _colorAttachments[index].Access();
 }
 
-GLuint FrameBuffer::GetDepthTexture() const
+const Texture* FrameBuffer::GetDepthTexture() const
 {
-    return _depthAttachment.Access() == nullptr ? 0 : _depthAttachment->GetBindID();
+    return _depthAttachment.Access();
 }
 
 void FrameBuffer::Clear() const
