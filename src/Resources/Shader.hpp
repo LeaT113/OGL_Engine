@@ -14,7 +14,7 @@
 class Shader : public Resource, public IBindable
 {
 public:
-    using UniformValue = std::variant<bool, float, int, unsigned int, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
+    using UniformValue = std::variant<bool, int, unsigned int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
 
     enum class Cull
     {

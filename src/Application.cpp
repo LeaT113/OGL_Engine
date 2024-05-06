@@ -107,20 +107,22 @@ int main()
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("SimpleTransparentShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("WaterShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("FireShader.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("ParticleFlipbook.glsl"));
 
 	// Textures
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Displacement", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Normal", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Roughness", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Occlusion", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Albedo"));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Displacement", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Normal", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Roughness", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Occlusion", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night", {false, true, Texture::Tiling::Extend}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("FireNoiseSeamless"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Displacement.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Normal.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Roughness.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Occlusion.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Albedo.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Displacement.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Normal.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Roughness.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Occlusion.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night.png", {false, true, Texture::Tiling::Extend}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("FireNoiseSeamless.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Flipbook/FireBall02_8x8.hdr"));
 
 	// Materials
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("GroundMaterial.mat"));
@@ -130,6 +132,7 @@ int main()
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("EmissionMaterial3.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("FireMaterial.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("WaterMaterial.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("ParticleFlipbookMat.mat"));
 
 
 	// Scene

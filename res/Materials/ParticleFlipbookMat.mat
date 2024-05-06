@@ -1,0 +1,9 @@
+_name: ParticleFlipbookMat
+_shader: ParticleFlipbook.glsl
+_uniforms:
+  Speed: 3
+  Dimension: 8
+_textures:
+  _CubemapTex: ~
+  _ShadowMap: ~
+  FlipbookTex: Flipbook/FireBall02_8x8
