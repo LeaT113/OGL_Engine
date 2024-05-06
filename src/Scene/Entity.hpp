@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <typeindex>
+#include <vector>
 
 #include "../Components/Component.hpp"
 #include "../Core/Handle.hpp"
@@ -17,7 +18,6 @@ public:
 	size_t ID() const;
 	const std::string& GetName() const;
 
-
 	// Components
 	template <typename T, typename... Args>
 	Entity& AddComponent(Args&&... args);
@@ -28,11 +28,14 @@ public:
 	// Shortcuts
 	TransformComponent* GetTransform() const;
 
+	static Entity* GetById(size_t id);
+
 private:
 	friend class Serializer;
 
 	// Static
 	static size_t _sIndexCounter;
+	static std::vector<Entity*> _sEntities;
 
 	size_t _id;
 	std::string _name;
