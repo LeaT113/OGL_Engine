@@ -20,5 +20,5 @@ void vert()
 
 void frag()
 {
-    color = vec4(Color, 0.3);
+    FragOut = vec4(Color, 0.3);
 }

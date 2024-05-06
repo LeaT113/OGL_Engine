@@ -111,5 +111,5 @@ void frag()
     float reflectance = FresnelShlick(reflectDot, f0).x;
     vec3 col = reflectance * reflectionCol + (1 - reflectance) * transmissionCol;
 
-    color = vec4(col, 1);
+    FragOut = vec4(col, 1);
 }

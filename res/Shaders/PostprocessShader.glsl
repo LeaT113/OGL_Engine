@@ -24,5 +24,5 @@ void frag()
 {
     vec3 col = texture(SourceTex, v2f.uv).rgb;
     col = FilmicToneMapping(col);
-    color = vec4(col, 1.0);
+    FragOut = vec4(col, 1.0);
 }

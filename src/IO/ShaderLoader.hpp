@@ -17,7 +17,7 @@ public:
 private:
     static const std::string ShadersPath;
     static const std::string GlslVersion;
-    static const std::string FragmentOutput;
+    static const std::string DefaultFragOutput;
 
     struct ParsedShader
     {

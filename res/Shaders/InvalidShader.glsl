@@ -88,6 +88,6 @@ void frag()
 
     vec3 col = mix(vec3(1, 0, 1), vec3(0,0,0), checker);
     col = pow(col, (1/2.2).xxx);
-    color = vec4(col, 1.0);
+    FragOut = vec4(col, 1.0);
     //color = vec4((floor(blurFactor*10)/10).xxx, 1.0);
 }

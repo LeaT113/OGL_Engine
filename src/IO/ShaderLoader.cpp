@@ -14,7 +14,7 @@
 
 const std::string ShaderLoader::ShadersPath = "res/Shaders/";
 const std::string ShaderLoader::GlslVersion = "#version 450 core\n";
-const std::string ShaderLoader::FragmentOutput = "out vec4 color;\n";
+const std::string ShaderLoader::DefaultFragOutput = "out vec4 FragOut;\n";
 
 
 Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
@@ -256,12 +256,14 @@ void ShaderLoader::ParseUniformsAndTextures(std::stringstream& source, ParsedSha
 
         for (auto &name : names)
         {
-            if(!type.starts_with("sampler"))
+            if(!type.starts_with("sampler") && !type.starts_with("usampler"))
             {
                 // Uniform
                 static const std::unordered_map<std::string, std::type_index> uniformTypes = {
                     {"bool", typeid(bool)},
                     {"float", typeid(float)},
+                    {"int", typeid(int)},
+                    {"uint", typeid(unsigned int)},
                     {"vec2", typeid(glm::vec2)},
                     {"vec3", typeid(glm::vec3)},
                     {"vec4", typeid(glm::vec4)},
@@ -284,6 +286,11 @@ void ShaderLoader::ParseUniformsAndTextures(std::stringstream& source, ParsedSha
                     {"sampler2D", Texture::Type::Tex2D},
                     {"sampler3D", Texture::Type::Tex3D},
                     {"samplerCube", Texture::Type::TexCubemap},
+
+                    {"usampler1D", Texture::Type::Tex1D},
+                    {"usampler2D", Texture::Type::Tex2D},
+                    {"usampler3D", Texture::Type::Tex3D},
+                    {"usamplerCube", Texture::Type::TexCubemap},
                 };
 
                 auto it = textureTypes.find(type);
@@ -306,6 +313,7 @@ void ShaderLoader::ParseBlocks(std::stringstream& shaderSource, ParsedShader& pa
         Fragment
     };
     BlockParseState state = Base;
+    std::string fragOutput = DefaultFragOutput;
 
     parsedShader.sharedBlock << "\n";
 
@@ -326,6 +334,10 @@ void ShaderLoader::ParseBlocks(std::stringstream& shaderSource, ParsedShader& pa
             {
                 parsedShader.vertexBlock << line << '\n';
             }
+            else if (line.starts_with("out"))
+            {
+                fragOutput = line + "\n";
+            }
             else if (line.starts_with("void vert"))
             {
                 parsedShader.vertexBlock << "void main()\n{\n";
@@ -333,7 +345,7 @@ void ShaderLoader::ParseBlocks(std::stringstream& shaderSource, ParsedShader& pa
             }
             else if (line.starts_with("void frag"))
             {
-                parsedShader.fragmentBlock << "out vec4 color;\nvoid main()\n{\n";
+                parsedShader.fragmentBlock << fragOutput << "void main()\n{\n";
                 state = Fragment;
             }
             else
@@ -417,6 +429,18 @@ Shader::UniformValue ShaderLoader::ConvertDefaultValue(std::type_index type, con
         if (value.empty())
             return 0.0f;
         return std::stof(value);
+    }
+    if (type == typeid(int))
+    {
+        if (value.empty())
+            return 0;
+        return std::stoi(value);
+    }
+    if (type == typeid(unsigned int))
+    {
+        if (value.empty())
+            return 0;
+        return static_cast<unsigned int>(std::stoul(value));
     }
     if (type == typeid(glm::vec2) || type == typeid(glm::vec3) || type == typeid(glm::vec4))
     {

@@ -72,5 +72,5 @@ void frag()
     vec3 lighting = ApplyLights(originalPosWS, normalWS, cameraPos);
 
     vec3 col = albedo.rgb * lighting * occlusion * occlusion * occlusion;
-    color = vec4(col, 1);
+    FragOut = vec4(col, 1);
 }

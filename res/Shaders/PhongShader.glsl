@@ -35,5 +35,5 @@ void frag()
     vec4 tex = texture(AlbedoTex, v2f.uv);
     vec3 col = pow(tex.rgb, vec3(2.2)) * lighting;
     col = FilmicToneMapping(col);
-    color = vec4(col, 1);
+    FragOut = vec4(col, 1);
 }

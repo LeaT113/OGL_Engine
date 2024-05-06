@@ -21,5 +21,5 @@ void vert()
 void frag()
 {
     vec3 col = Color.xyz;
-    color = vec4(col, 1);
+    FragOut = vec4(col, 1);
 }

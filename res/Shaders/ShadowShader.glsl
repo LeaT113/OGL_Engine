@@ -9,5 +9,5 @@ void vert()
 
 void frag()
 {
-    color = vec4(1);
+    FragOut = vec4(1);
 }
