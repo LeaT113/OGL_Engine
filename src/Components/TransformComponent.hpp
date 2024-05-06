@@ -22,6 +22,7 @@ public:
 	void LocalRotation(const glm::quat &rotation);
 
 	void SetParent(TransformComponent* parent);
+	TransformComponent* GetParent() const;
 
 	glm::vec3 Up() const;
 	glm::vec3 Forward() const;

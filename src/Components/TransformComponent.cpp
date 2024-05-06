@@ -79,9 +79,23 @@ void TransformComponent::SetParent(TransformComponent* parent)
 	if (parent == _parent)
 		return;
 
+	if (_parent)
+	{
+		_position = _parent->ModelToWorld() * glm::vec4(_position, 1);
+		_rotation = _parent->Rotation() * _rotation;
+	}
+	if (parent)
+	{
+		_position = parent->WorldToModel() * glm::vec4(_position, 1);
+		_rotation = inverse(parent->Rotation()) * _rotation;
+	}
 	_parent = parent;
-	Position(_position);
-	Rotation(_rotation);
+	_valid = false;
+}
+
+TransformComponent* TransformComponent::GetParent() const
+{
+	return _parent;
 }
 
 glm::mat4 TransformComponent::ModelToWorld() const
@@ -90,7 +104,7 @@ glm::mat4 TransformComponent::ModelToWorld() const
 		Update();
 
 	if (_parent)
-		return _modelToWorld * _parent->ModelToWorld();
+		return _parent->ModelToWorld() * _modelToWorld;
 	return _modelToWorld;
 }
 
