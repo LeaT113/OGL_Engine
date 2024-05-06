@@ -93,7 +93,6 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     {
         slot.location = glGetUniformLocation(program, name.c_str());
         slot.unit = textureUnit++;
-        // TODO Add texture type
     }
 
     return Handle<Shader>::Make(program, path, parsedShader.uniforms, parsedShader.textures, parsedShader.cull, parsedShader.depthWrite, parsedShader.depthTest, parsedShader.blending);
@@ -111,7 +110,7 @@ std::stringstream ShaderLoader::GenerateIncludeSource(std::stringstream &shaderS
     std::streamoff prevPos;
     for (std::string line; *sourceStack.top() >> std::ws, prevPos = sourceStack.top()->tellg(), std::getline(*sourceStack.top(), line); )
     {
-        if (line.empty() || line.starts_with("//")) // TODO empty() shouldn't be needed
+        if (line.starts_with("//"))
             continue;
 
         if (!line.starts_with("#include"))

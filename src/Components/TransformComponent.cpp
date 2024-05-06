@@ -114,7 +114,7 @@ glm::mat4 TransformComponent::WorldToModel() const
 		Update();
 
 	if (_parent)
-		return _worldToModel * _parent->WorldToModel(); // TODO Switch order?
+		return _worldToModel * _parent->WorldToModel();
 	return _worldToModel;
 }
 
