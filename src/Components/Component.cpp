@@ -11,3 +11,8 @@ TransformComponent* Component::GetTransform() const
 {
     return _owner->GetTransform();
 }
+
+const Entity& Component::GetEntity() const
+{
+    return *_owner;
+}

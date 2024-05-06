@@ -15,6 +15,8 @@ public:
 
 	TransformComponent* GetTransform() const;
 
+	const Entity& GetEntity() const;
+
 private:
 	friend class Serializer;
 };
