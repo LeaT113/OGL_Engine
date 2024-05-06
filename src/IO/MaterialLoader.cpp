@@ -35,6 +35,10 @@ Handle<Material> MaterialLoader::LoadMaterial(const std::string& path)
 
         if (type == typeid(bool))
             material->Set(key, uniform.second.as<bool>());
+        else if (type == typeid(int))
+            material->Set(key, uniform.second.as<int>());
+        else if (type == typeid(unsigned int))
+            material->Set(key, uniform.second.as<unsigned int>());
         else if (type == typeid(float))
             material->Set(key, uniform.second.as<float>());
         else if (type == typeid(glm::vec2))
