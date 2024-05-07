@@ -5,7 +5,7 @@
 
 #pragma Blend(Alpha)
 #pragma DepthWrite(Off)
-#pragma Cull(Off)
+#pragma Cull(Back)
 
 #define MAX_DEPTH_STEPS 50
 #define DEPTH_THICKNESS 0.1

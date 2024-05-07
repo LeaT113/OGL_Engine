@@ -8,7 +8,7 @@ _uniforms:
   TextureScale: 4
 _textures:
   AlbedoTex: StoneBricks/StoneBricks_Albedo
-  RoughnessTex: ~
+  RoughnessTex: StoneBricks/StoneBricks_Roughness
   OcclusionTex: StoneBricks/StoneBricks_Occlusion
   HeightmapTex: StoneBricks/StoneBricks_Displacement
   NormalTex: StoneBricks/StoneBricks_Normal

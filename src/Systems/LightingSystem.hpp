@@ -24,8 +24,8 @@ public:
     static constexpr int MAX_2D_SHADOWS = 2;
     static constexpr int MAX_CUBE_SHADOWS = 2;
     static constexpr int DIRECT_LIGHT_SHADOW_RESOLUTION = 4096;
-    static constexpr int POINT_LIGHT_SHADOW_RESOLUTION = 512;
-    static constexpr int SPOT_LIGHT_SHADOW_RESOLUTION = 2048;
+    static constexpr int POINT_LIGHT_SHADOW_RESOLUTION = 256;
+    static constexpr int SPOT_LIGHT_SHADOW_RESOLUTION = 1024;
 
     LightingSystem();
 

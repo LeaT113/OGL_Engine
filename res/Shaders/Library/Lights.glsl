@@ -1,5 +1,8 @@
 #include "Library/Lighting.glsl"
 
+#define MAX_POINT_LIGHTS 4
+#define MAX_SPOT_LIGHTS 4
+
 struct AmbientLight
 {
   vec3 color;
@@ -33,74 +36,33 @@ layout (std140, binding = 2) uniform lights
 {
     AmbientLight ambientLight;
     DirectLight directLight;
-    PointLight pointLights[4];
-    SpotLight spotLights[4];
+    PointLight pointLights[MAX_POINT_LIGHTS];
+    SpotLight spotLights[MAX_SPOT_LIGHTS];
 } Lights;
 
 
-vec3 ApplyAmbientLight(vec3 position, vec3 normal, vec3 cameraPos, AmbientLight ambientLight)
+vec3 PointLight_Energy(vec3 position, vec3 normal, PointLight light)
 {
-    return ambientLight.color;
+    vec3 lightDir = normalize(light.position - position);
+    float angleAtt = max(dot(normal, lightDir), 0);
+
+    float dist = length(light.position - position);
+    float distAtt = PointLight_DistanceAttenuationSphere(dist, 0.1f);
+
+    return light.color * angleAtt * distAtt;
 }
 
-vec3 ApplyDirectLight(vec3 position, vec3 normal, vec3 cameraPos, DirectLight directLight)
+vec3 SpotLight_Energy(vec3 position, vec3 normal, SpotLight light)
 {
-    float angleAttenuation = max(0, dot(normal, -directLight.direction));
+    vec3 lightDir = normalize(light.position - position);
+    float angleAtt = max(dot(normal, lightDir), 0);
 
-    return directLight.color * angleAttenuation;
-}
+    float dist = length(light.position - position);
+    float distAtt = PointLight_DistanceAttenuationSphere(dist, 0.1f);
 
-vec3 ApplyPointLight(vec3 position, vec3 normal, vec3 cameraPos, PointLight pointLight)
-{
-    vec3 lightDir = normalize(pointLight.position - position);
-    float angleAttenuation = max(0, dot(normal, lightDir));
+    float spotDot = dot(-lightDir, light.direction);
+    float spotAtt = clamp(spotDot * light.spotA + light.spotB, 0, 1);
+    spotAtt = spotAtt * spotAtt;
 
-    float dist = length(pointLight.position - position);
-    float distanceAttenuation = Point_DistanceAttenuationSphere(dist, 0.1f);
-
-    vec3 viewDir = normalize(cameraPos - position);
-    vec3 halfDir = normalize(viewDir + lightDir);
-    float specAttenuation = pow(max(dot(normal, halfDir), 0.0), 10);
-
-    float shadowAttenuation = 1;
-    #ifdef SHADOWS
-        shadowAttenuation = PointLight_Shadow(pointLight.shadowIndex, position);
-    #endif
-
-    return pointLight.color * angleAttenuation * distanceAttenuation * shadowAttenuation;
-}
-
-vec3 ApplySpotLight(vec3 position, vec3 normal, vec3 cameraPos, SpotLight spotLight)
-{
-    vec3 lightDir = normalize(spotLight.position - position);
-    float angleAttenuation = max(0, dot(normal, lightDir));
-
-    float dist = length(spotLight.position - position);
-    float distanceAttenuation = Point_DistanceAttenuationSphere(dist, 0.1f);
-
-    float spotDot = dot(-lightDir, spotLight.direction);
-    float spotAttenuation = clamp(spotDot * spotLight.spotA + spotLight.spotB, 0, 1);
-    spotAttenuation = spotAttenuation * spotAttenuation;
-
-    float shadowAttenuation = 1;
-    #ifdef SHADOWS
-        shadowAttenuation = SpotLight_Shadow(spotLight.shadowIndex, position);
-    #endif
-
-    return spotLight.color * angleAttenuation * distanceAttenuation * spotAttenuation * shadowAttenuation;
-}
-
-vec3 ApplyLights(vec3 position, vec3 normal, vec3 cameraPos)
-{
-    vec3 l = vec3(0.0);
-
-    l += ApplyAmbientLight(position, normal, cameraPos, Lights.ambientLight);
-    l += ApplyDirectLight(position, normal, cameraPos, Lights.directLight);
-
-    for (int i = 0; i < 4; i++)
-    {
-        l += ApplyPointLight(position, normal, cameraPos, Lights.pointLights[i]);
-        l += ApplySpotLight(position, normal, cameraPos, Lights.spotLights[i]);
-    }
-    return l;
+    return light.color * angleAtt * distAtt * spotAtt;
 }

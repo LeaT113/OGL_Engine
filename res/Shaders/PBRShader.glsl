@@ -1,10 +1,9 @@
 #include "Library/Core.glsl"
-#include "Library/Shadows.glsl"
 #include "Library/Lights.glsl"
-#include "Library/Tonemapping.glsl"
+#include "Library/Shadows.glsl"
 #include "Library/NormalMapping.glsl"
 #include "Library/HeightMapping.glsl"
-#include "Library/Scene.glsl"
+#include "Library/PBR.glsl"
 
 in vec3 aPosition;
 in vec3 aNormal;
@@ -45,11 +44,11 @@ void vert()
 void frag()
 {
     vec3 positionWS = v2f.position;
-    vec3 originalPosWS = v2f.position;
-    vec3 normalWS = normalize(v2f.normal);
     vec3 cameraPos = ViewToWorldPos((0).xxx);
+    vec3 viewDir = normalize(cameraPos - positionWS);
     vec2 uv = v2f.uv * TextureScale;
 
+    vec3 originalPosWS = v2f.position;
     if(UseHeightmap)
     {
         vec3 viewTS = normalize(inverse(v2f.tbn) * (positionWS - cameraPos));
@@ -57,8 +56,10 @@ void frag()
 
         uv += parallaxOffset.xy;
         positionWS += v2f.tbn * parallaxOffset;
+        viewDir = normalize(cameraPos - positionWS);
     }
 
+    vec3 normalWS = normalize(v2f.normal);
     if (UseNormalmap)
     {
         vec3 normal = texture(NormalTex, uv).rgb;
@@ -66,11 +67,37 @@ void frag()
         normalWS = normalize(v2f.tbn * normal);
     }
 
-    // Shading
-    vec4 albedo = texture(AlbedoTex, uv);
+    // Textures
+    vec3 albedo = texture(AlbedoTex, uv).rgb;
+    float roughness = texture(RoughnessTex, uv).r;
     float occlusion = texture(OcclusionTex, uv).r;
-    vec3 lighting = ApplyLights(originalPosWS, normalWS, cameraPos);
+    occlusion *= occlusion * occlusion;
 
-    vec3 col = albedo.rgb * lighting * occlusion * occlusion * occlusion;
-    FragOut = vec4(col, 1);
+    // Shading
+    Surface surface = Surface(albedo, roughness, 0, occlusion, normalWS);
+    vec3 brdf = vec3(0);
+
+    // TODO Ambient and direct
+    for (int i = 0; i < MAX_POINT_LIGHTS; i++)
+    {
+        PointLight light = Lights.pointLights[i];
+        vec3 lightEnergy = PointLight_Energy(positionWS, normalWS, light);
+        #ifdef SHADOWS
+            lightEnergy *= PointLight_Shadow(originalPosWS, light);
+        #endif
+
+        brdf += BRDF(surface, viewDir, lightEnergy, normalize(light.position - positionWS));
+    }
+    for (int i = 0; i < MAX_SPOT_LIGHTS; i++)
+    {
+        SpotLight light = Lights.spotLights[i];
+        vec3 lightEnergy = SpotLight_Energy(positionWS, normalWS, light);
+        #ifdef SHADOWS
+            lightEnergy *= SpotLight_Shadow(originalPosWS, light);
+        #endif
+
+        brdf += BRDF(surface, viewDir, lightEnergy, normalize(light.position - positionWS));
+    }
+
+    FragOut = vec4(brdf, 1);
 }

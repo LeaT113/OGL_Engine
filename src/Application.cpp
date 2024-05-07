@@ -158,7 +158,7 @@ int main()
 	flashlight.GetTransform()->LocalRotation(glm::vec3(0));
 	flashlight.GetComponent<LightComponent>()->SetSpotAngles(10, 90);
 	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
-	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(2));
+	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(6));
 
 	Entity skybox;
 	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMat");

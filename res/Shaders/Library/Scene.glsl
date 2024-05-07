@@ -1,4 +1,4 @@
-#include "Library/Core.glsl"<
+#include "Library/Core.glsl"
 
 uniform sampler2D _SceneColorTex;
 uniform sampler2D _SceneDepthTex;

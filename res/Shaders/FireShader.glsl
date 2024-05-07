@@ -50,5 +50,5 @@ void frag()
     val = saturate(val);
     val = pow(val, 1.2);
 
-    FragOut = vec4(val * vec3(0.761, 0.1, 0.02) * 255 * 2, 1);
+    FragOut = vec4(val * vec3(0.761, 0.2, 0.05) * 255 * 2, 1);
 }

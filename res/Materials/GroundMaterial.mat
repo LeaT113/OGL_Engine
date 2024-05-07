@@ -8,7 +8,7 @@ _uniforms:
   TextureScale: 3
 _textures:
   AlbedoTex: ForestGround/ForestGround_Albedo
-  RoughnessTex: ~
+  RoughnessTex: ForestGround/ForestGround_Roughness
   OcclusionTex: ForestGround/ForestGround_Occlusion
   HeightmapTex: ForestGround/ForestGround_Displacement
   NormalTex: ForestGround/ForestGround_Normal

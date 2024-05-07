@@ -1,9 +1,9 @@
-float Point_DistanceAttenuationSimple(float distance)
+float PointLight_DistanceAttenuationSimple(float distance)
 {
     return 1 / (distance*distance);
 }
 
-float Point_DistanceAttenuationUnity(float distance, float range)
+float PointLight_DistanceAttenuationUnity(float distance, float range)
 {
     // From https://catlikecoding.com/unity/tutorials/custom-srp/point-and-spot-lights/
     float d2r2 = (distance*distance)/(range*range);
@@ -12,7 +12,7 @@ float Point_DistanceAttenuationUnity(float distance, float range)
     return f*f;
 }
 
-float Point_DistanceAttenuationSphere(float distance, float radius)
+float PointLight_DistanceAttenuationSphere(float distance, float radius)
 {
     // From http://www.cemyuksel.com/research/pointlightattenuation/
     return 2 / (distance*distance + radius*radius + distance*sqrt(distance*distance + radius*radius));

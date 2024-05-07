@@ -1,3 +1,5 @@
+#define PI 3.1415926535897932384626433832795
+
 uniform mat4 _ModelMatrix;
 uniform mat4 _InvModelMatrix;
 uniform mat4 _ViewMatrix;
@@ -16,8 +18,6 @@ layout (std140, binding = 1) uniform core
 
 uniform vec3 _WorldSpaceCameraPos;
 uniform samplerCube _CubemapTex;
-uniform sampler2D _ShadowMap;
-uniform mat4 _ShadowMatrix;
 
 #define _ScreenPos (gl_FragCoord.xy/Core.screenSize)
 
