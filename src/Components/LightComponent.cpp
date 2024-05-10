@@ -11,6 +11,11 @@ LightComponent::LightComponent(const Entity& owner, Type type)
     LightingSystem::RegisterLight(this);
 }
 
+glm::vec3 LightComponent::GetColor() const
+{
+    return _color;
+}
+
 void LightComponent::SetColor(const glm::vec3& color)
 {
     _color = color;

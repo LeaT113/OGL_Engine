@@ -18,6 +18,8 @@ public:
 
     LightComponent(const Entity& owner, Type type);
 
+    glm::vec3 GetColor() const;
+
     void SetColor(const glm::vec3 &color);
     void SetDirection(const glm::vec3 &direction);
     void SetSpotAngles(float innerAngle, float outerAngle);
