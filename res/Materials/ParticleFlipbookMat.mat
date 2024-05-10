@@ -1,7 +1,7 @@
 _name: ParticleFlipbookMat
 _shader: ParticleFlipbook.glsl
 _uniforms:
-  Speed: 2.5
+  Speed: 3
   Dimension: 8
 _textures:
   _CubemapTex: ~

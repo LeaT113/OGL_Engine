@@ -5,7 +5,7 @@ _uniforms:
   HeightmapDepth: 0.04
   NormalMapStrenght: 1
   UseNormalmap: true
-  TextureScale: 3
+  TextureScale: 22
 _textures:
   AlbedoTex: ForestGround/ForestGround_Albedo
   RoughnessTex: ForestGround/ForestGround_Roughness
