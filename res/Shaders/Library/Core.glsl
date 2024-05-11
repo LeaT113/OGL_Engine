@@ -1,14 +1,5 @@
 #define PI 3.1415926535897932384626433832795
 
-uniform mat4 _ModelMatrix;
-uniform mat4 _InvModelMatrix;
-uniform mat4 _ViewMatrix;
-uniform mat4 _InvViewMatrix;
-uniform mat4 _ProjectionMatrix;
-uniform mat4 _InvProjectionMatrix;
-uniform mat3 _ModelNormalMatrix;
-uniform mat4 _MVPMatrix;
-
 layout (std140, binding = 1) uniform core
 {
     vec2 screenSize;
@@ -18,12 +9,21 @@ layout (std140, binding = 1) uniform core
 
 uniform vec3 _WorldSpaceCameraPos;
 uniform samplerCube _CubemapTex;
-
 #define _ScreenPos (gl_FragCoord.xy/Core.screenSize)
 
 
 //          Transformations
-// Position
+uniform mat4 _ModelMatrix;
+uniform mat4 _InvModelMatrix;
+uniform mat4 _ViewMatrix;
+uniform mat4 _InvViewMatrix;
+uniform mat4 _ProjectionMatrix;
+uniform mat4 _InvProjectionMatrix;
+uniform mat3 _ModelNormalMatrix;
+uniform mat4 _MVPMatrix;
+
+uniform bool _Instanced;
+
 vec3 ObjectToWorldPos(vec3 pos)
 {
     return (_ModelMatrix * vec4(pos, 1.0)).xyz;

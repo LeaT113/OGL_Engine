@@ -59,9 +59,10 @@ void Graphics::Bind(const FrameBuffer& frameBuffer)
 
 
 void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld,
-                          const Material &material, const CameraComponent &camera)
+                          const Material &material, const CameraComponent &camera, unsigned int instanceCount)
 {
-    Graphics::Bind(mesh.GetVertexArray());
+    Bind(mesh.GetVertexArray());
+
 
     // Bind shader
     const Shader &shader = material.GetShader();
@@ -80,7 +81,16 @@ void Graphics::RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm
 
     // Call draw
     auto submesh = mesh.GetSubmesh(submeshIndex);
-    glDrawElements(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset);
+    if (instanceCount)
+    {
+        Shader::SetBool(shader.GetUniformLocation("_Instanced"), true);
+        glDrawElementsInstanced(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset, static_cast<int>(instanceCount));
+    }
+    else
+    {
+        Shader::SetBool(shader.GetUniformLocation("_Instanced"), false);
+        glDrawElements(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset);
+    }
 }
 
 void Graphics::Render(const RendererComponent& renderer, const CameraComponent& camera)
@@ -89,7 +99,7 @@ void Graphics::Render(const RendererComponent& renderer, const CameraComponent& 
     // Or not here and rely on pipeline?
 
     // TODO Iterate through submeshes
-    RenderMesh(renderer.GetMesh(), 0, renderer.GetTransform()->ModelToWorld(), renderer.GetMaterial(), camera);
+    RenderMesh(renderer.GetMesh(), 0, renderer.GetTransform()->ModelToWorld(), renderer.GetMaterial(), camera, renderer.GetInstancingTransforms().size());
 }
 
 void Graphics::RenderWithShader(const RendererComponent& renderer, const CameraComponent& camera, const Shader& shader)
@@ -108,7 +118,16 @@ void Graphics::RenderWithShader(const RendererComponent& renderer, const CameraC
 
     // Call draw
     auto submesh = renderer.GetMesh().GetSubmesh(0);
-    glDrawElements(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset);
+    if (renderer.IsInstanced())
+    {
+        Shader::SetBool(shader.GetUniformLocation("_Instanced"), true);
+        glDrawElementsInstanced(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset, renderer.GetInstancingTransforms().size());
+    }
+    else
+    {
+        Shader::SetBool(shader.GetUniformLocation("_Instanced"), false);
+        glDrawElements(GL_TRIANGLES, submesh.elementCount, GL_UNSIGNED_INT, (void*)(uintptr_t)submesh.offset);
+    }
 }
 
 void Graphics::Blit(const FrameBuffer& source, const FrameBuffer& destination)

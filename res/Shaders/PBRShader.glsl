@@ -5,11 +5,6 @@
 #include "Library/HeightMapping.glsl"
 #include "Library/PBR.glsl"
 
-in vec3 aPosition;
-in vec3 aNormal;
-in vec3 aTangent;
-in vec2 aTexCoord0;
-
 uniform vec4 Color;
 uniform float TextureScale = 2.0;
 uniform sampler2D AlbedoTex;
@@ -22,6 +17,13 @@ uniform sampler2D HeightmapTex;
 uniform bool UseHeightmap;
 uniform float HeightmapDepth;
 
+in vec3 aPosition;
+in vec3 aNormal;
+in vec3 aTangent;
+in vec2 aTexCoord0;
+
+in mat4 aInstanceTransform;
+
 struct v2f
 {
     vec3 position;
@@ -33,12 +35,27 @@ struct v2f
 
 void vert()
 {
-    v2f.position = ObjectToWorldPos(aPosition);
-    v2f.normal = ObjectToWorldNormal(aNormal);
-    v2f.uv = aTexCoord0;
-    v2f.tbn = CreateTBNMatrix(aNormal, aTangent);
+    if (_Instanced)
+    {
+        vec4 pos = aInstanceTransform * vec4(aPosition, 1);
+        v2f.position = pos.xyz;
 
-    gl_Position = ObjectToClipPos(aPosition);
+        v2f.normal = normalize((aInstanceTransform * vec4(aNormal, 0)).xyz);
+        vec3 T = normalize((aInstanceTransform * vec4(aTangent, 0)).xyz);
+        vec3 B = cross(v2f.normal, T);
+        v2f.tbn = mat3(T, B, v2f.normal);
+
+        gl_Position = _ProjectionMatrix * _ViewMatrix * pos;
+    }
+    else
+    {
+        v2f.position = ObjectToWorldPos(aPosition);
+        v2f.normal = ObjectToWorldNormal(aNormal);
+        v2f.tbn = CreateTBNMatrix(aNormal, aTangent);
+        gl_Position = ObjectToClipPos(aPosition);
+    }
+
+    v2f.uv = aTexCoord0;
 }
 
 void frag()
@@ -71,7 +88,7 @@ void frag()
     vec3 albedo = texture(AlbedoTex, uv).rgb;
     float roughness = texture(RoughnessTex, uv).r;
     float occlusion = texture(OcclusionTex, uv).r;
-    occlusion *= occlusion * occlusion;
+//    occlusion *= occlusion * occlusion;
 
     // Shading
     Surface surface = Surface(albedo, roughness, 0, occlusion, normalWS);

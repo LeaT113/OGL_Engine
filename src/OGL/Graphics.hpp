@@ -31,7 +31,7 @@ public:
     static void Bind(const FrameBuffer &frameBuffer);
 
     // Render
-    static void RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld, const Material &material, const CameraComponent &camera);
+    static void RenderMesh(const Mesh &mesh, unsigned int submeshIndex, const glm::mat4 &modelToWorld, const Material &material, const CameraComponent &camera, unsigned int instanceCount = 0);
     static void Render(const RendererComponent& renderer, const CameraComponent& camera);
     static void RenderWithShader(const RendererComponent& renderer, const CameraComponent& camera, const Shader& shader);
     static void Blit(const FrameBuffer& source, const FrameBuffer& destination);

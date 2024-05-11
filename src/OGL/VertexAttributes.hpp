@@ -13,7 +13,8 @@ enum class VertexAttribute
     TexCoord1 = 4,
     TexCoord2 = 5,
     TexCoord3 = 6,
-    COUNT = 7
+    InstanceTransform = 7,
+    LAST = 7,
 };
 
 struct VertexAttributeInfo

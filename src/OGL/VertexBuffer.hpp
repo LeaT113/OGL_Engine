@@ -9,12 +9,10 @@
 class VertexBuffer : public IBindable
 {
 public:
-    VertexBuffer(const void* data, unsigned int size);
+    explicit VertexBuffer(unsigned int size);
     ~VertexBuffer() override;
 
-    void InsertData(unsigned int offset, const void* data, unsigned int size);
-
-    void InsertAttribute(VertexAttribute attribute, unsigned int &offset, const void* data, unsigned int vertexCount);
+    void InsertAttribute(VertexAttribute attribute, const void* data, unsigned int count);
 
     GLuint GetBindID() const override;
 
@@ -23,8 +21,9 @@ public:
 private:
     VertexBuffer();
 
-    GLuint _vbo;
-    unsigned int _size;
+    GLuint _vbo = 0;
+    unsigned int _size = 0;
+    unsigned int _insertOffset = 0;
 };
 
 

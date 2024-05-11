@@ -3,8 +3,6 @@
 
 #include <string>
 #include <sstream>
-#include <vector>
-#include <set>
 #include "../Resources/Shader.hpp"
 #include "../Core/Handle.hpp"
 

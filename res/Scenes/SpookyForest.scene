@@ -1,0 +1,135 @@
+- Entity:
+    _name: Fireball
+    _components:
+      RendererComponent:
+        _mesh: Quad
+        _material: ParticleFlipbookMat
+      TransformComponent:
+        _position: [2, 2, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: FireballLight
+    _components:
+      TransformComponent:
+        _position: [2, 2, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+      LightComponent:
+        _lightType: 2
+        _color: [50, 30, 15]
+        _direction: [0, 0, -1]
+        _spotInnerAngle: 20
+        _spotOuterAngle: 30
+        _shadowCasting: true
+- Entity:
+    _name: WarningLight
+    _components:
+      LightComponent:
+        _lightType: 3
+        _color: [60, 6, 8.4]
+        _direction: [0, 0, -1]
+        _spotInnerAngle: 30
+        _spotOuterAngle: 110
+        _shadowCasting: false
+      RendererComponent:
+        _mesh: Icosphere.obj
+        _material: EmissionMaterial3
+      TransformComponent:
+        _position: [0, 1.5, 0]
+        _rotation: [0.953716934, -0.300705791, 0, 0]
+        _scale: [0.100000001, 0.100000001, 0.100000001]
+- Entity:
+    _name: EmissiveSphere2
+    _components:
+      LightComponent:
+        _lightType: 2
+        _color: [0.16, 2.4, 3.8]
+        _direction: [0, -1, 0]
+        _spotInnerAngle: 20
+        _spotOuterAngle: 30
+        _shadowCasting: false
+      RendererComponent:
+        _mesh: Icosphere.obj
+        _material: EmissionMaterial2
+      TransformComponent:
+        _position: [0, 0, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.100000001, 0.100000001, 0.100000001]
+- Entity:
+    _name: Cube
+    _components:
+      RendererComponent:
+        _mesh: Cube.glb
+        _material: StoneBricksMaterial
+      TransformComponent:
+        _position: [-0.800000012, 0.5, -1.29999995]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: EmissiveSphere1
+    _components:
+      LightComponent:
+        _lightType: 2
+        _color: [24, 12, 18]
+        _direction: [0, -1, 0]
+        _spotInnerAngle: 20
+        _spotOuterAngle: 30
+        _shadowCasting: false
+      RendererComponent:
+        _mesh: Icosphere.obj
+        _material: EmissionMaterial1
+      TransformComponent:
+        _position: [-1.5, 0.300000012, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.100000001, 0.100000001, 0.100000001]
+- Entity:
+    _name: Suzanne
+    _components:
+      RendererComponent:
+        _mesh: Suzanne.obj
+        _material: GroundMaterial
+      TransformComponent:
+        _position: [1, 0.600000024, -1]
+        _rotation: [1, 0, 0, 0]
+        _scale: [0.400000006, 0.400000006, 0.400000006]
+- Entity:
+    _name: Fire
+    _components:
+      RendererComponent:
+        _mesh: Plane.obj
+        _material: FireMaterial
+      TransformComponent:
+        _position: [-0.800000012, 3, -1]
+        _rotation: [0.707106769, 0.707106769, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: Ground
+    _components:
+      RendererComponent:
+        _mesh: Forest/Ground.glb
+        _material: GroundMaterial
+      TransformComponent:
+        _position: [0, 0, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: LakeWater
+    _components:
+      RendererComponent:
+        _mesh: Forest/LakeWater.glb
+        _material: WaterMaterial
+      TransformComponent:
+        _position: [11.1, -1.5, -16.1]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]
+- Entity:
+    _name: Tree1
+    _components:
+      RendererComponent:
+        _mesh: Forest/Tree1.glb
+        _material: BarkMaterial
+      TransformComponent:
+        _position: [0, 0, 0]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1, 1, 1]

@@ -68,7 +68,7 @@ Handle<Shader> ShaderLoader::LoadShader(const std::string &path)
     glDeleteShader(fragmentShader);
 
     // Attribute locations
-    for(int i = 0; i < static_cast<int>(VertexAttribute::COUNT); i++)
+    for(int i = 0; i <= static_cast<int>(VertexAttribute::LAST); i++)
     {
         auto att = static_cast<VertexAttribute>(i);
         std::string name = "a" + GetVertexAttributeInfo(att).name;

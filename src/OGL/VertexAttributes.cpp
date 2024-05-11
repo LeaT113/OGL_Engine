@@ -3,7 +3,7 @@
 
 const VertexAttributeInfo &GetVertexAttributeInfo(VertexAttribute attribute)
 {
-    static constexpr VertexAttributeInfo attributeInfos[] =
+    static const VertexAttributeInfo attributeInfos[] =
             {
                     {3, GL_FLOAT, GL_FALSE, 3*sizeof(float), "Position"},
                     {3, GL_FLOAT, GL_FALSE, 3*sizeof(float), "Normal"},
@@ -12,10 +12,8 @@ const VertexAttributeInfo &GetVertexAttributeInfo(VertexAttribute attribute)
                     {2, GL_FLOAT, GL_FALSE, 2*sizeof(float), "TexCoord1"},
                     {2, GL_FLOAT, GL_FALSE, 2*sizeof(float), "TexCoord2"},
                     {2, GL_FLOAT, GL_FALSE, 2*sizeof(float), "TexCoord3"},
+                    {4, GL_FLOAT, GL_FALSE, 4*4*sizeof(float), "InstanceTransform"}
             };
-
-    if((int)attribute >= (int)VertexAttribute::COUNT)
-        throw std::runtime_error("Shader::GetAttributeInfo out of range");
 
     return attributeInfos[static_cast<int>(attribute)];
 }

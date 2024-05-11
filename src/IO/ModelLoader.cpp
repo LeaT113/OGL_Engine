@@ -82,16 +82,16 @@ Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
     unsigned int vertexDataSize = 0;
     for(auto attrib : attributes)
         vertexDataSize += vertexCount * GetVertexAttributeInfo(attrib).byteSize;
-    auto vertexBuffer = Handle<VertexBuffer>::Make(nullptr, vertexDataSize);
+    auto vertexBuffer = Handle<VertexBuffer>::Make(vertexDataSize);
     unsigned int offset = 0;
-    vertexBuffer->InsertAttribute(VertexAttribute::Position, offset, positions, vertexCount);
+    vertexBuffer->InsertAttribute(VertexAttribute::Position, positions, vertexCount);
     if(normals)
-        vertexBuffer->InsertAttribute(VertexAttribute::Normal, offset, normals, vertexCount);
+        vertexBuffer->InsertAttribute(VertexAttribute::Normal, normals, vertexCount);
     if(tangents)
-        vertexBuffer->InsertAttribute(VertexAttribute::Tangent, offset, tangents, vertexCount);
+        vertexBuffer->InsertAttribute(VertexAttribute::Tangent, tangents, vertexCount);
     for (int i = 0; i < UVs.size(); i++)
     {
-        vertexBuffer->InsertAttribute(static_cast<VertexAttribute>(static_cast<int>(VertexAttribute::TexCoord0) + i), offset, UVs[i].data(), vertexCount);
+        vertexBuffer->InsertAttribute(static_cast<VertexAttribute>(static_cast<int>(VertexAttribute::TexCoord0) + i), UVs[i].data(), vertexCount);
     }
 
     auto indexBuffer = Handle<IndexBuffer>::Make(indices.data(), indices.size() * sizeof(unsigned int));
