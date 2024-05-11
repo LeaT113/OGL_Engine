@@ -3,7 +3,6 @@ bin
 doc
 
 # IDE
-.idea
 
 # Debugging
 vgcore.*
