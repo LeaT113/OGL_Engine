@@ -28,6 +28,7 @@ Handle<Texture> TextureLoader::LoadTexture2D(const std::string &name, const Text
         .width = static_cast<unsigned int>(width), .height = static_cast<unsigned int>(height),
         .name = name.substr(0, name.find_first_of('.')), .data = imageData, .settings = settings
     });
+    stbi_image_free(imageData);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -59,6 +60,7 @@ Handle<Texture> TextureLoader::LoadCubemap(const std::string& name, const Textur
             });
 
         tex->Fill(imageData, i);
+        stbi_image_free(imageData);
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
