@@ -94,7 +94,7 @@ Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
         vertexBuffer->InsertAttribute(static_cast<VertexAttribute>(static_cast<int>(VertexAttribute::TexCoord0) + i), UVs[i].data(), vertexCount);
     }
 
-    auto indexBuffer = Handle<IndexBuffer>::Make(indices.data(), indices.size() * sizeof(unsigned int));
+    auto indexBuffer = Handle<IndexBuffer>::Make(indices);
 
     auto vertexArray = Handle<VertexArray>::Make(VertexArray::Layout::Packed, vertexCount);
     vertexArray->AddVertexBuffer(*vertexBuffer, attributes);

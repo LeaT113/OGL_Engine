@@ -18,7 +18,7 @@ Handle<Mesh> MeshFactory::CreateQuad()
             0, 1
         };
 
-    static unsigned int indicies[2 * 3] =
+    static std::vector<unsigned int> indicies =
         {
             0, 1, 3,
             1, 2, 3
@@ -28,7 +28,7 @@ Handle<Mesh> MeshFactory::CreateQuad()
     unsigned int offset = 0;
     vertexBuffer->InsertAttribute(VertexAttribute::Position, positions, 4);
     vertexBuffer->InsertAttribute(VertexAttribute::TexCoord0, uvs, 4);
-    auto indexBuffer = Handle<IndexBuffer>::Make(indicies, 2 * 3 * sizeof(unsigned int));
+    auto indexBuffer = Handle<IndexBuffer>::Make(indicies);
     auto vertexArray = Handle<VertexArray>::Make(VertexArray::Layout::Packed, 4);
     vertexArray->AddVertexBuffer(*vertexBuffer, std::vector{ VertexAttribute::Position, VertexAttribute::TexCoord0 });
     vertexArray->SetIndexBuffer(*indexBuffer);
