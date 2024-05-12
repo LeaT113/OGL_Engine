@@ -38,9 +38,13 @@ int main()
 	rendererSystem = std::make_unique<RenderSystem>();
 	lightingSystem = std::make_unique<LightingSystem>();
 
-	// GLFW window
+	// GLFW
 	if (!glfwInit())
 		return -1;
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	GLFWwindow *mainWindow;
 	mainWindow = glfwCreateWindow(1280, 720, "OGL_Engine", nullptr, nullptr);
 	if (!mainWindow)
