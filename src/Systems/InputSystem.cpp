@@ -4,6 +4,14 @@
 
 InputSystem::InputSystem() = default;
 
+void InputSystem::ClearPresses()
+{
+    for (int i = 0; i < _keyPress.size(); i++)
+        _keyPress[i] = false;
+    for (int i = 0; i < _mouseButtonPress.size(); i++)
+        _mouseButtonPress[i] = false;
+}
+
 void InputSystem::OnKeyChanged(int key, int action)
 {
 	if(!IsKeyValid(key))
@@ -25,9 +33,7 @@ bool InputSystem::IsKeyPressed(int key) const
 
 bool InputSystem::GetKeyPress(int key)
 {
-    bool val = Instance()._keyPress[key];
-    Instance()._keyPress[key] = false;
-    return val;
+    return Instance()._keyPress[key];
 }
 
 
@@ -77,9 +83,7 @@ std::pair<unsigned int, unsigned int> InputSystem::GetMousePosition()
 
 bool InputSystem::GetMouseButtonPress(int button)
 {
-    bool val = Instance()._mouseButtonPress[button];
-    Instance()._mouseButtonPress[button] = false;
-    return val;
+    return Instance()._mouseButtonPress[button];
 }
 
 

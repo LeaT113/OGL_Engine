@@ -55,6 +55,9 @@ add_executable(${PROJECT_NAME}
         src/Resources/Shader.hpp src/Resources/Shader.cpp
         src/Resources/Material.hpp src/Resources/Material.cpp
         src/Resources/Texture.hpp src/Resources/Texture.cpp
+
+        # Utils
+        src/Utils/Spline.hpp src/Utils/Spline.cpp
 )
 
 # Libraries

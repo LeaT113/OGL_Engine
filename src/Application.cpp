@@ -21,6 +21,9 @@
 #include "Systems/LightingSystem.hpp"
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+
+#include "Utils/Spline.hpp"
 
 std::unique_ptr<TimeKeeper> timeKeeper;
 std::unique_ptr<InputSystem> inputSystem;
@@ -157,6 +160,28 @@ int main()
 	LightComponent& fireballLight = *scene->GetEntity("FireballLight")->GetComponent<LightComponent>();
 	glm::vec3 fireballLightColor =fireballLight.GetColor();
 
+	Spline path1 ({glm::vec3(-46.763466, 1.604800, 38.400867),
+glm::vec3(-30.252951, 2.599903, 35.546146),
+glm::vec3(-16.164583, 2.506992, 35.887779),
+glm::vec3(-8.282252, 3.664126, 45.020203),
+glm::vec3(-2.339834, 3.370311, 35.728607),
+glm::vec3(4.756345, 3.972067, 33.395844),
+glm::vec3(8.889107, 3.847589, 25.879944),
+glm::vec3(12.823547, 3.133041, 11.608407),
+glm::vec3(22.913528, 1.412410, -11.244169),
+glm::vec3(24.035505, 4.074424, -42.231049),
+glm::vec3(2.842738, 3.862304, -49.383217),
+glm::vec3(-14.745708, 3.735934, -50.389236),
+glm::vec3(-31.436272, 6.579220, -49.870770),
+glm::vec3(-59.219330, 22.259750, -53.168964),
+glm::vec3(-67.896065, 14.807197, -34.900658),
+glm::vec3(-68.334106, 9.431996, -19.093090),
+glm::vec3(-58.151402, 3.607426, -7.889922),
+glm::vec3(-57.247894, 0.977964, 1.966164),
+glm::vec3(-58.355469, 0.306650, 15.580692),
+glm::vec3(-57.175400, 10.172410, 22.823545),
+glm::vec3(-56.632530, 8.739169, 36.918461)}, true);
+
 	// Other
 	Entity camera("Camera");
 	camera
@@ -175,7 +200,8 @@ int main()
 	flashlight.GetTransform()->LocalRotation(glm::vec3(0));
 	flashlight.GetComponent<LightComponent>()->SetSpotAngles(15, 120);
 	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
-	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(0.5, 0.6, 1) * 30.0f);
+	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(0.5, 0.6, 1) * 50.0f);
+	auto flashlightCol = flashlight.GetComponent<LightComponent>()->GetColor();
 
 	Entity skybox;
 	Material skyboxMat(*ResourceDatabase::GetShader("SkyboxShader.glsl"), "SkyboxMat");
@@ -185,6 +211,8 @@ int main()
 
 	// Game loop
 	bool editMode = false;
+	bool isPlayerCam = true;
+	bool flashlightEnabled = true;
 	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	while (!glfwWindowShouldClose(mainWindow))
 	{
@@ -219,28 +247,90 @@ int main()
 			}
 		}
 
-        // Camera movement
-        float rotationX, rotationY;
-        inputSystem->GetRelativeMouse(rotationX, rotationY);
-        inputSystem->RestartRelativeMouse();
-        camera.GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 4*1.77f, glm::vec3(0, 1, 0));
-        camera.GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 4, camera.GetTransform()->Right());
+		// Camera positions
+		int selectedCamera = 0;
+		if (InputSystem::GetKeyPress(GLFW_KEY_F1))
+			selectedCamera = 1;
+		if (InputSystem::GetKeyPress(GLFW_KEY_F2))
+			selectedCamera = 2;
+		if (InputSystem::GetKeyPress(GLFW_KEY_F3))
+			selectedCamera = 3;
+		if (InputSystem::GetKeyPress(GLFW_KEY_F4))
+			selectedCamera = 4;
+		if (InputSystem::GetKeyPress(GLFW_KEY_F5))
+			selectedCamera = 5;
+		if (selectedCamera != 0)
+		{
+			camera.GetTransform()->SetParent(nullptr);
 
-        float movementRight = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_D)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_A));
-        float movementForward = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_W)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_S));
-        float movementUp = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT));
-        glm::vec3 movementHorizontal = movementRight * camera.GetTransform()->Right() + movementForward * camera.GetTransform()->Forward();
-        if(glm::length(movementHorizontal) > 0)
-            movementHorizontal = glm::normalize(movementHorizontal);
-        glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
-        camera.GetTransform()->Position(camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement);
+			// Free or set
+			if (selectedCamera < 5)
+			{
+				flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(0));
+				isPlayerCam = false;
+
+				if (selectedCamera < 4)
+				{
+					auto camPos = scene->GetEntity(std::format("CameraPos{}", selectedCamera))->GetTransform();
+					camera.GetTransform()->AlignWith(*camPos);
+				}
+				else
+				{
+					camera.GetTransform()->SetParent(emissiveSphere1.GetTransform());
+					camera.GetTransform()->LocalPosition(glm::vec3(0, 0, 0));
+					camera.GetTransform()->LocalRotation(glm::quat(glm::vec3(0, 0, 0)));
+				}
+			}
+			else
+			{
+				flashlight.GetComponent<LightComponent>()->SetColor(flashlightEnabled ? flashlightCol : glm::vec3(0));
+				isPlayerCam = true;
+				inputSystem->RestartRelativeMouse();
+			}
+		}
+
+		// Flashlight
+		if (InputSystem::GetKeyPress(GLFW_KEY_F))
+		{
+			flashlightEnabled = !flashlightEnabled;
+			flashlight.GetComponent<LightComponent>()->SetColor(flashlightEnabled ? flashlightCol : glm::vec3(0));
+		}
+
+		if (InputSystem::GetKeyPress(GLFW_KEY_P))
+		{
+			std::cout << to_string(camera.GetTransform()->Position()) << std::endl;
+		}
+
+
+        // Camera movement
+		if (isPlayerCam)
+		{
+			float rotationX, rotationY;
+			inputSystem->GetRelativeMouse(rotationX, rotationY);
+			inputSystem->RestartRelativeMouse();
+			camera.GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 4*1.77f, glm::vec3(0, 1, 0));
+			camera.GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 4, camera.GetTransform()->Right());
+
+			float movementRight = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_D)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_A));
+			float movementForward = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_W)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_S));
+			float movementUp = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT));
+			glm::vec3 movementHorizontal = movementRight * camera.GetTransform()->Right() + movementForward * camera.GetTransform()->Forward();
+			if(glm::length(movementHorizontal) > 0)
+				movementHorizontal = glm::normalize(movementHorizontal);
+			glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
+			camera.GetTransform()->Position(camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement);
+		}
 
 		// Objects
-		emissiveSphere1.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 0.15) * 20, 0.5, sin(timeKeeper->TimeSinceStartup() * 0.3) * 15));
+		auto es1p = path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70);
+		auto es1d = normalize(path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70 + 0.01f) - es1p);
+		emissiveSphere1.GetTransform()->Position(es1p);
+		emissiveSphere1.GetTransform()->LookAt(es1d, glm::vec3(0, 1, 0));
 		emissiveSphere2.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 0.5) * 5, sin(timeKeeper->TimeSinceStartup() * 2) * 4 + 0.5, 0));
 		warningLight.GetTransform()->AngleAxis(TimeKeeper::DeltaTime() * 80, glm::vec3(0, 1, 0));
 
 		// Fireball
+		//fireball.GetTransform()->Position(path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70));
 		float shakeSpeed = 3.5f;
 		float shakeStrength = 0.01f;
 		fireballLight.GetTransform()->Position(fireball.GetTransform()->Position() + glm::vec3(sin(TimeKeeper::TimeSinceStartup() * shakeSpeed * 4.5) * shakeStrength, sin(TimeKeeper::TimeSinceStartup() * shakeStrength * 3.75f + 5.0f) * shakeStrength, sin(TimeKeeper::TimeSinceStartup() * shakeSpeed * 3.0f + 14.0f) * shakeStrength));
@@ -251,6 +341,7 @@ int main()
 		// Render
 		lightingSystem->UpdateLights();
         rendererSystem->Render();
+		inputSystem->ClearPresses();
 		glfwSwapBuffers(mainWindow);
 		glfwPollEvents();
 	}
