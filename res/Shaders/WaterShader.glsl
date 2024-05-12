@@ -7,7 +7,7 @@
 #pragma DepthWrite(Off)
 #pragma Cull(Back)
 
-#define MAX_DEPTH_STEPS 50
+#define MAX_DEPTH_STEPS 80
 #define DEPTH_THICKNESS 0.1
 
 #define IOR 1.33
@@ -69,7 +69,7 @@ void frag()
     for (; i < MAX_DEPTH_STEPS; ++i)
     {
         rayLen += stepSize;
-        stepSize *= 1.04;
+        stepSize *= 1.03;
         vec3 rayPos = rayStart + rayDir * rayLen;
         vec3 rayProjected = WorldPosToNormalizedViewport(rayPos);
 

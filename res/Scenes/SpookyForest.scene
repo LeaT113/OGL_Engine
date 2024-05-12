@@ -121,7 +121,7 @@
         _material: WaterMaterial
       TransformComponent:
         _position: [11.1, -1.5, -16.1]
-        _rotation: [1, 0, 0, 0]
+        _rotation: [0.974370, 0.000000, -0.224951, 0.000000]
         _scale: [1, 1, 1]
 - Entity:
     _name: CameraPos1

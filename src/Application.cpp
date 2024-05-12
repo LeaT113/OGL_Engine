@@ -158,8 +158,6 @@ int main()
 	Entity& emissiveSphere1 = *scene->GetEntity("EmissiveSphere1");
 	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
 	Entity& warningLight = *scene->GetEntity("WarningLight");
-	Entity& lakeWater = *scene->GetEntity("LakeWater");
-	lakeWater.GetTransform()->AngleAxis(-26, glm::vec3(0, 1, 0));
 	Entity& fireball = *scene->GetEntity("Fireball");
 	LightComponent& fireballLight = *scene->GetEntity("FireballLight")->GetComponent<LightComponent>();
 	glm::vec3 fireballLightColor =fireballLight.GetColor();
