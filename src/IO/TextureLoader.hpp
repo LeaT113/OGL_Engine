@@ -9,15 +9,13 @@ class Texture;
 class TextureLoader
 {
 public:
-    static Handle<Texture> LoadTexture2D(const std::string &name, const Texture::Settings& settings = {});
+    static Handle<Texture> LoadTexture2D(const std::string &name, const Texture::Settings& settings = Texture::Settings::Default());
     static Handle<Texture> LoadCubemap(const std::string& name, const Texture::Settings& settings);
 
 private:
     static const std::string TexturesPath;
-
-    static void LoadImageToTex2D(const std::string& absolutePath, const Texture::Settings& params, unsigned int target);
 };
 
 
 
-#endif //TEXTURELOADER_HPP
+#endif

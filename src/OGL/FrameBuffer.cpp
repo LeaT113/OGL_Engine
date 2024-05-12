@@ -57,7 +57,7 @@ void FrameBuffer::Resize(int width, int height)
     {
         _colorAttachments.emplace_back(Handle<Texture>::Make(Texture::Type::Tex2D, format, Texture::Params {
             .width = _width, .height = _height,
-            .settings = { .mipmaps = false, .sRGB =  false }
+            .settings = { .mipmaps = false, .sRGB =  false, .tiling = Texture::Tiling::Extend }
         }));
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _colorAttachments.size() - 1, GL_TEXTURE_2D, _colorAttachments.back()->GetBindID(), 0);
@@ -67,7 +67,7 @@ void FrameBuffer::Resize(int width, int height)
     {
         _depthAttachment = Handle<Texture>::Make(Texture::Type::Tex2D, _depthFormat, Texture::Params {
             .width = _width, .height = _height,
-            .settings = { .mipmaps = false, .sRGB =  false }
+            .settings = { .mipmaps = false, .sRGB =  false, .tiling = Texture::Tiling::Extend }
         });
 
         unsigned int attachmentType;

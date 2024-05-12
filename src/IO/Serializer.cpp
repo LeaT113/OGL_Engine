@@ -127,6 +127,7 @@ YAML::Node Serializer::SerializeComponent<RendererComponent>(const RendererCompo
 
     properties["_mesh"] = component._mesh->Name();
     properties["_material"] = component._material->Name();
+    properties["_instancingTransforms"] = component._instancingTransforms;
 
     return properties;
 }
@@ -175,6 +176,8 @@ Handle<RendererComponent> Serializer::DeserializeComponent(const YAML::Node& com
 
     component->_mesh = ResourceDatabase::GetMesh(componentYaml["_mesh"].as<std::string>());
     component->_material = ResourceDatabase::GetMaterial(componentYaml["_material"].as<std::string>());
+    if (componentYaml["_instancingTransforms"])
+        component->SetInstancingTransforms(componentYaml["_instancingTransforms"].as<std::vector<glm::mat4>>());
 
     RenderSystem::RegisterRenderer(component.Access());
 

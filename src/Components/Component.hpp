@@ -6,16 +6,16 @@ class Entity;
 
 class Component
 {
-protected:
-	explicit Component(const Entity& owner);
-	const Entity* _owner;
-
 public:
 	virtual ~Component();
 
 	TransformComponent* GetTransform() const;
 
 	const Entity& GetEntity() const;
+
+protected:
+	explicit Component(const Entity& owner);
+	const Entity* _owner;
 
 private:
 	friend class Serializer;

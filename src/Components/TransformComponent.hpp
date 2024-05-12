@@ -9,27 +9,32 @@ class TransformComponent : public Component
 public:
 	explicit TransformComponent(const Entity& owner);
 
+	// Global positioning
 	glm::vec3 Position() const;
 	void Position(const glm::vec3 &position);
 	glm::quat Rotation() const;
 	void Rotation(const glm::quat &rotation);
-	glm::vec3 Scale() const;
-	void Scale(const glm::vec3 &scale);
 
+	// Local positioning
 	glm::vec3 LocalPosition() const;
 	void LocalPosition(const glm::vec3 &position);
 	glm::quat LocalRotation() const;
 	void LocalRotation(const glm::quat &rotation);
+	glm::vec3 LocalScale() const;
+	void LocalScale(const glm::vec3 &scale);
 
-	void SetParent(TransformComponent* parent);
-	TransformComponent* GetParent() const;
+	// Transformations
+	glm::mat4 ModelToWorld() const;
+	glm::mat4 WorldToModel() const;
 
+	// Directions
 	glm::vec3 Up() const;
 	glm::vec3 Forward() const;
 	glm::vec3 Right() const;
 
-	glm::mat4 ModelToWorld() const;
-	glm::mat4 WorldToModel() const;
+	// Parenting
+	TransformComponent* GetParent() const;
+	void SetParent(TransformComponent* parent);
 
 	/// Rotation of <i>angle</i> degrees around <i>axis</i> around the local origin
 	/// \param angle How many degrees to rotate
@@ -47,6 +52,8 @@ public:
 	/// @param up Vector to align own up vector with
 	void LookAt(glm::vec3 direction, glm::vec3 up);
 
+	/// Align position and rotation to another transform
+	/// @param other Transform to align with
 	void AlignWith(const TransformComponent& other);
 
 private:

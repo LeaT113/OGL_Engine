@@ -17,6 +17,8 @@ public:
     ~FrameBuffer() override;
 
     void Resize(int width, int height);
+    unsigned int GetWidth() const;
+    unsigned int GetHeight() const;
 
     const Texture* GetColorTexture(uint32_t index = 0) const;
     const Texture* GetDepthTexture() const;
@@ -24,8 +26,6 @@ public:
     void Clear() const;
 
     GLuint GetBindID() const override;
-    unsigned int GetWidth() const;
-    unsigned int GetHeight() const;
 
     const static FrameBuffer None;
 private:

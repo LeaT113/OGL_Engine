@@ -23,4 +23,4 @@ public:
 };
 
 
-#endif //OGL_ENGINE_SINGLETON_HPP
+#endif

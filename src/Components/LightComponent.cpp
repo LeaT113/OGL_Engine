@@ -21,6 +21,11 @@ void LightComponent::SetColor(const glm::vec3& color)
     _color = color;
 }
 
+glm::vec3 LightComponent::GetDirection() const
+{
+    return _direction;
+}
+
 void LightComponent::SetDirection(const glm::vec3& direction)
 {
     _direction = glm::normalize(direction);

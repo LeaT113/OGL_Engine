@@ -3,17 +3,16 @@
 #include <chrono>
 
 #include "../Core/HybridSingleton.hpp"
-#include "../Core/Singleton.hpp"
 
 class TimeKeeper : public HybridSingleton<TimeKeeper>
 {
 public:
+	TimeKeeper();
+
 	static double TimeSinceStartup();
 	static double DeltaTime();
 
 	void EnableLogging(bool enable);
-
-	TimeKeeper();
 
 	void Update();
 
@@ -29,4 +28,4 @@ private:
 };
 
 
-#endif //OGL_ENGINE_TIMEKEEPER_HPP
+#endif

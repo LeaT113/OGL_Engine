@@ -88,6 +88,7 @@ namespace YAML
     {
         static Node encode(const glm::mat3& rhs)
         {
+            // TODO Rework
             Node node;
             for (int i = 0; i < 3; ++i)
             {
@@ -125,32 +126,26 @@ namespace YAML
         static Node encode(const glm::mat4& rhs)
         {
             Node node;
-            for (int i = 0; i < 4; ++i)
+            for (int col = 0; col < 4; ++col)
             {
-                Node rowNode;
-                for (int j = 0; j < 4; ++j)
-                    rowNode.push_back(rhs[j][i]);
-
-                rowNode.SetStyle(EmitterStyle::Flow);
-
-                node.push_back(rowNode);
+                for (int row = 0; row < 4; ++row)
+                {
+                    node.push_back(rhs[col][row]); // TODO Maybe switch row and col
+                }
             }
+            node.SetStyle(EmitterStyle::Flow);
+
             return node;
         }
 
         static bool decode(const Node& node, glm::mat4& rhs)
         {
-            if (!node.IsSequence() || node.size() != 4)
+            if (!node.IsSequence() || node.size() != 16)
                 return false;
 
-            for (int i = 0; i < 4; ++i)
-            {
-                if (!node[i].IsSequence() || node[i].size() != 4)
-                    return false;
+            for (int i = 0; i < 16; ++i)
+                rhs[i / 4][i % 4] = node[i].as<float>();
 
-                for (int j = 0; j < 4; ++j)
-                    rhs[j][i] = node[i][j].as<float>();
-            }
             return true;
         }
     };

@@ -2,7 +2,7 @@
 #include "../Scene/Entity.hpp"
 
 CameraComponent::CameraComponent(const Entity &owner, ProjectionType projectionType, float horizontalFov)
-		: Component(owner), _projectionType(projectionType), _horizontalFov(horizontalFov), _projectionValid(false)
+		: Component(owner), _projectionType(projectionType), _horizontalFov(horizontalFov)
 {
 	SetWindowDimensions(1, 1);
 }

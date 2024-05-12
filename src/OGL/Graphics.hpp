@@ -36,8 +36,6 @@ public:
     static void RenderWithShader(const RendererComponent& renderer, const CameraComponent& camera, const Shader& shader);
     static void Blit(const FrameBuffer& source, const FrameBuffer& destination);
     static void Blit(const FrameBuffer& source, const FrameBuffer& destination, const Material& material);
-    //static void DrawMesh(const MeshData* mesh, );
-    //static void DrawMeshInstanced;
 };
 
 #endif

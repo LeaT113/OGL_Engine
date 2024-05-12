@@ -34,14 +34,12 @@ private:
 	static constexpr float NearClippingPlane = 0.1f;
 	static constexpr float FarClippingPlane = 1000.0f;
 
+	ProjectionType _projectionType = ProjectionType::Perspective;
+	float _horizontalFov = 0;
+	int _width = 0, _height = 0;
 
-	// Data
-	ProjectionType _projectionType;
-	float _horizontalFov;
-	int _width, _height;
-
-	mutable glm::mat4 _projectionMatrix;
-	mutable bool _projectionValid;
+	mutable glm::mat4 _projectionMatrix = glm::mat4();
+	mutable bool _projectionValid = false;
 };
 
 

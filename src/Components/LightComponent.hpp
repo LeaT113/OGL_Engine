@@ -19,12 +19,13 @@ public:
     LightComponent(const Entity& owner, Type type);
 
     glm::vec3 GetColor() const;
-
     void SetColor(const glm::vec3 &color);
+    glm::vec3 GetDirection() const;
     void SetDirection(const glm::vec3 &direction);
-    void SetSpotAngles(float innerAngle, float outerAngle);
     std::pair<float, float> GetSpotAngles() const;
+    void SetSpotAngles(float innerAngle, float outerAngle);
 
+    // Shadows
     void SetShadowCasting(bool enable);
     bool IsShadowCasting() const;
     void SetShadowIndex(int index);

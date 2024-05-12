@@ -25,10 +25,11 @@ public:
 	const Mesh& GetMesh() const;
     const Material& GetMaterial() const;
 
+    // Instancing
     bool IsInstanced() const;
     const std::vector<glm::mat4>& GetInstancingTransforms() const;
-    const VertexBuffer* GetInstancingTransformsBuffer() const;
     void SetInstancingTransforms(std::vector<glm::mat4> transforms);
+    const VertexBuffer* GetInstancingTransformsBuffer() const;
 
 private:
     friend class Serializer;

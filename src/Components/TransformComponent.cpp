@@ -41,12 +41,12 @@ void TransformComponent::Rotation(const glm::quat &rotation)
 	_valid = false;
 }
 
-glm::vec3 TransformComponent::Scale() const
+glm::vec3 TransformComponent::LocalScale() const
 {
-	return _scale; // TODO How to handle global scale
+	return _scale;
 }
 
-void TransformComponent::Scale(const glm::vec3 &scale)
+void TransformComponent::LocalScale(const glm::vec3 &scale)
 {
 	_scale = scale;
 	_valid = false;
