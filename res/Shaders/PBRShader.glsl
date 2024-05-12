@@ -5,7 +5,7 @@
 #include "Library/HeightMapping.glsl"
 #include "Library/PBR.glsl"
 
-uniform vec4 Color;
+uniform vec3 Color = vec3(1, 1, 1);
 uniform float TextureScale = 2.0;
 uniform sampler2D AlbedoTex;
 uniform sampler2D RoughnessTex;
@@ -85,10 +85,10 @@ void frag()
     }
 
     // Textures
-    vec3 albedo = texture(AlbedoTex, uv).rgb;
+    vec3 albedo = texture(AlbedoTex, uv).rgb * Color;
     float roughness = texture(RoughnessTex, uv).r;
     float occlusion = texture(OcclusionTex, uv).r;
-//    occlusion *= occlusion * occlusion;
+    occlusion *= occlusion;
 
     // Shading
     Surface surface = Surface(albedo, roughness, 0, occlusion, normalWS);
@@ -115,6 +115,8 @@ void frag()
 
         brdf += BRDF(surface, viewDir, lightEnergy, normalize(light.position - positionWS));
     }
+
+//    brdf += BRDF(surface, viewDir, vec3(3), vec3(0, 1, 0));
 
     FragOut = vec4(brdf, 1);
 }

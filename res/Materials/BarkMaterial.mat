@@ -1,11 +1,12 @@
 _name: BarkMaterial
 _shader: PBRShader.glsl
 _uniforms:
+  Color: [0.45, 0.30, 0.22]
   UseHeightmap: true
-  HeightmapDepth: 0.1
-  NormalMapStrenght: 1
+  HeightmapDepth: 0.05
+  NormalMapStrenght: 2
   UseNormalmap: true
-  TextureScale: 2
+  TextureScale: 1.65
 _textures:
   AlbedoTex: Bark01/Bark01_Albedo
   RoughnessTex: Bark01/Bark01_Roughness

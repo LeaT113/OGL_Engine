@@ -1,6 +1,7 @@
 _name: GroundMaterial
 _shader: PBRShader.glsl
 _uniforms:
+  Color: [1, 1, 1]
   UseHeightmap: true
   HeightmapDepth: 0.04
   NormalMapStrenght: 1

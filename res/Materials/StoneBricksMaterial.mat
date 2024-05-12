@@ -1,8 +1,9 @@
 _name: StoneBricksMaterial
 _shader: PBRShader.glsl
 _uniforms:
+  Color: [1, 1, 1]
   UseHeightmap: true
-  HeightmapDepth: 0.2
+  HeightmapDepth: 0.4
   NormalMapStrenght: 1
   UseNormalmap: true
   TextureScale: 4
