@@ -44,11 +44,11 @@
     _components:
       LightComponent:
         _lightType: 2
-        _color: [0.16, 2.4, 3.8]
+        _color: [1.6, 24, 38]
         _direction: [0, -1, 0]
         _spotInnerAngle: 20
         _spotOuterAngle: 30
-        _shadowCasting: false
+        _shadowCasting: true
       RendererComponent:
         _mesh: Icosphere.obj
         _material: EmissionMaterial2

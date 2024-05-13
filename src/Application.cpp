@@ -33,10 +33,7 @@ std::unique_ptr<LightingSystem> lightingSystem;
 int main()
 {
 	// Systems
-	timeKeeper = std::make_unique<TimeKeeper>();
-	inputSystem = std::make_unique<InputSystem>();
-	rendererSystem = std::make_unique<RenderSystem>();
-	lightingSystem = std::make_unique<LightingSystem>();
+
 
 	// GLFW
 	if (!glfwInit())
@@ -62,6 +59,11 @@ int main()
 		return -1;
 	}
 	std::cout << glGetString(GL_VERSION) << std::endl;
+
+	timeKeeper = std::make_unique<TimeKeeper>();
+	inputSystem = std::make_unique<InputSystem>();
+	rendererSystem = std::make_unique<RenderSystem>();
+	lightingSystem = std::make_unique<LightingSystem>();
 
 	// GLFW callbacks
 	glfwSetFramebufferSizeCallback(mainWindow, [](GLFWwindow* window, int width, int height) {
@@ -162,27 +164,44 @@ int main()
 	LightComponent& fireballLight = *scene->GetEntity("FireballLight")->GetComponent<LightComponent>();
 	glm::vec3 fireballLightColor =fireballLight.GetColor();
 
-	Spline path1 ({glm::vec3(-46.763466, 1.604800, 38.400867),
-glm::vec3(-30.252951, 2.599903, 35.546146),
-glm::vec3(-16.164583, 2.506992, 35.887779),
-glm::vec3(-8.282252, 3.664126, 45.020203),
-glm::vec3(-2.339834, 3.370311, 35.728607),
-glm::vec3(4.756345, 3.972067, 33.395844),
-glm::vec3(8.889107, 3.847589, 25.879944),
-glm::vec3(12.823547, 3.133041, 11.608407),
-glm::vec3(22.913528, 1.412410, -11.244169),
-glm::vec3(24.035505, 4.074424, -42.231049),
-glm::vec3(2.842738, 3.862304, -49.383217),
-glm::vec3(-14.745708, 3.735934, -50.389236),
-glm::vec3(-31.436272, 6.579220, -49.870770),
-glm::vec3(-59.219330, 22.259750, -53.168964),
-glm::vec3(-67.896065, 14.807197, -34.900658),
-glm::vec3(-68.334106, 9.431996, -19.093090),
-glm::vec3(-58.151402, 3.607426, -7.889922),
-glm::vec3(-57.247894, 0.977964, 1.966164),
-glm::vec3(-58.355469, 0.306650, 15.580692),
-glm::vec3(-57.175400, 10.172410, 22.823545),
-glm::vec3(-56.632530, 8.739169, 36.918461)}, true);
+	Spline path1 ({
+		glm::vec3(-46.763466, 1.604800, 38.400867),
+		glm::vec3(-30.252951, 2.599903, 35.546146),
+		glm::vec3(-16.164583, 2.506992, 35.887779),
+		glm::vec3(-8.282252, 3.664126, 45.020203),
+		glm::vec3(-2.339834, 3.370311, 35.728607),
+		glm::vec3(4.756345, 3.972067, 33.395844),
+		glm::vec3(8.889107, 3.847589, 25.879944),
+		glm::vec3(12.823547, 3.133041, 11.608407),
+		glm::vec3(22.913528, 1.412410, -11.244169),
+		glm::vec3(24.035505, 4.074424, -42.231049),
+		glm::vec3(2.842738, 3.862304, -49.383217),
+		glm::vec3(-14.745708, 3.735934, -50.389236),
+		glm::vec3(-31.436272, 6.579220, -49.870770),
+		glm::vec3(-59.219330, 22.259750, -53.168964),
+		glm::vec3(-67.896065, 14.807197, -34.900658),
+		glm::vec3(-68.334106, 9.431996, -19.093090),
+		glm::vec3(-58.151402, 3.607426, -7.889922),
+		glm::vec3(-57.247894, 0.977964, 1.966164),
+		glm::vec3(-58.355469, 0.306650, 15.580692),
+		glm::vec3(-57.175400, 10.172410, 22.823545),
+		glm::vec3(-56.632530, 8.739169, 36.918461)
+	}, true);
+
+	Spline path2 ({
+		glm::vec3(-20.324287, 4.320406, 47.003925),
+		glm::vec3(-39.547157, 1.574403, 39.784435),
+		glm::vec3(-53.356712, -0.631056, 30.385187),
+		glm::vec3(-63.848427, 0.148807, 15.595203),
+		glm::vec3(-60.036579, 2.561289, -9.130140),
+		glm::vec3(-41.664307, 5.773416, -23.148098),
+		glm::vec3(-37.194904, 4.922056, -14.466686),
+		glm::vec3(-15.324898, 2.610783, 10.671150),
+		glm::vec3(-7.846649, 1.523810, 24.275705),
+		glm::vec3(4.490672, 3.153982, 24.140432),
+		glm::vec3(16.087767, 3.470337, 35.054230),
+		glm::vec3(-0.304375, 2.642592, 47.540894)
+	}, true);
 
 	// Other
 	Entity camera("Camera");
@@ -263,8 +282,6 @@ glm::vec3(-56.632530, 8.739169, 36.918461)}, true);
 			selectedCamera = 5;
 		if (selectedCamera != 0)
 		{
-			camera.GetTransform()->SetParent(nullptr);
-
 			// Free or set
 			if (selectedCamera < 5)
 			{
@@ -273,18 +290,23 @@ glm::vec3(-56.632530, 8.739169, 36.918461)}, true);
 
 				if (selectedCamera < 4)
 				{
+					camera.GetTransform()->SetParent(nullptr);
 					auto camPos = scene->GetEntity(std::format("CameraPos{}", selectedCamera))->GetTransform();
 					camera.GetTransform()->AlignWith(*camPos);
 				}
 				else
 				{
-					camera.GetTransform()->SetParent(emissiveSphere1.GetTransform());
+					if (camera.GetTransform()->GetParent() == emissiveSphere1.GetTransform())
+						camera.GetTransform()->SetParent(emissiveSphere2.GetTransform());
+					else
+						camera.GetTransform()->SetParent(emissiveSphere1.GetTransform());
 					camera.GetTransform()->LocalPosition(glm::vec3(0, 0, 0));
-					camera.GetTransform()->LocalRotation(glm::quat(glm::vec3(0, 0, 0)));
+					camera.GetTransform()->LocalRotation(glm::quat(glm::vec3(0)));
 				}
 			}
 			else
 			{
+				camera.GetTransform()->SetParent(nullptr);
 				flashlight.GetComponent<LightComponent>()->SetColor(flashlightEnabled ? flashlightCol : glm::vec3(0));
 				isPlayerCam = true;
 				inputSystem->RestartRelativeMouse();
@@ -324,11 +346,19 @@ glm::vec3(-56.632530, 8.739169, 36.918461)}, true);
 		}
 
 		// Objects
+		if (TimeKeeper::TimeSinceStartup() - floor(TimeKeeper::TimeSinceStartup()) < 0.05f )
+			std::cout << 1/TimeKeeper::DeltaTime() << std::endl;
 		auto es1p = path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70);
 		auto es1d = normalize(path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70 + 0.01f) - es1p);
 		emissiveSphere1.GetTransform()->Position(es1p);
 		emissiveSphere1.GetTransform()->LookAt(es1d, glm::vec3(0, 1, 0));
-		emissiveSphere2.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 0.5) * 5, sin(timeKeeper->TimeSinceStartup() * 2) * 4 + 0.5, 0));
+
+		auto es2p = path2.Evaluate(TimeKeeper::TimeSinceStartup() / 70 + 0.6f);
+		auto es2d = normalize(path2.Evaluate(TimeKeeper::TimeSinceStartup() / 70 + 0.6f + 0.01f) - es2p);
+		emissiveSphere2.GetTransform()->Position(es2p);
+		emissiveSphere2.GetTransform()->LookAt(es2d, glm::vec3(0, 1, 0));
+
+		// emissiveSphere2.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 0.5) * 5, sin(timeKeeper->TimeSinceStartup() * 2) * 4 + 0.5, 0));
 		warningLight.GetTransform()->AngleAxis(TimeKeeper::DeltaTime() * 80, glm::vec3(0, 1, 0));
 
 		// Fireball
