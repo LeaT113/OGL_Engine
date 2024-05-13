@@ -32,9 +32,6 @@ std::unique_ptr<LightingSystem> lightingSystem;
 
 int main()
 {
-	// Systems
-
-
 	// GLFW
 	if (!glfwInit())
 		return -1;
@@ -50,7 +47,6 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(mainWindow);
-	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLEW
 	if (glewInit() != GLEW_OK)
@@ -60,6 +56,7 @@ int main()
 	}
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
+	// Systems
 	timeKeeper = std::make_unique<TimeKeeper>();
 	inputSystem = std::make_unique<InputSystem>();
 	rendererSystem = std::make_unique<RenderSystem>();
@@ -122,6 +119,7 @@ int main()
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("WaterShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("FireShader.glsl"));
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("ParticleFlipbook.glsl"));
+	ResourceDatabase::AddShader(ShaderLoader::LoadShader("VolumetricFogShader.glsl"));
 
 	// Textures
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo.png"));
@@ -235,10 +233,13 @@ int main()
 	bool isPlayerCam = true;
 	bool flashlightEnabled = true;
 	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	inputSystem->RestartRelativeMouse();
+	timeKeeper->EnableLogging(true);
 	while (!glfwWindowShouldClose(mainWindow))
 	{
 		// Update state
 		timeKeeper->Update();
+		glfwPollEvents();
 
 		// Edit mode
 		if(InputSystem::GetKeyPress(GLFW_KEY_ESCAPE))
@@ -346,8 +347,6 @@ int main()
 		}
 
 		// Objects
-		if (TimeKeeper::TimeSinceStartup() - floor(TimeKeeper::TimeSinceStartup()) < 0.05f )
-			std::cout << 1/TimeKeeper::DeltaTime() << std::endl;
 		auto es1p = path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70);
 		auto es1d = normalize(path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70 + 0.01f) - es1p);
 		emissiveSphere1.GetTransform()->Position(es1p);
@@ -375,7 +374,6 @@ int main()
         rendererSystem->Render();
 		inputSystem->ClearPresses();
 		glfwSwapBuffers(mainWindow);
-		glfwPollEvents();
 	}
 
 

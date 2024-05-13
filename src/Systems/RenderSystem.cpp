@@ -15,6 +15,7 @@ RenderSystem::RenderSystem()
     : _renderBuffer(0, 0, { RenderFormatColor, RenderFormatDepth }),
     _shadowBuffer(0, 0, { LightingSystem::SHADOW_TEX_FORMAT }),
     _entityIdBuffer(0, 0, { RenderFormatEntityId, RenderFormatDepth }),
+    _fogBuffer(0, 0, { RenderFormatColor }),
     _postprocessMaterial(Handle<Material>::Empty())
 {}
 
@@ -24,6 +25,7 @@ void RenderSystem::SetRenderSize(int width, int height)
     _height = height;
 
     _renderBuffer.Resize(width, height);
+    _fogBuffer.Resize(width, height);
     if (_opaqueTexture.Access() == nullptr)
     {
         _opaqueTexture = Handle<Texture>::Make(Texture::Type::Tex2D, RenderFormatColor, Texture::Params { .settings = { .mipmaps = false, .sRGB =  false } });
@@ -221,10 +223,19 @@ void RenderSystem::Render()
         Graphics::RenderWithShader(*Instance()._highlightEntity->GetComponent<RendererComponent>(), *Instance()._camera, shader);
     }
 
+    // Fog
+    if (Instance()._volumetricFogMaterial.Access() == nullptr)
+        Instance()._volumetricFogMaterial = Handle<Material>::Make(*ResourceDatabase::GetShader("VolumetricFogShader.glsl"), "VolumetricFogMaterial");
+    Graphics::Bind(Instance()._fogBuffer);
+    auto& fogShader = Instance()._volumetricFogMaterial->GetShader();
+    Graphics::Bind(fogShader);
+    fogShader.SetTextures(Instance()._opaqueTexture->GetBindID(), Instance()._depthTexture->GetBindID(), ResourceDatabase::GetTexture("Skybox/Night")->GetBindID());
+    Graphics::RenderMesh(*ResourceDatabase::GetMesh("Quad"), 0, glm::mat4(), *Instance()._volumetricFogMaterial, *Instance()._camera, 0);
+
     // Post process
     if (Instance()._postprocessMaterial.Access() == nullptr)
         Instance()._postprocessMaterial = Handle<Material>::Make(*ResourceDatabase::GetShader("PostprocessShader.glsl"), "PostprocessMaterial");
-    Graphics::Blit(renderBuffer, FrameBuffer::None, *Instance()._postprocessMaterial);
+    Graphics::Blit(Instance()._fogBuffer, FrameBuffer::None, *Instance()._postprocessMaterial);
 
     if (Instance()._enableEntityIds)
         RenderEntityIds();

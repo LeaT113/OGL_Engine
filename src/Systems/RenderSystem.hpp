@@ -57,6 +57,9 @@ private:
 	const Entity* _highlightEntity = nullptr;
 	const Shader* _entityIdShader = nullptr;
 	const Shader* _entityHighlightShader = nullptr;
+
+	FrameBuffer _fogBuffer;
+	Handle<Material> _volumetricFogMaterial;
 };
 
 
