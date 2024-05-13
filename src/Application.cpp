@@ -374,6 +374,7 @@ int main()
         rendererSystem->Render();
 		inputSystem->ClearPresses();
 		glfwSwapBuffers(mainWindow);
+		glFinish();
 	}
 
 
