@@ -27,12 +27,12 @@ public:
 
 private:
 	// Keyboard
-	std::array<bool, GLFW_KEY_LAST + 1> _keyState;
-	std::array<bool, GLFW_KEY_LAST + 1> _keyPress;
+	std::array<bool, GLFW_KEY_LAST + 1> _keyState{};
+	std::array<bool, GLFW_KEY_LAST + 1> _keyPress{};
 
 	// Mouse
-	std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> _mouseButtonState;
-	std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> _mouseButtonPress;
+	std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> _mouseButtonState{};
+	std::array<bool, GLFW_MOUSE_BUTTON_LAST + 1> _mouseButtonPress{};
 	double _mouseStartX, _mouseStartY;
     double _mouseCurrentX, _mouseCurrentY;
 
