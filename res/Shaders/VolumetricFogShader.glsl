@@ -8,6 +8,7 @@
 #pragma DepthWrite(Off)
 #define ABSORB vec3(0.1)
 #define LIGHT_FACTOR 0.005
+#define MAX_STEPS 100
 
 vec3 WorldToNormalizedViewportPos(vec4 viewPos)
 {
@@ -38,9 +39,9 @@ void frag()
 
     float stepSize = 0.1;
     vec3 rayStart = ViewToWorldPos(vec3(0));
-    float rayLen = 0;
+    float rayLen = 0.1;
     vec3 totalLight = vec3(0);
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < MAX_STEPS; i++)
     {
         rayLen += stepSize;
         stepSize *= 1.05;
@@ -56,6 +57,7 @@ void frag()
             PointLight light = Lights.pointLights[i];
             vec3 dir = light.position - rayPos;
             vec3 lightEnergy = PointLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
+            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 5, 0.05, 1);
             #ifdef SHADOWS
                 lightEnergy *= PointLight_Shadow(rayPos, light);
             #endif
@@ -68,6 +70,7 @@ void frag()
             SpotLight light = Lights.spotLights[i];
             vec3 dir = light.position - rayPos;
             vec3 lightEnergy = SpotLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
+            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 5, 0.11, 1);
             #ifdef SHADOWS
                 lightEnergy *= SpotLight_Shadow(rayPos, light);
             #endif
