@@ -70,7 +70,7 @@ void frag()
             SpotLight light = Lights.spotLights[i];
             vec3 dir = light.position - rayPos;
             vec3 lightEnergy = SpotLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
-            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 5, 0.11, 1);
+            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 3, 0.2, 1);
             #ifdef SHADOWS
                 lightEnergy *= SpotLight_Shadow(rayPos, light);
             #endif
