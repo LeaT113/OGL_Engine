@@ -101,7 +101,7 @@ void FrameBuffer::Resize(int width, int height)
     }
 }
 
-const Texture* FrameBuffer::GetColorTexture(uint32_t index) const
+Texture *FrameBuffer::GetColorTexture(uint32_t index) const
 {
     if (index > _colorAttachments.size())
         throw std::runtime_error("FrameBuffer::GetColorTexture Index out of range");

@@ -17,7 +17,7 @@
         _scale: [1, 1, 1]
       LightComponent:
         _lightType: 2
-        _color: [50, 30, 15]
+        _color: [25, 15, 7]
         _direction: [0, 0, -1]
         _spotInnerAngle: 20
         _spotOuterAngle: 30
@@ -32,9 +32,6 @@
         _spotInnerAngle: 30
         _spotOuterAngle: 110
         _shadowCasting: false
-      RendererComponent:
-        _mesh: Icosphere.obj
-        _material: EmissionMaterial3
       TransformComponent:
         _position: [0, 1.5, 0]
         _rotation: [0.953716934, -0.300705791, 0, 0]
@@ -49,9 +46,6 @@
         _spotInnerAngle: 20
         _spotOuterAngle: 30
         _shadowCasting: true
-      RendererComponent:
-        _mesh: Icosphere.obj
-        _material: EmissionMaterial2
       TransformComponent:
         _position: [0, 0, 0]
         _rotation: [1, 0, 0, 0]
@@ -76,9 +70,6 @@
         _spotInnerAngle: 20
         _spotOuterAngle: 30
         _shadowCasting: true
-      RendererComponent:
-        _mesh: Icosphere.obj
-        _material: EmissionMaterial1
       TransformComponent:
         _position: [-1.5, 0.300000012, 0]
         _rotation: [1, 0, 0, 0]

@@ -1,5 +1,6 @@
 #include "Library/Core.glsl"
 #include "Library/Tonemapping.glsl"
+#include "Library/Optics.glsl"
 
 #pragma DepthTest(Off)
 #pragma DepthWrite(Off)
@@ -8,21 +9,17 @@ in vec3 aPosition;
 in vec2 aTexCoord0;
 
 uniform sampler2D SourceTex;
-
-struct v2f
-{
-  vec2 uv;
-};
+uniform sampler2D FogTex;
 
 void vert()
 {
     gl_Position = vec4(aPosition.x, aPosition.y, 0.0, 1.0);
-    v2f.uv = aTexCoord0;
 }
 
 void frag()
 {
-    vec3 col = texture(SourceTex, v2f.uv).rgb;
+    vec3 col = texture(SourceTex, _ScreenPos).rgb;
+    col += texture(FogTex, _ScreenPos).rgb;
     col = FilmicToneMapping(col);
     FragOut = vec4(col, 1.0);
 }

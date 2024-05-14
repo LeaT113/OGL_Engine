@@ -25,7 +25,7 @@ void RenderSystem::SetRenderSize(int width, int height)
     _height = height;
 
     _renderBuffer.Resize(width, height);
-    _fogBuffer.Resize(width, height);
+    _fogBuffer.Resize(width / VolumetricDownscaleFactor, height / VolumetricDownscaleFactor);
     if (_opaqueTexture.Access() == nullptr)
     {
         _opaqueTexture = Handle<Texture>::Make(Texture::Type::Tex2D, RenderFormatColor, Texture::Params { .settings = { .mipmaps = false, .sRGB =  false } });
@@ -226,16 +226,26 @@ void RenderSystem::Render()
     // Fog
     if (Instance()._volumetricFogMaterial.Access() == nullptr)
         Instance()._volumetricFogMaterial = Handle<Material>::Make(*ResourceDatabase::GetShader("VolumetricFogShader.glsl"), "VolumetricFogMaterial");
-    Graphics::Bind(Instance()._fogBuffer);
+    auto &fogBuffer = Instance()._fogBuffer;
+    Graphics::Bind(fogBuffer);
+    glViewport(0, 0, fogBuffer.GetWidth(), fogBuffer.GetHeight());
+    auto fogScreenSize = glm::vec2(fogBuffer.GetWidth(), fogBuffer.GetHeight());
+    Instance()._coreUniformBuffer->SetData(0, sizeof(glm::vec2), &fogScreenSize);
     auto& fogShader = Instance()._volumetricFogMaterial->GetShader();
     Graphics::Bind(fogShader);
     fogShader.SetTextures(Instance()._opaqueTexture->GetBindID(), Instance()._depthTexture->GetBindID(), ResourceDatabase::GetTexture("Skybox/Night")->GetBindID());
     Graphics::RenderMesh(*ResourceDatabase::GetMesh("Quad"), 0, glm::mat4(), *Instance()._volumetricFogMaterial, *Instance()._camera, 0);
+    Graphics::Bind(FrameBuffer::None);
 
     // Post process
     if (Instance()._postprocessMaterial.Access() == nullptr)
         Instance()._postprocessMaterial = Handle<Material>::Make(*ResourceDatabase::GetShader("PostprocessShader.glsl"), "PostprocessMaterial");
-    Graphics::Blit(Instance()._fogBuffer, FrameBuffer::None, *Instance()._postprocessMaterial);
+    Instance()._postprocessMaterial->Set("FogTex", Instance()._fogBuffer.GetColorTexture());
+    glViewport(0, 0, Instance()._width, Instance()._height);
+    Instance()._coreUniformBuffer->SetData(0, sizeof(glm::vec2), &screenSize);
+    Graphics::Bind(Instance()._postprocessMaterial->GetShader());
+    Instance()._postprocessMaterial->GetShader().SetTexture("FogTex", Instance()._fogBuffer.GetColorTexture()->GetBindID());
+    Graphics::Blit(renderBuffer, FrameBuffer::None, *Instance()._postprocessMaterial);
 
     if (Instance()._enableEntityIds)
         RenderEntityIds();

@@ -6,12 +6,12 @@
 
 #pragma DepthTest(Off)
 #pragma DepthWrite(Off)
-#define ABSORB vec3(0.85)
-uniform vec3 AbsorptionColor = vec3(50);
+#define ABSORB vec3(0.1)
+#define LIGHT_FACTOR 0.005
 
-vec3 ViewPosToNormalizedViewport(vec3 viewPos)
+vec3 WorldToNormalizedViewportPos(vec4 viewPos)
 {
-    vec4 projectedPos = _ProjectionMatrix * vec4(viewPos, 1);
+    vec4 projectedPos = _ProjectionMatrix * viewPos;
     projectedPos.xyz /= projectedPos.w;
     return projectedPos.xyz * 0.5 + 0.5;
 }
@@ -32,17 +32,18 @@ void vert()
 
 void frag()
 {
-    vec3 rayDir = normalize((_InvViewMatrix * _InvProjectionMatrix * vec4(v2f.pos.xy, 1, 1.0)).xyz);
-    float stopDepth = DepthToLinear(SceneDepth(WorldPosToNormalizedViewport(rayDir).xy));
+    vec4 viewPos = _InvProjectionMatrix * vec4(v2f.pos.xy, 1.0, 1.0);
+    vec3 rayDir = normalize((_InvViewMatrix * vec4(viewPos.xyz, 0)).xyz);
+    float stopDepth = DepthToLinear(SceneDepth(_ScreenPos));
 
     float stepSize = 0.1;
     vec3 rayStart = ViewToWorldPos(vec3(0));
     float rayLen = 0;
     vec3 totalLight = vec3(0);
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 100; i++)
     {
         rayLen += stepSize;
-        stepSize *= 1.01;
+        stepSize *= 1.05;
         vec3 rayPos = rayStart + rayDir * rayLen;
         vec3 projected = WorldPosToNormalizedViewport(rayPos);
         if (DepthToLinear(projected.z) > stopDepth)
@@ -54,7 +55,7 @@ void frag()
         {
             PointLight light = Lights.pointLights[i];
             vec3 dir = light.position - rayPos;
-            vec3 lightEnergy = PointLight_Energy(rayPos, normalize(dir), light);
+            vec3 lightEnergy = PointLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
             #ifdef SHADOWS
                 lightEnergy *= PointLight_Shadow(rayPos, light);
             #endif
@@ -62,16 +63,20 @@ void frag()
             // Attentuate distance to light
             collectedLight += BeerLambertAbsorption(lightEnergy, ABSORB, length(dir));
         }
+        for (int i = 0; i < MAX_SPOT_LIGHTS; i++)
+        {
+            SpotLight light = Lights.spotLights[i];
+            vec3 dir = light.position - rayPos;
+            vec3 lightEnergy = SpotLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
+            #ifdef SHADOWS
+                lightEnergy *= SpotLight_Shadow(rayPos, light);
+            #endif
+
+            collectedLight += BeerLambertAbsorption(lightEnergy, ABSORB, length(dir));
+        }
 
         totalLight += BeerLambertAbsorption(collectedLight, ABSORB, rayLen);
     }
 
-//    float depth = DepthToLinear(SceneDepth(posClipSpace.xy * 0.5 + 0.5));
-
-//    col = BeerLambertAbsorption(col, vec3(0.001), depth);
-
-    vec3 col = SceneColor(_ScreenPos).xyz;
-    col += totalLight;
-
-    FragOut = vec4(col, 1.0);
+    FragOut = vec4(totalLight, 1.0);
 }

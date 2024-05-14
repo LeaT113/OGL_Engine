@@ -20,7 +20,7 @@ public:
     unsigned int GetWidth() const;
     unsigned int GetHeight() const;
 
-    const Texture* GetColorTexture(uint32_t index = 0) const;
+    Texture *GetColorTexture(uint32_t index = 0) const;
     const Texture* GetDepthTexture() const;
 
     void Clear() const;

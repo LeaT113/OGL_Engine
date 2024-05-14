@@ -34,6 +34,7 @@ private:
 	static inline FrameBuffer::RenderFormat RenderFormatDepth = FrameBuffer::RenderFormat::Depth24Stencil8;
 	static inline FrameBuffer::RenderFormat RenderFormatEntityId = FrameBuffer::RenderFormat::R32UI;
 	static inline unsigned int EntityIdDownscaleFactor = 4;
+	static inline unsigned int VolumetricDownscaleFactor = 2;
 
 
 	CameraComponent* _camera = nullptr;
