@@ -49,12 +49,12 @@ Handle<Texture> TextureLoader::LoadCubemap(const std::string& name, const Textur
     for (int i = 0; i < 6; i++)
     {
         int width, height, channelCount;
-        const auto imageData = stbi_load(std::format("{}{}_{}.{}", TexturesPath, name1, suffixes[i], ext).c_str(), &width, &height, &channelCount, 0);
+        const auto imageData = stbi_loadf(std::format("{}{}_{}.{}", TexturesPath, name1, suffixes[i], ext).c_str(), &width, &height, &channelCount, 0);
         if (!imageData)
             throw std::runtime_error("TextureLoader Failed to load image");
 
         if (tex.Access() == nullptr)
-            tex = Handle<Texture>::Make(Texture::Type::TexCubemap, Texture::Format::RGB8, Texture::Params {
+            tex = Handle<Texture>::Make(Texture::Type::TexCubemap, Texture::Format::RGB16F, Texture::Params {
                 .width = static_cast<unsigned int>(width), .height = static_cast<unsigned int>(height),
                 .name = name1, .settings = settings
             });

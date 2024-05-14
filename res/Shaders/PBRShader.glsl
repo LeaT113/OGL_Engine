@@ -116,7 +116,7 @@ void frag()
         brdf += BRDF(surface, viewDir, lightEnergy, normalize(light.position - positionWS));
     }
 
-//    brdf += BRDF(surface, viewDir, vec3(3), vec3(0, 1, 0));
+    brdf += BRDF(surface, viewDir, vec3(0.05), normalize(vec3(0.3, 1, -0.1)));
 
     FragOut = vec4(brdf, 1);
 }

@@ -102,7 +102,7 @@ void frag()
 
     // Reflection
     vec3 reflectionRay = reflect(viewDir, waveNormal);
-    vec3 reflectionCol = texture(_CubemapTex, reflectionRay).rgb;
+    vec3 reflectionCol = texture(_CubemapTex, reflectionRay).rgb * 0.15f;
 
     // Mix
     float reflectDot = dot(-viewDir, waveNormal);

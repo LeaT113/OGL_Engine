@@ -156,6 +156,9 @@ Texture::FormatInfo Texture::GetFormatInfo(Format format, bool sRGB)
     case Format::RGBA8:
         return { sRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE };
 
+    case Format::RGB16F:
+        return { GL_RGB16F, GL_RGB, GL_FLOAT };
+
     case Format::RGBA16F:
         return { GL_RGBA16F, GL_RGBA, GL_FLOAT };
 

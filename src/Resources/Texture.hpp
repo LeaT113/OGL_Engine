@@ -29,6 +29,8 @@ public:
         RGB8,
         RGBA8,
 
+        // HDR
+        RGB16F,
         RGBA16F,
 
         // Depth
