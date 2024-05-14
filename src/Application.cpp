@@ -107,6 +107,7 @@ int main()
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/LakeWater.glb"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/Tree1.glb"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Buoy.glb"));
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Campfire.glb"));
 
 	// Shaders
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("Internal/EntityIdShader.glsl"));
@@ -130,6 +131,7 @@ int main()
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Normal.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Roughness.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Occlusion.png", {.sRGB = false}));
+
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Bark01/Bark01_Albedo.png"));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Bark01/Bark01_Displacement.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Bark01/Bark01_Normal.png", {.sRGB = false}));
@@ -138,6 +140,11 @@ int main()
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Buoy/Buoy_Albedo.png"));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Buoy/Buoy_Normal.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Buoy/Buoy_Roughness.png", {.sRGB = false}));
+
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Campfire/Campfire_Albedo.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Campfire/Campfire_Normal.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Campfire/Campfire_Roughness.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Campfire/Campfire_Occlusion.png", {.sRGB = false}));
 
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Albedo.png"));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Displacement.png", {.sRGB = false}));
@@ -159,6 +166,7 @@ int main()
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("BarkMaterial.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("ParticleFlipbookMat.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("BuoyMaterial.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("CampfireMaterial.mat"));
 
 
 	// Scene
@@ -177,6 +185,11 @@ int main()
 	fireball.GetTransform()->Rotation(glm::quat(glm::vec3(0, -45, 0)));
 	LightComponent& fireballLight = *scene->GetEntity("FireballLight")->GetComponent<LightComponent>();
 	glm::vec3 fireballLightColor =fireballLight.GetColor();
+
+	Entity& campfire = *scene->GetEntity("Campfire");
+	Entity& fire = *scene->GetEntity("Fire");
+	fire.GetTransform()->SetParent(campfire.GetTransform());
+	fire.GetTransform()->LocalPosition(glm::vec3(0, 0.3, 0));
 
 	Spline path1 ({
 		glm::vec3(-46.763466, 1.604800, 38.400867),
@@ -305,6 +318,11 @@ int main()
 					else if (ent->GetName() == "Fireball")
 					{
 						fireballTravel = 0.0f;
+					}
+					else if (ent->GetName() == "Campfire")
+					{
+						auto localPos = fire.GetTransform()->LocalPosition();
+						fire.GetTransform()->LocalPosition(glm::vec3(localPos.x, localPos.y + (localPos.y < 10.0f ? 100.0f : -100.0f), localPos.z));
 					}
 				}
 			}

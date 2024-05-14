@@ -1,0 +1,15 @@
+_name: CampfireMaterial
+_shader: PBRShader.glsl
+_uniforms:
+  Color: [1,1,1]
+  UseHeightmap: false
+  HeightmapDepth: 0.05
+  NormalMapStrenght: 0.2
+  UseNormalmap: true
+  TextureScale: 1.0
+_textures:
+  AlbedoTex: Campfire/Campfire_Albedo
+  RoughnessTex: Campfire/Campfire_Roughness
+  OcclusionTex: Campfire/Campfire_Occlusion
+  HeightmapTex: ~
+  NormalTex: Campfire/Campfire_Normal
