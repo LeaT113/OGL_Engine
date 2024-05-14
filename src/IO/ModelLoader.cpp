@@ -1,5 +1,6 @@
 #include "ModelLoader.hpp"
 
+#include <iostream>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
@@ -105,9 +106,9 @@ Handle<Mesh> ModelLoader::LoadModel(const std::string& path, bool keepOnCpu)
     std::vector<glm::vec3> vertices;
     if (keepOnCpu)
     {
-        for (auto i = 0; i < vertexCount; i += 3)
+        for (auto i = 0; i < vertexCount; i++)
         {
-            vertices.emplace_back(positions[i], positions[i+1], positions[i+2]);
+            vertices.emplace_back(positions[i*3], positions[i*3 + 1], positions[i*3 + 2]);
         }
     }
 

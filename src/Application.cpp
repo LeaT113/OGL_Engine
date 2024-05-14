@@ -23,6 +23,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "Utils/CollisionTerrain.hpp"
 #include "Utils/Spline.hpp"
 
 std::unique_ptr<TimeKeeper> timeKeeper;
@@ -102,6 +103,7 @@ int main()
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Cube.glb"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Icosphere.obj"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/Ground.glb"));
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/Ground_Collision.glb", true));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/LakeWater.glb"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/Tree1.glb"));
 
@@ -155,6 +157,7 @@ int main()
 
 	// Scene
 	auto scene = Serializer::LoadScene("SpookyForest.scene");
+	Entity& ground = *scene->GetEntity("Ground");
 	Entity& emissiveSphere1 = *scene->GetEntity("EmissiveSphere1");
 	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
 	Entity& warningLight = *scene->GetEntity("WarningLight");
@@ -201,13 +204,15 @@ int main()
 		glm::vec3(-0.304375, 2.642592, 47.540894)
 	}, true);
 
+	CollisionTerrain terrain(150.0f, ResourceDatabase::GetMesh("Forest/Ground_Collision.glb")->GetVertices(), ground.GetTransform()->WorldToModel());
+
 	// Other
 	Entity camera("Camera");
 	camera
 		.AddComponent<TransformComponent>()
-		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 75);
-	camera.GetTransform()->Position(glm::vec3(-2, 1.6, 0.3));
-	camera.GetTransform()->AngleAxis(-40, glm::vec3(0, 1, 0));
+		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 65);
+	camera.GetTransform()->Position(glm::vec3(-48.0f, -1.0f, 23.0f));
+	camera.GetTransform()->AngleAxis(-90, glm::vec3(0, 1, 0));
 	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
 
 	Entity flashlight;
@@ -336,6 +341,8 @@ int main()
 			camera.GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 4*1.77f, glm::vec3(0, 1, 0));
 			camera.GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 4, camera.GetTransform()->Right());
 
+			const auto boundsMin = glm::vec3(-75, -5, -75);
+			const auto boundsMax = glm::vec3(75, 20, 75);
 			float movementRight = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_D)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_A));
 			float movementForward = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_W)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_S));
 			float movementUp = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT));
@@ -343,7 +350,10 @@ int main()
 			if(glm::length(movementHorizontal) > 0)
 				movementHorizontal = glm::normalize(movementHorizontal);
 			glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
-			camera.GetTransform()->Position(camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement);
+			auto newPos = camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement;
+			newPos = clamp(newPos, boundsMin, boundsMax);
+			newPos = glm::vec3(newPos.x, terrain.GroundAt(newPos).y + 1.75f, newPos.z);
+			camera.GetTransform()->Position(newPos);
 		}
 
 		// Objects

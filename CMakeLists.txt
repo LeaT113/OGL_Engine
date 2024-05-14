@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME}
 
         # Utils
         src/Utils/Spline.hpp src/Utils/Spline.cpp
+        src/Utils/CollisionTerrain.hpp src/Utils/CollisionTerrain.cpp
 )
 
 # Libraries
