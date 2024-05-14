@@ -2,18 +2,20 @@
 #include <iomanip>
 #include "TimeKeeper.hpp"
 
-TimeKeeper::TimeKeeper(): _startupTime(std::chrono::steady_clock::now())
+#include <GLFW/glfw3.h>
+
+TimeKeeper::TimeKeeper()
 {
 	Update();
 }
 
 void TimeKeeper::Update()
 {
-	TimePoint currentTime = std::chrono::steady_clock::now();
+	auto currentTime = glfwGetTime();
 
-	_timeSinceStartup = std::chrono::duration<double>(currentTime - _startupTime).count();
+	_timeSinceStartup = currentTime;
 
-	_deltaTime = std::chrono::duration<double>(currentTime - _lastUpdateTime).count();
+	_deltaTime = currentTime - _lastUpdateTime;
 
 	_lastUpdateTime = currentTime;
 
@@ -23,7 +25,7 @@ void TimeKeeper::Update()
 
 double TimeKeeper::TimeSinceStartup()
 {
-	return Instance()._timeSinceStartup;
+	return glfwGetTime();
 }
 
 double TimeKeeper::DeltaTime()

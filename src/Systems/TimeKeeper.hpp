@@ -20,8 +20,7 @@ private:
 	using Duration = std::chrono::duration<long long, std::nano>;
 	using TimePoint = std::chrono::time_point<std::chrono::steady_clock, Duration>;
 
-	const TimePoint _startupTime;
-	TimePoint _lastUpdateTime;
+	double _lastUpdateTime = 0;
 	double _timeSinceStartup = 0;
 	double _deltaTime = 0;
 	bool _logging = false;
