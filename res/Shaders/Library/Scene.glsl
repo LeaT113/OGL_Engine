@@ -16,9 +16,11 @@ float SceneDepth(vec2 uv)
 
 float DepthToLinear(float depth)
 {
-    float z = depth * 2 - 1;
     float near = Core.cameraNearFar.x;
     float far = Core.cameraNearFar.y;
+    return 2 * far * near / (far + near - (far - near) * (2 * depth - 1));
+
+    float z = depth * 2 - 1;
     return (2.0 * near * far) / (far + near - z * (far - near));;
 }
 

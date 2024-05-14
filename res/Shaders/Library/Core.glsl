@@ -54,6 +54,13 @@ vec3 ObjectToWorldNormal(vec3 normal)
     return normalize(_ModelNormalMatrix * normal);
 }
 
+float NDC_ZToLinear(float z)
+{
+    float near = Core.cameraNearFar.x;
+    float far = Core.cameraNearFar.y;
+    return 2 * far * near / (far + near - (far - near) * z);
+}
+
 // Mapping
 float saturate(float value)
 {

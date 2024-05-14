@@ -1,8 +1,11 @@
 #include "Library/Core.glsl"
 #include "Library/Noise.glsl"
+#include "Library/Billboards.glsl"
+#include "Library/Scene.glsl"
 
 #pragma Blend(Add)
 #pragma DepthWrite(Off)
+#pragma DepthTest(Off)
 #pragma Cull(Off)
 
 in vec3 aPosition;
@@ -16,13 +19,16 @@ uniform sampler2D FireNoiseTex;
 struct v2f
 {
     vec2 uv;
+    float depth;
 };
 
 void vert()
 {
     v2f.uv = aTexCoord0.xy;
 
-    gl_Position = ObjectToClipPos(aPosition);
+    vec4 clipPos = CylinderBillboard_ObjectToClipPos(aPosition);
+    gl_Position = clipPos;
+    v2f.depth = clipPos.z / clipPos.w;
 }
 
 void frag()
@@ -50,5 +56,11 @@ void frag()
     val = saturate(val);
     val = pow(val, 1.2);
 
-    FragOut = vec4(val * vec3(0.761, 0.2, 0.05) * 255 * 2, 1);
+    // Depth fade
+    float sampleDepth = DepthToLinear(SceneDepth(_ScreenPos));
+    float depth = NDC_ZToLinear(v2f.depth);
+    float depthDiff = depth - sampleDepth + 0.1;
+    float fade = RemapClamped(depthDiff, 0, 0.5, 1, 0);
+
+    FragOut = vec4(val * vec3(0.761, 0.2, 0.05) * 255 * fade, 1);
 }
