@@ -422,8 +422,8 @@ int main()
 			float rotationX, rotationY;
 			inputSystem->GetRelativeMouse(rotationX, rotationY);
 			inputSystem->RestartRelativeMouse();
-			camera->GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 4*1.77f, glm::vec3(0, 1, 0));
-			camera->GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 4, camera->GetTransform()->Right());
+			camera->GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 3.5*1.77f, glm::vec3(0, 1, 0));
+			camera->GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 3.5, camera->GetTransform()->Right());
 
 			const auto boundsMin = glm::vec3(-75, -5, -75);
 			const auto boundsMax = glm::vec3(75, 20, 75);
@@ -434,7 +434,7 @@ int main()
 			if(glm::length(movementHorizontal) > 0)
 				movementHorizontal = glm::normalize(movementHorizontal);
 			glm::vec3 movement = movementHorizontal + movementUp * camera->GetTransform()->Up();
-			auto newPos = camera->GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 15) * movement;
+			auto newPos = camera->GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement;
 			newPos = clamp(newPos, boundsMin, boundsMax);
 			if (gravityEnabled)
 				newPos = glm::vec3(newPos.x, terrain.GroundAt(newPos).y + 1.75f, newPos.z);
