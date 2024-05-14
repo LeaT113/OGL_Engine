@@ -1,14 +1,16 @@
 #include "ModelLoader.hpp"
+
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <vector>
+#include <glm/gtx/string_cast.hpp>
+
 #include "../Core/Handle.hpp"
 #include "../OGL/VertexBuffer.hpp"
 #include "../OGL/IndexBuffer.hpp"
 #include "../OGL/VertexArray.hpp"
 #include "../Resources/Mesh.hpp"
-#include "../Systems/ResourceDatabase.hpp"
 
 
 const std::string ModelLoader::ModelsPath = "res/Models/";
@@ -17,7 +19,7 @@ unsigned int ModelLoader::PostProcessingFlags = aiProcess_Triangulate |
                                                 aiProcess_CalcTangentSpace |
                                                 aiProcess_JoinIdenticalVertices;
 
-Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
+Handle<Mesh> ModelLoader::LoadModel(const std::string& path, bool keepOnCpu)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(ModelsPath+path, PostProcessingFlags);
@@ -100,8 +102,16 @@ Handle<Mesh> ModelLoader::LoadModel(const std::string& path)
     vertexArray->AddVertexBuffer(*vertexBuffer, attributes);
     vertexArray->SetIndexBuffer(*indexBuffer);
 
+    std::vector<glm::vec3> vertices;
+    if (keepOnCpu)
+    {
+        for (auto i = 0; i < vertexCount; i += 3)
+        {
+            vertices.emplace_back(positions[i], positions[i+1], positions[i+2]);
+        }
+    }
 
-    auto mesh = Handle<Mesh>::Make(path, vertexBuffer.Pass(), indexBuffer.Pass(), vertexArray.Pass());
+    auto mesh = Handle<Mesh>::Make(path, vertexBuffer.Pass(), indexBuffer.Pass(), vertexArray.Pass(), vertices);
     mesh->AddSubmesh(Submesh{0, static_cast<int>(triangleCount*3)});
 
     return mesh;

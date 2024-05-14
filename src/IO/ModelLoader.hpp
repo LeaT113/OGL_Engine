@@ -9,7 +9,7 @@ class Mesh;
 class ModelLoader
 {
 public:
-    static Handle<Mesh> LoadModel(const std::string& path);
+    static Handle<Mesh> LoadModel(const std::string& path, bool keepOnCpu = false);
 
 private:
     static const std::string ModelsPath;

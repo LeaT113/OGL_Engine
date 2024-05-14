@@ -2,6 +2,7 @@
 #define OGL_ENGINE_MESH_HPP
 
 #include <vector>
+#include <glm/glm.hpp>
 
 #include "Resource.hpp"
 #include "../Core/Handle.hpp"
@@ -19,9 +20,11 @@ struct Submesh
 class Mesh : public Resource
 {
 public:
-    Mesh(std::string name, Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray);
+    Mesh(std::string name, Handle<VertexBuffer> vertexBuffer, Handle<IndexBuffer> indexBuffer, Handle<VertexArray> vertexArray, std::vector<glm::vec3> vertices = std::vector<glm::vec3>());
 
     const VertexArray &GetVertexArray() const;
+
+    const std::vector<glm::vec3> &GetVertices() const;
 
     // Submeshes
     void AddSubmesh(Submesh submesh);
@@ -32,6 +35,8 @@ private:
     Handle<IndexBuffer> _indexBuffer;
     Handle<VertexArray> _vertexArray;
     std::vector<Submesh> _submeshes;
+
+    const std::vector<glm::vec3> _vertices;
 };
 
 
