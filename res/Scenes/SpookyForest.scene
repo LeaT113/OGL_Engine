@@ -27,10 +27,10 @@
     _components:
       LightComponent:
         _lightType: 3
-        _color: [180, 18, 27]
+        _color: [60, 6, 8]
         _direction: [0, 0, -1]
-        _spotInnerAngle: 30
-        _spotOuterAngle: 110
+        _spotInnerAngle: 80
+        _spotOuterAngle: 120
         _shadowCasting: false
       TransformComponent:
         _position: [0, 1.5, 0]
@@ -96,7 +96,7 @@
         _scale: [0.4, 0.4, 0.4]
       LightComponent:
         _lightType: 2
-        _color: [20, 10, 5]
+        _color: [30, 15, 7.5]
         _direction: [ 0, -1, 0 ]
         _spotInnerAngle: 20
         _spotOuterAngle: 30

@@ -7,7 +7,8 @@
 #pragma DepthTest(Off)
 #pragma DepthWrite(Off)
 #define ABSORB vec3(0.1)
-#define LIGHT_FACTOR 0.005
+#define LIGHT_FACTOR 0.01
+#define START_DEPTH 0.2
 #define MAX_STEPS 100
 
 vec3 WorldToNormalizedViewportPos(vec4 viewPos)
@@ -37,14 +38,15 @@ void frag()
     vec3 rayDir = normalize((_InvViewMatrix * vec4(viewPos.xyz, 0)).xyz);
     float stopDepth = DepthToLinear(SceneDepth(_ScreenPos));
 
-    float stepSize = 0.1;
     vec3 rayStart = ViewToWorldPos(vec3(0));
-    float rayLen = 0.1;
+    float rayLen = START_DEPTH;
     vec3 totalLight = vec3(0);
     for (int i = 0; i < MAX_STEPS; i++)
     {
+        float distFac = smoothstep(0, 1, RemapClamped(rayLen - START_DEPTH, 2, 20, 0, 1));
+        float stepSize = RemapClamped(distFac, 0, 1, 0.1, 2);
+
         rayLen += stepSize;
-        stepSize *= 1.04;
         vec3 rayPos = rayStart + rayDir * rayLen;
         vec3 projected = WorldPosToNormalizedViewport(rayPos);
         if (DepthToLinear(projected.z) > stopDepth)
@@ -56,8 +58,8 @@ void frag()
         {
             PointLight light = Lights.pointLights[i];
             vec3 dir = light.position - rayPos;
-            vec3 lightEnergy = PointLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
-            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 5, 0.05, 1);
+            vec3 lightEnergy = PointLight_Energy(rayPos, normalize(dir), light) * stepSize * LIGHT_FACTOR;
+            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 3, 0.05, 1);
             #ifdef SHADOWS
                 lightEnergy *= PointLight_Shadow(rayPos, light);
             #endif
@@ -70,7 +72,7 @@ void frag()
             SpotLight light = Lights.spotLights[i];
             vec3 dir = light.position - rayPos;
             vec3 lightEnergy = SpotLight_Energy(rayPos, normalize(dir), light) * LIGHT_FACTOR;
-            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 3, 0.2, 1);
+            lightEnergy *= RemapClamped(distance(light.position, rayStart), 1, 3, 0.19, 1);
             #ifdef SHADOWS
                 lightEnergy *= SpotLight_Shadow(rayPos, light);
             #endif

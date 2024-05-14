@@ -282,7 +282,7 @@ int main()
 	flashlight.GetTransform()->SetParent(camera->GetTransform());
 	flashlight.GetTransform()->LocalPosition(glm::vec3(0.2f, -0.5f, 0.1f));
 	flashlight.GetTransform()->LocalRotation(glm::vec3(0));
-	flashlight.GetComponent<LightComponent>()->SetSpotAngles(15, 120);
+	flashlight.GetComponent<LightComponent>()->SetSpotAngles(40, 100);
 	flashlight.GetComponent<LightComponent>()->SetShadowCasting(true);
 	flashlight.GetComponent<LightComponent>()->SetColor(glm::vec3(0.5, 0.6, 1) * 50.0f);
 	auto flashlightCol = flashlight.GetComponent<LightComponent>()->GetColor();
