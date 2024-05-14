@@ -126,6 +126,8 @@ int main()
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("VolumetricFogShader.glsl"));
 
 	// Textures
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("white.png"));
+
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Albedo.png"));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Displacement.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("ForestGround/ForestGround_Normal.png", {.sRGB = false}));

@@ -10,6 +10,6 @@ _uniforms:
 _textures:
   AlbedoTex: Buoy/Buoy_Albedo
   RoughnessTex: Buoy/Buoy_Roughness
-  OcclusionTex: ~
+  OcclusionTex: white
   HeightmapTex: ~
   NormalTex: Buoy/Buoy_Normal
