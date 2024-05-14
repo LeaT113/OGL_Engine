@@ -31,6 +31,20 @@ std::unique_ptr<InputSystem> inputSystem;
 std::unique_ptr<RenderSystem> rendererSystem;
 std::unique_ptr<LightingSystem> lightingSystem;
 
+#ifdef _MSC_VER
+	extern "C" {
+		// Hint to aquire a dedicated GPU on laptops, only supported on MSVC
+		__declspec(dllexport) uint64_t NvOptimusEnablement = 0x00000001;  // NVIDIA
+		__declspec(dllexport) int32_t AmdPowerXpressRequestHighPerformance = 1;    // AMD
+	}
+#endif
+#ifdef __GNUC__
+extern "C" {
+	__attribute__((dllexport)) uint64_t NvOptimusEnablement = 0x00000001;  // NVIDIA
+	__attribute__((dllexport)) int32_t AmdPowerXpressRequestHighPerformance = 1;  // AMD
+}
+#endif
+
 int main()
 {
 	// GLFW
