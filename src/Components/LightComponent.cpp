@@ -47,8 +47,9 @@ void LightComponent::SetShadowCasting(bool enable)
     if (_lightType == Type::Ambient)
         throw std::runtime_error("LightComponent Shadows not supported for ambient light");
 
-
     _shadowCasting = enable;
+    if (!enable)
+        SetShadowIndex(-1);
 }
 
 LightComponent::Type LightComponent::GetType() const

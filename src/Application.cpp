@@ -21,6 +21,7 @@
 #include "Systems/LightingSystem.hpp"
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/norm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
 #include "Utils/CollisionTerrain.hpp"
@@ -62,6 +63,7 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(mainWindow);
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLEW
 	if (glewInit() != GLEW_OK)
@@ -207,6 +209,8 @@ int main()
 	fire.GetTransform()->SetParent(campfire.GetTransform());
 	fire.GetTransform()->LocalPosition(glm::vec3(0, 0.3, 0));
 
+	std::vector shadowPointLights = { emissiveSphere1.GetTransform(), emissiveSphere2.GetTransform(), fire.GetTransform() };
+
 	Spline path1 ({
 		glm::vec3(-46.763466, 1.604800, 38.400867),
 		glm::vec3(-30.252951, 2.599903, 35.546146),
@@ -263,19 +267,19 @@ int main()
 	CollisionTerrain terrain(150.0f, ResourceDatabase::GetMesh("Forest/Ground_Collision.glb")->GetVertices(), ground.GetTransform()->WorldToModel());
 
 	// Other
-	Entity camera("Camera");
-	camera
-		.AddComponent<TransformComponent>()
+	Handle<Entity> camera = Handle<Entity>::Make("Camera");
+	camera->
+		AddComponent<TransformComponent>()
 		.AddComponent<CameraComponent>(CameraComponent::ProjectionType::Perspective, 65);
-	camera.GetTransform()->Position(glm::vec3(-48.0f, -1.0f, 23.0f));
-	camera.GetTransform()->AngleAxis(-90, glm::vec3(0, 1, 0));
-	rendererSystem->SetRenderCamera(camera.GetComponent<CameraComponent>());
+	camera->GetTransform()->Position(glm::vec3(-48.0f, -1.0f, 23.0f));
+	camera->GetTransform()->AngleAxis(-90, glm::vec3(0, 1, 0));
+	rendererSystem->SetRenderCamera(camera->GetComponent<CameraComponent>());
 
 	Entity flashlight;
 	flashlight
 	    .AddComponent<TransformComponent>()
 	    .AddComponent<LightComponent>(LightComponent::Type::Spot);
-	flashlight.GetTransform()->SetParent(camera.GetTransform());
+	flashlight.GetTransform()->SetParent(camera->GetTransform());
 	flashlight.GetTransform()->LocalPosition(glm::vec3(0.2f, -0.5f, 0.1f));
 	flashlight.GetTransform()->LocalRotation(glm::vec3(0));
 	flashlight.GetComponent<LightComponent>()->SetSpotAngles(15, 120);
@@ -347,7 +351,7 @@ int main()
 				if (ent->GetTransform()->GetParent())
 					ent->GetTransform()->SetParent(nullptr);
 				else
-					ent->GetTransform()->SetParent(camera.GetTransform());
+					ent->GetTransform()->SetParent(camera->GetTransform());
 			}
 		}
 
@@ -375,23 +379,23 @@ int main()
 
 				if (selectedCamera < 4)
 				{
-					camera.GetTransform()->SetParent(nullptr);
+					camera->GetTransform()->SetParent(nullptr);
 					auto camPos = scene->GetEntity(std::format("CameraPos{}", selectedCamera))->GetTransform();
-					camera.GetTransform()->AlignWith(*camPos);
+					camera->GetTransform()->AlignWith(*camPos);
 				}
 				else
 				{
-					if (camera.GetTransform()->GetParent() == emissiveSphere1.GetTransform())
-						camera.GetTransform()->SetParent(emissiveSphere2.GetTransform());
+					if (camera->GetTransform()->GetParent() == emissiveSphere1.GetTransform())
+						camera->GetTransform()->SetParent(emissiveSphere2.GetTransform());
 					else
-						camera.GetTransform()->SetParent(emissiveSphere1.GetTransform());
-					camera.GetTransform()->LocalPosition(glm::vec3(0, 0, 0));
-					camera.GetTransform()->LocalRotation(glm::quat(glm::vec3(0)));
+						camera->GetTransform()->SetParent(emissiveSphere1.GetTransform());
+					camera->GetTransform()->LocalPosition(glm::vec3(0, 0, 0));
+					camera->GetTransform()->LocalRotation(glm::quat(glm::vec3(0)));
 				}
 			}
 			else
 			{
-				camera.GetTransform()->SetParent(nullptr);
+				camera->GetTransform()->SetParent(nullptr);
 				flashlight.GetComponent<LightComponent>()->SetColor(flashlightEnabled ? flashlightCol : glm::vec3(0));
 				isPlayerCam = true;
 				gravityEnabled = selectedCamera == 6;
@@ -408,7 +412,7 @@ int main()
 
 		if (InputSystem::GetKeyPress(GLFW_KEY_P))
 		{
-			std::cout << to_string(camera.GetTransform()->Position()) << std::endl;
+			std::cout << std::format("Pos {} Rot {}", to_string(camera->GetTransform()->Position()), to_string(camera->GetTransform()->Rotation())) << std::endl;
 		}
 
 
@@ -418,23 +422,23 @@ int main()
 			float rotationX, rotationY;
 			inputSystem->GetRelativeMouse(rotationX, rotationY);
 			inputSystem->RestartRelativeMouse();
-			camera.GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 4*1.77f, glm::vec3(0, 1, 0));
-			camera.GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 4, camera.GetTransform()->Right());
+			camera->GetTransform()->AngleAxis(-rotationX * TimeKeeper::DeltaTime() * 4*1.77f, glm::vec3(0, 1, 0));
+			camera->GetTransform()->AngleAxis(-rotationY * TimeKeeper::DeltaTime() * 4, camera->GetTransform()->Right());
 
 			const auto boundsMin = glm::vec3(-75, -5, -75);
 			const auto boundsMax = glm::vec3(75, 20, 75);
 			float movementRight = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_D)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_A));
 			float movementForward = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_W)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_S));
 			float movementUp = static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_SPACE)) - static_cast<float>(inputSystem->IsKeyPressed(GLFW_KEY_LEFT_SHIFT));
-			glm::vec3 movementHorizontal = movementRight * camera.GetTransform()->Right() + movementForward * camera.GetTransform()->Forward();
+			glm::vec3 movementHorizontal = movementRight * camera->GetTransform()->Right() + movementForward * camera->GetTransform()->Forward();
 			if(glm::length(movementHorizontal) > 0)
 				movementHorizontal = glm::normalize(movementHorizontal);
-			glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
-			auto newPos = camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement;
+			glm::vec3 movement = movementHorizontal + movementUp * camera->GetTransform()->Up();
+			auto newPos = camera->GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 15) * movement;
 			newPos = clamp(newPos, boundsMin, boundsMax);
 			if (gravityEnabled)
 				newPos = glm::vec3(newPos.x, terrain.GroundAt(newPos).y + 1.75f, newPos.z);
-			camera.GetTransform()->Position(newPos);
+			camera->GetTransform()->Position(newPos);
 		}
 
 		// Objects
@@ -466,6 +470,18 @@ int main()
 		float lightMult = (sin(TimeKeeper::TimeSinceStartup() * 12) + 1) / 2;
 		lightMult *= (sin(TimeKeeper::TimeSinceStartup() * 21.5f) + 1) / 4 + 0.5;
 		fireballLight.SetColor(fireballLightColor * (2.0f + lightMult * 0.8f - 0.6f));
+
+		// Shadow selection
+		auto cameraPtr = camera.Access();
+		std::ranges::sort(shadowPointLights, [cameraPtr](TransformComponent* a, TransformComponent* b)
+		{
+			auto dist1 = length2(a->Position() - cameraPtr->GetTransform()->Position());
+			auto dist2 = length2(b->Position() - cameraPtr->GetTransform()->Position());
+			return dist1 < dist2;
+		});
+		shadowPointLights[2]->GetEntity().GetComponent<LightComponent>()->SetShadowCasting(false);
+		shadowPointLights[0]->GetEntity().GetComponent<LightComponent>()->SetShadowCasting(true);
+		shadowPointLights[1]->GetEntity().GetComponent<LightComponent>()->SetShadowCasting(true);
 
 		// Render
 		lightingSystem->UpdateLights();

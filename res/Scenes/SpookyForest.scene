@@ -27,7 +27,7 @@
     _components:
       LightComponent:
         _lightType: 3
-        _color: [120, 12, 18]
+        _color: [180, 18, 27]
         _direction: [0, 0, -1]
         _spotInnerAngle: 30
         _spotOuterAngle: 110
@@ -96,7 +96,7 @@
         _scale: [0.4, 0.4, 0.4]
       LightComponent:
         _lightType: 2
-        _color: [12, 6, 3]
+        _color: [20, 10, 5]
         _direction: [ 0, -1, 0 ]
         _spotInnerAngle: 20
         _spotOuterAngle: 30

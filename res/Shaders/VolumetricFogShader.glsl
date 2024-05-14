@@ -44,7 +44,7 @@ void frag()
     for (int i = 0; i < MAX_STEPS; i++)
     {
         rayLen += stepSize;
-        stepSize *= 1.05;
+        stepSize *= 1.04;
         vec3 rayPos = rayStart + rayDir * rayLen;
         vec3 projected = WorldPosToNormalizedViewport(rayPos);
         if (DepthToLinear(projected.z) > stopDepth)
