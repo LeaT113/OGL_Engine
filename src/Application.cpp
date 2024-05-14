@@ -144,7 +144,7 @@ int main()
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Normal.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Roughness.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Occlusion.png", {.sRGB = false}));
-	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night.png", {false, true, Texture::Tiling::Extend}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadCubemap("Skybox/Night.hdr", {false, false, Texture::Tiling::Extend}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("FireNoiseSeamless.png"));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Flipbook/FireBall02_8x8.hdr"));
 
@@ -171,8 +171,10 @@ int main()
 	Entity& warningLight = *scene->GetEntity("WarningLight");
 	warningLight.GetTransform()->SetParent(buoy.GetTransform());
 	warningLight.GetTransform()->LocalPosition(glm::vec3(0, 3.75, 0));
+	auto warningLightColor = warningLight.GetComponent<LightComponent>()->GetColor();
 
 	Entity& fireball = *scene->GetEntity("Fireball");
+	fireball.GetTransform()->Rotation(glm::quat(glm::vec3(0, -45, 0)));
 	LightComponent& fireballLight = *scene->GetEntity("FireballLight")->GetComponent<LightComponent>();
 	glm::vec3 fireballLightColor =fireballLight.GetColor();
 
@@ -215,6 +217,20 @@ int main()
 		glm::vec3(-0.304375, 2.642592, 47.540894)
 	}, true);
 
+	Spline path3({
+			glm::vec3(11.735162, 3.099527, 4.173303),
+			glm::vec3(15.394011, 1.708269, -3.791292),
+			glm::vec3(8.157375, 1.479180, -7.879596),
+			glm::vec3(1.626803, 1.796493, -6.859668),
+			glm::vec3(0.137587, 2.063640, -11.803920),
+			glm::vec3(5.999215, 1.707160, -15.201338),
+			glm::vec3(4.225876, 6.538656, -9.954954),
+			glm::vec3(-21.940914, 6.588815, -16.913481),
+			glm::vec3(-16.417822, 3.692607, -3.661718),
+			glm::vec3(-1.126975, 2.971200, 1.317145)
+
+		}, true);
+
 	CollisionTerrain terrain(150.0f, ResourceDatabase::GetMesh("Forest/Ground_Collision.glb")->GetVertices(), ground.GetTransform()->WorldToModel());
 
 	// Other
@@ -248,9 +264,10 @@ int main()
 	bool editMode = false;
 	bool isPlayerCam = true;
 	bool flashlightEnabled = true;
+	bool gravityEnabled = true;
+	float fireballTravel = 1.0f;
 	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	inputSystem->RestartRelativeMouse();
-	timeKeeper->EnableLogging(true);
 	while (!glfwWindowShouldClose(mainWindow))
 	{
 		// Update state
@@ -277,11 +294,26 @@ int main()
 			{
 				if (ent)
 				{
-					if (ent->GetTransform()->GetParent())
-						ent->GetTransform()->SetParent(nullptr);
-					else
-						ent->GetTransform()->SetParent(camera.GetTransform());
+					if (ent->GetName() == "Buoy")
+					{
+						auto entLight = warningLight.GetComponent<LightComponent>();
+						if (entLight->GetColor() == glm::vec3(0))
+							entLight->SetColor(warningLightColor);
+						else
+							entLight->SetColor(glm::vec3(0));
+					}
+					else if (ent->GetName() == "Fireball")
+					{
+						fireballTravel = 0.0f;
+					}
 				}
+			}
+			else if (InputSystem::GetKeyPress(GLFW_KEY_M))
+			{
+				if (ent->GetTransform()->GetParent())
+					ent->GetTransform()->SetParent(nullptr);
+				else
+					ent->GetTransform()->SetParent(camera.GetTransform());
 			}
 		}
 
@@ -297,6 +329,8 @@ int main()
 			selectedCamera = 4;
 		if (InputSystem::GetKeyPress(GLFW_KEY_F5))
 			selectedCamera = 5;
+		if (InputSystem::GetKeyPress(GLFW_KEY_F6))
+			selectedCamera = 6;
 		if (selectedCamera != 0)
 		{
 			// Free or set
@@ -326,6 +360,7 @@ int main()
 				camera.GetTransform()->SetParent(nullptr);
 				flashlight.GetComponent<LightComponent>()->SetColor(flashlightEnabled ? flashlightCol : glm::vec3(0));
 				isPlayerCam = true;
+				gravityEnabled = selectedCamera == 6;
 				inputSystem->RestartRelativeMouse();
 			}
 		}
@@ -363,7 +398,8 @@ int main()
 			glm::vec3 movement = movementHorizontal + movementUp * camera.GetTransform()->Up();
 			auto newPos = camera.GetTransform()->Position() + static_cast<float>(TimeKeeper::DeltaTime() * 8) * movement;
 			newPos = clamp(newPos, boundsMin, boundsMax);
-			newPos = glm::vec3(newPos.x, terrain.GroundAt(newPos).y + 1.75f, newPos.z);
+			if (gravityEnabled)
+				newPos = glm::vec3(newPos.x, terrain.GroundAt(newPos).y + 1.75f, newPos.z);
 			camera.GetTransform()->Position(newPos);
 		}
 
@@ -385,7 +421,11 @@ int main()
 		warningLight.GetTransform()->LocalRotation(glm::angleAxis(static_cast<float>(TimeKeeper::TimeSinceStartup()) * 1.5f, glm::vec3(0, 1, 0)));
 
 		// Fireball
-		//fireball.GetTransform()->Position(path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70));
+		if (fireballTravel < 1.0f)
+		{
+			fireballTravel += TimeKeeper::DeltaTime() * 0.08f;
+			fireball.GetTransform()->Position(path3.Evaluate(fireballTravel));
+		}
 		float shakeSpeed = 3.5f;
 		float shakeStrength = 0.01f;
 		fireballLight.GetTransform()->Position(fireball.GetTransform()->Position() + glm::vec3(sin(TimeKeeper::TimeSinceStartup() * shakeSpeed * 4.5) * shakeStrength, sin(TimeKeeper::TimeSinceStartup() * shakeStrength * 3.75f + 5.0f) * shakeStrength, sin(TimeKeeper::TimeSinceStartup() * shakeSpeed * 3.0f + 14.0f) * shakeStrength));

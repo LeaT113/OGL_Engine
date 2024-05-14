@@ -5,7 +5,7 @@
         _mesh: Quad
         _material: ParticleFlipbookMat
       TransformComponent:
-        _position: [15, 2, -15]
+        _position: [11.735162, 3.099527, 4.173303]
         _rotation: [1, 0, 0, 0]
         _scale: [1, 1, 1]
 - Entity:

@@ -6,7 +6,7 @@ Spline::Spline(std::initializer_list<glm::vec3> points, bool loop)
 
 glm::vec3 Spline::Evaluate(float t) const
 {
-    float bigT = t * (static_cast<float>(_points.size()) - 1.0f);
+    float bigT = t * (static_cast<float>(_points.size()) - 1.0f + (_loop ? 1.0f : 0.0f));
     int index1 = static_cast<int>(bigT);
     float smallT = bigT - floor(bigT);
 
