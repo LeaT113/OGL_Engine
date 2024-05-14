@@ -106,6 +106,7 @@ int main()
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/Ground_Collision.glb", true));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/LakeWater.glb"));
 	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Forest/Tree1.glb"));
+	ResourceDatabase::AddMesh(ModelLoader::LoadModel("Buoy.glb"));
 
 	// Shaders
 	ResourceDatabase::AddShader(ShaderLoader::LoadShader("Internal/EntityIdShader.glsl"));
@@ -134,6 +135,10 @@ int main()
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Bark01/Bark01_Normal.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Bark01/Bark01_Roughness.png", {.sRGB = false}));
 
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Buoy/Buoy_Albedo.png"));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Buoy/Buoy_Normal.png", {.sRGB = false}));
+	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("Buoy/Buoy_Roughness.png", {.sRGB = false}));
+
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Albedo.png"));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Displacement.png", {.sRGB = false}));
 	ResourceDatabase::AddTexture(TextureLoader::LoadTexture2D("StoneBricks/StoneBricks_Normal.png", {.sRGB = false}));
@@ -153,6 +158,7 @@ int main()
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("WaterMaterial.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("BarkMaterial.mat"));
 	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("ParticleFlipbookMat.mat"));
+	ResourceDatabase::AddMaterial(MaterialLoader::LoadMaterial("BuoyMaterial.mat"));
 
 
 	// Scene
@@ -160,7 +166,12 @@ int main()
 	Entity& ground = *scene->GetEntity("Ground");
 	Entity& emissiveSphere1 = *scene->GetEntity("EmissiveSphere1");
 	Entity& emissiveSphere2 = *scene->GetEntity("EmissiveSphere2");
+
+	Entity& buoy = *scene->GetEntity("Buoy");
 	Entity& warningLight = *scene->GetEntity("WarningLight");
+	warningLight.GetTransform()->SetParent(buoy.GetTransform());
+	warningLight.GetTransform()->LocalPosition(glm::vec3(0, 3.75, 0));
+
 	Entity& fireball = *scene->GetEntity("Fireball");
 	LightComponent& fireballLight = *scene->GetEntity("FireballLight")->GetComponent<LightComponent>();
 	glm::vec3 fireballLightColor =fireballLight.GetColor();
@@ -367,8 +378,11 @@ int main()
 		emissiveSphere2.GetTransform()->Position(es2p);
 		emissiveSphere2.GetTransform()->LookAt(es2d, glm::vec3(0, 1, 0));
 
-		// emissiveSphere2.GetTransform()->Position(glm::vec3(sin(timeKeeper->TimeSinceStartup() * 0.5) * 5, sin(timeKeeper->TimeSinceStartup() * 2) * 4 + 0.5, 0));
-		warningLight.GetTransform()->AngleAxis(TimeKeeper::DeltaTime() * 80, glm::vec3(0, 1, 0));
+		// Buoy
+		float buoyRotX = sin(TimeKeeper::TimeSinceStartup()* 1.5) * 0.12f;
+		float buoyRotZ = sin(TimeKeeper::TimeSinceStartup()* 1.7f) * 0.09f;
+		buoy.GetTransform()->Rotation(glm::quat(glm::vec3(buoyRotX, 0, buoyRotZ)));
+		warningLight.GetTransform()->LocalRotation(glm::angleAxis(static_cast<float>(TimeKeeper::TimeSinceStartup()) * 1.5f, glm::vec3(0, 1, 0)));
 
 		// Fireball
 		//fireball.GetTransform()->Position(path1.Evaluate(TimeKeeper::TimeSinceStartup() / 70));

@@ -1,0 +1,15 @@
+_name: BuoyMaterial
+_shader: PBRShader.glsl
+_uniforms:
+  Color: [1,1,1]
+  UseHeightmap: false
+  HeightmapDepth: 0.05
+  NormalMapStrenght: 1
+  UseNormalmap: true
+  TextureScale: 1.0
+_textures:
+  AlbedoTex: Buoy/Buoy_Albedo
+  RoughnessTex: Buoy/Buoy_Roughness
+  OcclusionTex: ~
+  HeightmapTex: ~
+  NormalTex: Buoy/Buoy_Normal

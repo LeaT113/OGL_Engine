@@ -5,7 +5,7 @@
         _mesh: Quad
         _material: ParticleFlipbookMat
       TransformComponent:
-        _position: [2, 2, 0]
+        _position: [15, 2, -15]
         _rotation: [1, 0, 0, 0]
         _scale: [1, 1, 1]
 - Entity:
@@ -27,7 +27,7 @@
     _components:
       LightComponent:
         _lightType: 3
-        _color: [60, 6, 8.4]
+        _color: [120, 12, 18]
         _direction: [0, 0, -1]
         _spotInnerAngle: 30
         _spotOuterAngle: 110
@@ -84,6 +84,16 @@
         _position: [1, 0.600000024, -1]
         _rotation: [1, 0, 0, 0]
         _scale: [0.400000006, 0.400000006, 0.400000006]
+- Entity:
+    _name: Buoy
+    _components:
+      RendererComponent:
+        _mesh: Buoy.glb
+        _material: BuoyMaterial
+      TransformComponent:
+        _position: [4.7, -2, -10]
+        _rotation: [1, 0, 0, 0]
+        _scale: [1,1,1]
 - Entity:
     _name: Fire
     _components:
