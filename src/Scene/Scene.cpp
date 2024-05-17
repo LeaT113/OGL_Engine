@@ -1,5 +1,4 @@
 #include "Scene.hpp"
-
 #include "Entity.hpp"
 
 void Scene::AddEntity(Handle<Entity> entity)

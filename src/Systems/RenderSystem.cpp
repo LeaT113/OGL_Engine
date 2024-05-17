@@ -1,14 +1,12 @@
 #include "RenderSystem.hpp"
 
-#include <algorithm>
-#include <glm/gtx/norm.hpp>
-
 #include "LightingSystem.hpp"
 #include "ResourceDatabase.hpp"
 #include "TimeKeeper.hpp"
 #include "../Scene/Entity.hpp"
 #include "../OGL/Graphics.hpp"
 #include "../OGL/UniformBuffer.hpp"
+#include "../Components/TransformComponent.hpp"
 
 
 RenderSystem::RenderSystem()

@@ -1,4 +1,5 @@
 #include "CameraComponent.hpp"
+#include "TransformComponent.hpp"
 #include "../Scene/Entity.hpp"
 
 CameraComponent::CameraComponent(const Entity &owner, ProjectionType projectionType, float horizontalFov)

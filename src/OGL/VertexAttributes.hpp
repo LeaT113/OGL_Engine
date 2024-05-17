@@ -1,9 +1,6 @@
 #ifndef OGL_ENGINE_VERTEXATTRIBUTES_HPP
 #define OGL_ENGINE_VERTEXATTRIBUTES_HPP
 
-#include <stdexcept>
-
-
 enum class VertexAttribute
 {
     Position = 0,

@@ -1,18 +1,13 @@
 #include "ModelLoader.hpp"
 
-#include <iostream>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
-#include <vector>
-#include <glm/gtx/string_cast.hpp>
 
-#include "../Core/Handle.hpp"
 #include "../OGL/VertexBuffer.hpp"
 #include "../OGL/IndexBuffer.hpp"
 #include "../OGL/VertexArray.hpp"
 #include "../Resources/Mesh.hpp"
-
 
 const std::string ModelLoader::ModelsPath = "res/Models/";
 unsigned int ModelLoader::PostProcessingFlags = aiProcess_Triangulate |

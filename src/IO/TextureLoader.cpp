@@ -1,6 +1,5 @@
 #include "TextureLoader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include <format>
 #include <stb_image.h>
 #include <GL/glew.h>
 #include "../Resources/Texture.hpp"

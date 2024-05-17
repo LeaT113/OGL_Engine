@@ -1,7 +1,5 @@
 #ifndef RESOURCE_HPP
 #define RESOURCE_HPP
-#include <string>
-#include <unordered_map>
 
 using SerializedResource = std::unordered_map<std::string, std::string>;
 

@@ -1,9 +1,5 @@
 #ifndef SPLINE_H
 #define SPLINE_H
-#include <initializer_list>
-#include <vector>
-#include <glm/glm.hpp>
-
 
 class Spline
 {

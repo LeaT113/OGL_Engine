@@ -1,6 +1,3 @@
-#include <iostream>
-#include <memory>
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -8,6 +5,7 @@
 #include "Systems/TimeKeeper.hpp"
 #include "Scene/Entity.hpp"
 #include "Components/CameraComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "IO/MaterialLoader.hpp"
 #include "IO/MeshFactory.hpp"
 #include "IO/ModelLoader.hpp"
@@ -19,10 +17,6 @@
 #include "Systems/RenderSystem.hpp"
 #include "Scene/Scene.hpp"
 #include "Systems/LightingSystem.hpp"
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/norm.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include "Utils/CollisionTerrain.hpp"
 #include "Utils/Spline.hpp"

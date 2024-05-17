@@ -1,9 +1,5 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
-#include <unordered_map>
-
-#include "../Core/Handle.hpp"
-
 
 class Entity;
 

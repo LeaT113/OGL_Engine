@@ -1,6 +1,5 @@
 #ifndef OGL_ENGINE_TIMEKEEPER_HPP
 #define OGL_ENGINE_TIMEKEEPER_HPP
-#include <chrono>
 
 #include "../Core/HybridSingleton.hpp"
 
@@ -17,9 +16,6 @@ public:
 	void Update();
 
 private:
-	using Duration = std::chrono::duration<long long, std::nano>;
-	using TimePoint = std::chrono::time_point<std::chrono::steady_clock, Duration>;
-
 	double _lastUpdateTime = 0;
 	double _timeSinceStartup = 0;
 	double _deltaTime = 0;

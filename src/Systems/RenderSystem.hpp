@@ -1,7 +1,6 @@
 #ifndef OGL_ENGINE_RENDERSYSTEM_HPP
 #define OGL_ENGINE_RENDERSYSTEM_HPP
 
-#include <vector>
 #include "../Components/CameraComponent.hpp"
 #include "../Components/RendererComponent.hpp"
 #include "../Core/HybridSingleton.hpp"

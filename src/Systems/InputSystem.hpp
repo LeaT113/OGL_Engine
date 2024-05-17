@@ -1,6 +1,5 @@
 #ifndef OGL_ENGINE_INPUTSYSTEM_HPP
 #define OGL_ENGINE_INPUTSYSTEM_HPP
-#include <array>
 #include <GLFW/glfw3.h>
 #include "../Core/HybridSingleton.hpp"
 

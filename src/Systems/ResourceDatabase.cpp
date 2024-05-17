@@ -1,6 +1,4 @@
 #include "ResourceDatabase.hpp"
-#include <fstream>
-
 #include "../Resources/Material.hpp"
 #include "../IO/ShaderLoader.hpp"
 

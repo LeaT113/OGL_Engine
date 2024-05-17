@@ -1,8 +1,5 @@
 #include "Serializer.hpp"
 
-#include <fstream>
-#include <glm/gtc/quaternion.hpp>
-
 #include "../Scene/Entity.hpp"
 #include "../Components/CameraComponent.hpp"
 #include "../Components/LightComponent.hpp"

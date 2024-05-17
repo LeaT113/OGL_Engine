@@ -1,4 +1,3 @@
-#include <functional>
 #include "Material.hpp"
 #include "../OGL/Graphics.hpp"
 

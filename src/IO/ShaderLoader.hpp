@@ -1,8 +1,6 @@
 #ifndef OGL_ENGINE_SHADERLOADER_HPP
 #define OGL_ENGINE_SHADERLOADER_HPP
 
-#include <string>
-#include <sstream>
 #include "../Resources/Shader.hpp"
 #include "../Core/Handle.hpp"
 

@@ -1,6 +1,4 @@
-#include <iostream>
 #include "InputSystem.hpp"
-
 
 InputSystem::InputSystem() = default;
 

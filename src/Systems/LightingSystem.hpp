@@ -1,10 +1,5 @@
 #ifndef LIGHTINGSYSTEM_HPP
 #define LIGHTINGSYSTEM_HPP
-#include <memory>
-#include <vector>
-#include <array>
-
-#include "../Core/Handle.hpp"
 #include "../Components/LightComponent.hpp"
 #include "../Core/HybridSingleton.hpp"
 #include "../OGL/UniformBuffer.hpp"

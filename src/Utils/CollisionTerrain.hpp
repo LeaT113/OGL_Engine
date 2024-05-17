@@ -1,10 +1,6 @@
 #ifndef COLLISIONTERRAIN_HPP
 #define COLLISIONTERRAIN_HPP
 
-#include <vector>
-#include <glm/glm.hpp>
-
-
 class CollisionTerrain
 {
 public:

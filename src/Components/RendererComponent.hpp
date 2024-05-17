@@ -1,17 +1,7 @@
 #ifndef OGL_ENGINE_RENDERERCOMPONENT_HPP
 #define OGL_ENGINE_RENDERERCOMPONENT_HPP
 
-#include <iosfwd>
-#include <memory>
-#include <vector>
-#include <vector>
-
-#include "CameraComponent.hpp"
-#include "CameraComponent.hpp"
-#include "CameraComponent.hpp"
-#include "CameraComponent.hpp"
 #include "Component.hpp"
-#include "TransformComponent.hpp"
 #include "../Resources/Mesh.hpp"
 #include "../Resources/Material.hpp"
 

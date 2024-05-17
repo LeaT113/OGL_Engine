@@ -1,5 +1,3 @@
-#include <cassert>
-#include <stdexcept>
 #include "VertexArray.hpp"
 #include "Graphics.hpp"
 

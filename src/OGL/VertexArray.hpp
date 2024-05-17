@@ -1,7 +1,6 @@
 #ifndef OGL_ENGINE_VERTEXARRAY_HPP
 #define OGL_ENGINE_VERTEXARRAY_HPP
 
-#include <vector>
 #include "IBindable.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"

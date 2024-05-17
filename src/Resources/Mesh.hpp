@@ -1,11 +1,7 @@
 #ifndef OGL_ENGINE_MESH_HPP
 #define OGL_ENGINE_MESH_HPP
 
-#include <vector>
-#include <glm/glm.hpp>
-
 #include "Resource.hpp"
-#include "../Core/Handle.hpp"
 #include "../OGL/VertexBuffer.hpp"
 #include "../OGL/IndexBuffer.hpp"
 #include "../OGL/VertexArray.hpp"

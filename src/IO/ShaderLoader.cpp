@@ -1,13 +1,7 @@
 #include "ShaderLoader.hpp"
 
-#include <fstream>
-#include <set>
-#include <cstring>
-#include <format>
-#include <stack>
-
-#include "../Resources/Texture.hpp"
 #include "GL/glew.h"
+#include "../Resources/Texture.hpp"
 #include "../OGL/VertexAttributes.hpp"
 #include "../Systems/ResourceDatabase.hpp"
 

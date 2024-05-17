@@ -1,6 +1,4 @@
 #include "MaterialLoader.hpp"
-#include <fstream>
-#include <unordered_map>
 #include "../Resources/Material.hpp"
 #include <yaml-cpp/yaml.h>
 #include "YAMLExtensions.hpp"

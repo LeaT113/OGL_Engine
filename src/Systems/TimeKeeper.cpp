@@ -1,7 +1,4 @@
-#include <iostream>
-#include <iomanip>
 #include "TimeKeeper.hpp"
-
 #include <GLFW/glfw3.h>
 
 TimeKeeper::TimeKeeper()

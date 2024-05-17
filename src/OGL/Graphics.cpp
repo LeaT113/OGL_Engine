@@ -10,6 +10,7 @@
 #include "../Resources/Material.hpp"
 #include "../Resources/Texture.hpp"
 #include "../Components/CameraComponent.hpp"
+#include "../Components/TransformComponent.hpp"
 #include "../Systems/LightingSystem.hpp"
 #include "../Systems/ResourceDatabase.hpp"
 

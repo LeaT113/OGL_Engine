@@ -1,7 +1,4 @@
 #include "LightingSystem.hpp"
-
-#include <format>
-
 #include "../OGL/Graphics.hpp"
 
 LightingSystem::LightingSystem() = default;

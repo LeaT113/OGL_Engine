@@ -1,11 +1,6 @@
 #ifndef OGL_ENGINE_SHADER_HPP
 #define OGL_ENGINE_SHADER_HPP
 
-#include <unordered_map>
-#include <typeindex>
-#include <variant>
-#include <glm/glm.hpp>
-
 #include "Resource.hpp"
 #include "Texture.hpp"
 #include "../OGL/IBindable.hpp"

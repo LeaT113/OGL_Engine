@@ -1,7 +1,6 @@
 #ifndef OGL_ENGINE_HANDLE_HPP
 #define OGL_ENGINE_HANDLE_HPP
 
-#include <memory>
 #include <utility>
 
 template<typename T>

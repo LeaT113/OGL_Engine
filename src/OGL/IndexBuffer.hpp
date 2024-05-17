@@ -1,8 +1,6 @@
 #ifndef OGL_ENGINE_INDEXBUFFER_HPP
 #define OGL_ENGINE_INDEXBUFFER_HPP
 
-#include <vector>
-
 #include "GL/glew.h"
 #include "IBindable.hpp"
 

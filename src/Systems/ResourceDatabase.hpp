@@ -1,8 +1,6 @@
 #ifndef OGL_ENGINE_RESOURCEDATABASE_HPP
 #define OGL_ENGINE_RESOURCEDATABASE_HPP
 
-#include <string>
-#include <unordered_map>
 #include "../Core/Singleton.hpp"
 #include "../Resources/Mesh.hpp"
 #include "../Resources/Shader.hpp"

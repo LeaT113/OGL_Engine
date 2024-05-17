@@ -1,7 +1,6 @@
 #ifndef OGL_ENGINE_MODELLOADER_HPP
 #define OGL_ENGINE_MODELLOADER_HPP
 
-#include <string>
 #include "../Scene/Entity.hpp"
 
 class Mesh;

@@ -1,5 +1,4 @@
 #include "Component.hpp"
-
 #include "../Scene/Entity.hpp"
 
 Component::Component(const Entity& owner) : _owner(&owner)

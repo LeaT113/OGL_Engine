@@ -1,7 +1,6 @@
 #ifndef TEXTURELOADER_HPP
 #define TEXTURELOADER_HPP
 
-#include "../Core/Handle.hpp"
 #include "../Resources/Texture.hpp"
 
 class Texture;

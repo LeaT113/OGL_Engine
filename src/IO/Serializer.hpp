@@ -1,11 +1,6 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
-#include <filesystem>
-#include <stdexcept>
-#include <string>
 #include <yaml-cpp/yaml.h>
-
-#include "../Core/Handle.hpp"
 
 class Scene;
 class CameraComponent;

@@ -1,8 +1,4 @@
 #include "CollisionTerrain.hpp"
-#include <algorithm>
-#include <format>
-#include <iostream>
-#include <glm/gtx/string_cast.hpp>
 
 CollisionTerrain::CollisionTerrain(float size, std::vector<glm::vec3> vertices, const glm::mat4 &worldToModel)
     : _size(size), _vertices(std::move(vertices)), _worldToModel(worldToModel)

@@ -1,7 +1,6 @@
 #ifndef OGL_ENGINE_SINGLETON_HPP
 #define OGL_ENGINE_SINGLETON_HPP
 
-
 template <typename T>
 class Singleton
 {

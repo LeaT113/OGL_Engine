@@ -1,7 +1,5 @@
 #include "FrameBuffer.hpp"
 
-#include <stdexcept>
-
 const FrameBuffer FrameBuffer::None = FrameBuffer();
 
 FrameBuffer::FrameBuffer() = default;

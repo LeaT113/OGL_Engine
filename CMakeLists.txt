@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(${PROJECT_NAME}
         src/Application.cpp
 
+        src/pch.hpp
+
         # Core
         src/Core/Handle.hpp
         src/Core/HybridSingleton.hpp
@@ -59,6 +61,11 @@ add_executable(${PROJECT_NAME}
         # Utils
         src/Utils/Spline.hpp src/Utils/Spline.cpp
         src/Utils/CollisionTerrain.hpp src/Utils/CollisionTerrain.cpp
+        src/pch.hpp
+)
+
+target_precompile_headers(${PROJECT_NAME}
+        PUBLIC src/pch.hpp
 )
 
 # Libraries

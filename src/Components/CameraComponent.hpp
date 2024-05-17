@@ -1,9 +1,7 @@
 #ifndef OGL_ENGINE_CAMERACOMPONENT_HPP
 #define OGL_ENGINE_CAMERACOMPONENT_HPP
 
-#include <glm/glm.hpp>
 #include "Component.hpp"
-#include "TransformComponent.hpp"
 
 class Entity;
 

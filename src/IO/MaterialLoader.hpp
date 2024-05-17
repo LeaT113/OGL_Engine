@@ -1,7 +1,5 @@
 #ifndef MATERIALLOADER_HPP
 #define MATERIALLOADER_HPP
-#include "../Core/Handle.hpp"
-
 
 class Material;
 

@@ -1,11 +1,8 @@
 #ifndef FRAMEBUFFER_HPP
 #define FRAMEBUFFER_HPP
-#include <set>
-#include <vector>
 #include <GL/glew.h>
 
 #include "IBindable.hpp"
-#include "../Core/Handle.hpp"
 #include "../Resources/Texture.hpp"
 
 class FrameBuffer : public IBindable

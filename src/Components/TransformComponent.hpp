@@ -1,8 +1,6 @@
 #ifndef OGL_ENGINE_TRANSFORMCOMPONENT_HPP
 #define OGL_ENGINE_TRANSFORMCOMPONENT_HPP
 #include "Component.hpp"
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 class TransformComponent : public Component
 {

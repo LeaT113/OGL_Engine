@@ -1,9 +1,5 @@
 #ifndef OGL_ENGINE_ENTITY_HPP
 #define OGL_ENGINE_ENTITY_HPP
-#include <memory>
-#include <map>
-#include <typeindex>
-#include <vector>
 
 #include "../Components/Component.hpp"
 #include "../Core/Handle.hpp"

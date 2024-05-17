@@ -1,10 +1,6 @@
 #ifndef OGL_ENGINE_MATERIAL_HPP
 #define OGL_ENGINE_MATERIAL_HPP
 
-#include <string>
-#include <variant>
-#include <stdexcept>
-
 #include "Resource.hpp"
 #include "Shader.hpp"
 

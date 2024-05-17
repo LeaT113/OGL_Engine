@@ -1,6 +1,5 @@
 #ifndef OGL_ENGINE_GRAPHICS_HPP
 #define OGL_ENGINE_GRAPHICS_HPP
-#include <glm/fwd.hpp>
 
 #include "../Components/RendererComponent.hpp"
 

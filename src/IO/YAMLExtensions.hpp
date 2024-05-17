@@ -2,9 +2,6 @@
 #define YAMLEXTENSIONS_HPP
 
 #include <yaml-cpp/yaml.h>
-#include <glm/glm.hpp>
-#include <glm/detail/type_quat.hpp>
-
 
 namespace YAML
 {
